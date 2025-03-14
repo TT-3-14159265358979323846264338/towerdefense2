@@ -20,9 +20,17 @@ public class DefaultData {
 			"image/soldier/normal heal core.png",
 			"image/soldier/normal speed core.png"
 			);
+	final static List<String> CENTER_CORE_NAME_LIST = Arrays.asList(
+			"image/soldier/normal core center.png",
+			"image/soldier/normal atack core center.png",
+			"image/soldier/normal defense core center.png",
+			"image/soldier/normal range core center.png",
+			"image/soldier/normal heal core center.png",
+			"image/soldier/normal speed core center.png"
+			);
 	final static List<String> WEAPON_NAME_LIST = Arrays.asList(
 			"image/soldier/Japanese sword.png",
-			"image/soldier/Japanese sword.png"
+			"image/soldier/bow.png"
 			);
 	final static List<List<String>> RIGHT_WEAPON_NAME_LIST = Arrays.asList(
 			Arrays.asList("image/soldier/Japanese sword right 0.png",
@@ -31,12 +39,7 @@ public class DefaultData {
 					"image/soldier/Japanese sword right 3.png",
 					"image/soldier/Japanese sword right 4.png",
 					"image/soldier/Japanese sword right 5.png"),
-			Arrays.asList("image/soldier/Japanese sword right 0.png",
-					"image/soldier/Japanese sword right 1.png",
-					"image/soldier/Japanese sword right 2.png",
-					"image/soldier/Japanese sword right 3.png",
-					"image/soldier/Japanese sword right 4.png",
-					"image/soldier/Japanese sword right 5.png")
+			Arrays.asList()
 			);
 	final static List<List<String>> LEFT_WEAPON_NAME_LIST = Arrays.asList(
 			Arrays.asList("image/soldier/Japanese sword left 0.png",
@@ -46,15 +49,19 @@ public class DefaultData {
 					"image/soldier/Japanese sword left 4.png",
 					"image/soldier/Japanese sword left 5.png"),
 			Arrays.asList("image/soldier/Japanese sword left 0.png",
-					"image/soldier/Japanese sword left 1.png",
-					"image/soldier/Japanese sword left 2.png",
-					"image/soldier/Japanese sword left 3.png",
-					"image/soldier/Japanese sword left 4.png",
-					"image/soldier/Japanese sword left 5.png")
+					"image/soldier/bow left 1.png",
+					"image/soldier/bow left 2.png",
+					"image/soldier/bow left 3.png",
+					"image/soldier/bow left 4.png",
+					"image/soldier/bow left 5.png")
 			);
 	
 	public List<BufferedImage> coreImage(int ratio){
 		return new InputImage().inputList(CORE_NAME_LIST, ratio);
+	}
+	
+	public List<BufferedImage> centerCoreImage(int ratio){
+		return new InputImage().inputList(CENTER_CORE_NAME_LIST, ratio);
 	}
 	
 	public List<BufferedImage> weaponImage(int ratio){

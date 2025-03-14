@@ -192,8 +192,8 @@ public class MenuComposition extends JPanel{
 	}
 	
 	private void setCoreScroll() {
-		coreScroll.setPreferredSize(new Dimension(170, 500));
-		coreScroll.setBounds(610,40,170,500);
+		coreScroll.setPreferredSize(new Dimension(120, 500));
+		coreScroll.setBounds(610,40,120,500);
 	}
 	
 	private void addWeaponScroll() {
@@ -203,7 +203,7 @@ public class MenuComposition extends JPanel{
 	
 	private void setWeaponScroll() {
 		weaponScroll.setPreferredSize(new Dimension(120, 500));
-		weaponScroll.setBounds(790,40,120,500);
+		weaponScroll.setBounds(740,40,120,500);
 	}
 	
 	private void test(Graphics g) {
@@ -212,7 +212,7 @@ public class MenuComposition extends JPanel{
 		for(int i = 0; i < right.get(0).size(); i ++) {
 			g.drawImage(right.get(0).get(i), 10 + i * 100 , 10, this);
 		}
-		List<BufferedImage> core = DefaultData.coreImage(2);
+		List<BufferedImage> core = DefaultData.centerCoreImage(2);
 		for(int i = 0; i < core.size(); i ++) {
 			g.drawImage(core.get(i), 10 + i * 100 , 100, this);
 		}
@@ -224,7 +224,7 @@ class ImagePanel extends JPanel{
 	
 	protected ImagePanel(List<BufferedImage> imageList) {
 		this.imageList = imageList;
-		setPreferredSize(new Dimension(100, imageList.size() * 100 + 50));
+		setPreferredSize(new Dimension(100, imageList.size() * 100));
 	}
 	
 	protected void paintComponent(Graphics g) {
