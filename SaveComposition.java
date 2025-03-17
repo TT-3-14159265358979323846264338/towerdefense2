@@ -10,10 +10,22 @@ public class SaveComposition implements Serializable{
 	public transient final static String COMPOSITION_FILE = "composition data.dat";
 	List<List<List<Integer>>> allCompositionList = new ArrayList<>();
 	List<String> compositionNameList = new ArrayList<>();
+	int selectNumber;
 	List<List<Integer>> selectCompositionList = new ArrayList<>();
 	
 	public SaveComposition() {
-		allCompositionList = Arrays.asList(Arrays.asList(
+		newComposition();
+	}
+	
+	public SaveComposition(List<List<List<Integer>>> allCompositionList, List<String> compositionNameList, int selectNumber,  List<List<Integer>> selectCompositionList) {
+		this.allCompositionList = allCompositionList;
+		this.compositionNameList = compositionNameList;
+		this.selectNumber = selectNumber;
+		this.selectCompositionList = selectCompositionList;
+	}
+	
+	public void newComposition() {
+		allCompositionList.add(Arrays.asList(
 				Arrays.asList(-1, 0, -1),
 				Arrays.asList(-1, 0, -1),
 				Arrays.asList(-1, 0, -1),
@@ -22,22 +34,26 @@ public class SaveComposition implements Serializable{
 				Arrays.asList(-1, 0, -1),
 				Arrays.asList(-1, 0, -1),
 				Arrays.asList(-1, 0, -1)));
-		compositionNameList.add("編成 1");
-		selectCompositionList = new ArrayList<>(allCompositionList.get(0));
+		compositionNameList.add("編成 " + allCompositionList.size());
+		selectNumber = allCompositionList.size() - 1;
 	}
 	
-	public SaveComposition(List<List<List<Integer>>> allCompositionList, List<String> compositionNameList, List<List<Integer>> selectCompositionList) {
-		this.allCompositionList = allCompositionList;
-		this.compositionNameList = compositionNameList;
-		this.selectCompositionList = selectCompositionList;
+	public void removeComposition(int number) {
+		allCompositionList.remove(number);
+		compositionNameList.remove(number);
+		selectNumber = (number == 0)? 0: number - 1;
 	}
 	
 	public List<List<List<Integer>>> getAllCompositionList(){
 		return allCompositionList;
 	}
 	
-	public List<String> getCompositionModel(){
+	public List<String> getCompositionNameList(){
 		return compositionNameList;
+	}
+	
+	public int getSelectNumber() {
+		return selectNumber;
 	}
 	
 	public List<List<Integer>> getSelectCompositionList(){

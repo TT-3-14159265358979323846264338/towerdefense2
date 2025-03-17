@@ -35,7 +35,7 @@ public class MainFrame extends JFrame{
 	public void compositionDraw() {
 		getContentPane().removeAll();
 		setTitle("ユニット編成");
-		setSize(885, 600);
+		setSize(845, 570);
 		add(new MenuComposition(this));
 		setLocationRelativeTo(null);
 	}

@@ -13,7 +13,7 @@ public class SaveHoldItem implements Serializable{
 	
 	public SaveHoldItem() {
 		coreNumberList = Arrays.asList(8, 0, 0, 0, 0, 0);
-		weaponNumberList = Arrays.asList(2);
+		weaponNumberList = Arrays.asList(2, 2);
 	}
 	
 	public SaveHoldItem(List<Integer> coreNumberList, List<Integer> weaponNumberList) {
