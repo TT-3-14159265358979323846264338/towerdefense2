@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 
 //デフォルトデータ
 public class DefaultData {
+	public final static int SIZE = 60;
 	final static List<String> CORE_NAME_LIST = Arrays.asList(
 			"image/soldier/normal core.png",
 			"image/soldier/normal atack core.png",
@@ -32,6 +33,11 @@ public class DefaultData {
 			"image/soldier/Japanese sword.png",
 			"image/soldier/bow.png"
 			);
+	//List① 0: 近接, 1: 遠隔, 2: 遠近 ② 0: 片手, 1: 両手 で登録
+	public final static List<List<Integer>> WEAPON_TYPE= Arrays.asList(
+			Arrays.asList(0, 0),
+			Arrays.asList(1, 1)
+			);
 	final static List<List<String>> RIGHT_WEAPON_NAME_LIST = Arrays.asList(
 			Arrays.asList("image/soldier/Japanese sword right 0.png",
 					"image/soldier/Japanese sword right 1.png",
@@ -48,7 +54,7 @@ public class DefaultData {
 					"image/soldier/Japanese sword left 3.png",
 					"image/soldier/Japanese sword left 4.png",
 					"image/soldier/Japanese sword left 5.png"),
-			Arrays.asList("image/soldier/Japanese sword left 0.png",
+			Arrays.asList("image/soldier/bow left 0.png",
 					"image/soldier/bow left 1.png",
 					"image/soldier/bow left 2.png",
 					"image/soldier/bow left 3.png",

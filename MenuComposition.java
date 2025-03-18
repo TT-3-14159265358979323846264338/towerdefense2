@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -13,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +33,7 @@ import savecomposition.SaveComposition;
 import saveholditem.SaveHoldItem;
 
 //編成
-public class MenuComposition extends JPanel{
+public class MenuComposition extends JPanel implements MouseListener{
 	JLabel compositionNameLabel = new JLabel();
 	JLabel compositionLabel = new JLabel();
 	JLabel coreLabel = new JLabel();
@@ -46,6 +49,8 @@ public class MenuComposition extends JPanel{
 	JScrollPane compositionScroll = new JScrollPane();
 	JScrollPane coreScroll = new JScrollPane();
 	JScrollPane weaponScroll = new JScrollPane();
+	ImagePanel CoreImagePanel = new ImagePanel(new DefaultData().coreImage(2));
+	ImagePanel WeaponImagePanel = new ImagePanel(new DefaultData().weaponImage(2));;
 	SaveHoldItem SaveHoldItem;
 	SaveComposition SaveComposition;
 	List<List<BufferedImage>> rightWeaponList = new ArrayList<>(new DefaultData().rightWeaponImage(2));
@@ -58,7 +63,9 @@ public class MenuComposition extends JPanel{
 	int selectNumber;
 	
 	public MenuComposition(MainFrame MainFrame) {
+		addMouseListener(this);
 		setBackground(new Color(240, 170, 80));
+		load();
 		addCompositionNameLabel();
 		addCompositionLabel();
 		addCoreLabel();
@@ -72,7 +79,6 @@ public class MenuComposition extends JPanel{
 		addCompositionScroll();
 		addCoreScroll();
 		addWeaponScroll();
-		load();
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -91,6 +97,44 @@ public class MenuComposition extends JPanel{
 		setCoreScroll();
 		setWeaponScroll();
 		setComposition(g);
+	}
+	
+	private void load() {
+		try {
+			ObjectInputStream itemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
+			SaveHoldItem = (SaveHoldItem) itemData.readObject();
+			itemData.close();
+			ObjectInputStream compositionData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
+			SaveComposition = (SaveComposition) compositionData.readObject();
+			compositionData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		input();
+	}
+	
+	private void input() {
+		coreNumberList = SaveHoldItem.getCoreNumberList();
+		weaponNumberList = SaveHoldItem.getWeaponNumberList();
+		allCompositionList = SaveComposition.getAllCompositionList();
+		compositionNameList = SaveComposition.getCompositionNameList();
+		compositionListModel.clear();
+		for(String i: compositionNameList) {
+			compositionListModel.addElement(i);
+		}
+		selectNumber = SaveComposition.getSelectNumber();
+		compositionJList.setSelectedIndex(selectNumber);
+		new DelaySelect(compositionJList, selectNumber).start();
+	}
+	
+	private void save() {
+		try {
+			ObjectOutputStream compositionData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
+			compositionData.writeObject(new SaveComposition(allCompositionList, compositionNameList, selectNumber, allCompositionList.get(selectNumber)));
+			compositionData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void addCompositionNameLabel() {
@@ -142,7 +186,6 @@ public class MenuComposition extends JPanel{
 		newButton.addActionListener(e->{
 			SaveComposition.newComposition();
 			input();
-			compositionJList.ensureIndexIsVisible(allCompositionList.size() - 1);
 		});
 	}
 	
@@ -271,7 +314,8 @@ public class MenuComposition extends JPanel{
 	}
 	
 	private void addCoreScroll() {
-		coreScroll.getViewport().setView(new ImagePanel(new DefaultData().coreImage(2)));
+		CoreImagePanel.setImagePanel(coreNumberList, WeaponImagePanel);
+		coreScroll.getViewport().setView(CoreImagePanel);
     	add(coreScroll);
 	}
 	
@@ -281,7 +325,8 @@ public class MenuComposition extends JPanel{
 	}
 	
 	private void addWeaponScroll() {
-		weaponScroll.getViewport().setView(new ImagePanel(new DefaultData().weaponImage(2)));
+		WeaponImagePanel.setImagePanel(weaponNumberList, CoreImagePanel);
+		weaponScroll.getViewport().setView(WeaponImagePanel);
     	add(weaponScroll);
 	}
 	
@@ -295,72 +340,201 @@ public class MenuComposition extends JPanel{
 		g.fillRect(230, 40, 330, 480);
 		for(int i = 0; i < allCompositionList.get(selectNumber).size(); i++) {
 			try {
-				drawImage(g, i, rightWeaponList.get(allCompositionList.get(selectNumber).get(i).get(0)).get(0));
+				g.drawImage(rightWeaponList.get(allCompositionList.get(selectNumber).get(i).get(0)).get(0), positionX(i), positionY(i), this);
 			}catch(Exception ignore) {
 				//右武器を装備していないので、無視する
 			}
-			drawImage(g, i, ceterCoreList.get(allCompositionList.get(selectNumber).get(i).get(1)));
+			g.drawImage(ceterCoreList.get(allCompositionList.get(selectNumber).get(i).get(1)), positionX(i), positionY(i), this);
 			try {
-				drawImage(g, i, leftWeaponList.get(allCompositionList.get(selectNumber).get(i).get(2)).get(0));
+				g.drawImage(leftWeaponList.get(allCompositionList.get(selectNumber).get(i).get(2)).get(0), positionX(i), positionY(i), this);
 			}catch(Exception ignore) {
 				//左武器を装備していないので、無視する
 			}
 		}
 	}
 	
-	private void drawImage(Graphics g, int i, BufferedImage image) {
-		g.drawImage(image, 230 + i % 2 * 150, 40 + i / 2 * 100, this);
+	private int positionX(int i) {
+		return 230 + i % 2 * 150;
 	}
 	
-	private void load() {
-		try {
-			ObjectInputStream itemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
-			SaveHoldItem = (SaveHoldItem) itemData.readObject();
-			itemData.close();
-			ObjectInputStream compositionData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
-			SaveComposition = (SaveComposition) compositionData.readObject();
-			compositionData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
+	private int positionY(int i) {
+		return 40 + i / 2 * 100;
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+		for(int i = 0; i < allCompositionList.get(selectNumber).size(); i++) {
+			int x = positionX(i) + 60;
+			int y = positionY(i) + 60;
+			if(ValueRange.of(x, x + DefaultData.SIZE).isValidIntValue(e.getX())
+					&& ValueRange.of(y, y + DefaultData.SIZE).isValidIntValue(e.getY())){
+				int selectCore = CoreImagePanel.getSelectNumber();
+				int selectWeapon = WeaponImagePanel.getSelectNumber();
+				if(0 <= selectCore) {
+					changeCore(i, selectCore);
+				}else if(0 <= selectWeapon) {
+					changeWeaponJudgment(i, selectWeapon);
+				}else {
+					removeWeapon(i);
+				}
+			}
 		}
-		input();
+	}
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+	@Override
+	public void mouseExited(MouseEvent e) {
 	}
 	
-	private void input() {
-		coreNumberList = SaveHoldItem.getCoreNumberList();
-		weaponNumberList = SaveHoldItem.getWeaponNumberList();
-		allCompositionList = SaveComposition.getAllCompositionList();
-		compositionNameList = SaveComposition.getCompositionNameList();
-		compositionListModel.clear();
-		for(String i: compositionNameList) {
-			compositionListModel.addElement(i);
+	private void changeCore(int number, int selectCore) {
+		allCompositionList.get(selectNumber).get(number).set(1, selectCore);
+	}
+	
+	private void changeWeaponJudgment(int number, int selectWeapon) {
+		if(DefaultData.WEAPON_TYPE.get(selectWeapon).get(1) == 1) {
+			allCompositionList.get(selectNumber).get(number).set(2, selectWeapon);
+			allCompositionList.get(selectNumber).get(number).set(0, -1);
+		}else if(allCompositionList.get(selectNumber).get(number).get(2) == -1) {
+			changeWeapon(number, selectWeapon);
+		}else {
+			switch(DefaultData.WEAPON_TYPE.get(allCompositionList.get(selectNumber).get(number).get(2)).get(1)) {
+			case 0:
+				changeWeapon(number, selectWeapon);
+				break;
+			case 1:
+				if(changeWeapon(number, selectWeapon) == 1) {
+					allCompositionList.get(selectNumber).get(number).set(2, -1);
+				}
+				break;
+			default:
+				break;
+			}
 		}
-		compositionJList.setSelectedIndex(SaveComposition.getSelectNumber());
 	}
 	
-	private void save() {
-		try {
-			ObjectOutputStream compositionData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
-			compositionData.writeObject(new SaveComposition(allCompositionList, compositionNameList, selectNumber, allCompositionList.get(selectNumber)));
-			compositionData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
+	private int changeWeapon(int number, int selectWeapon) {
+		String[] menu = {"左", "右", "戻る"};
+		int select = showOptionDialog(null, "左右どちらの武器を変更しますか", "武器変更", OK_CANCEL_OPTION, PLAIN_MESSAGE, null, menu, menu[0]);
+		switch(select) {
+		case 0:
+			allCompositionList.get(selectNumber).get(number).set(2, selectWeapon);
+			break;
+		case 1:
+			allCompositionList.get(selectNumber).get(number).set(0, selectWeapon);
+			break;
+		default:
+			break;
+		}
+		return select;
+	}
+	
+	private void removeWeapon(int number) {
+		String[] menu = new String[3];
+		menu[0] = (allCompositionList.get(selectNumber).get(number).get(2) == -1)? "": "左";
+		menu[1] = (allCompositionList.get(selectNumber).get(number).get(0) == -1)? "": "右";
+		menu[2] = "戻る";
+		int select = showOptionDialog(null, "武器解除する部位を選択してください", "ステータス", OK_CANCEL_OPTION, PLAIN_MESSAGE, null, menu, menu[0]);
+		switch(select) {
+		case 0:
+			allCompositionList.get(selectNumber).get(number).set(2, -1);
+			break;
+		case 1:
+			allCompositionList.get(selectNumber).get(number).set(0, -1);
+			break;
+		default:
+			break;
 		}
 	}
 }
 
-class ImagePanel extends JPanel{
+//ユニット表示
+class ImagePanel extends JPanel implements MouseListener{
 	List<BufferedImage> imageList;
+	List<Integer> numberList;
+	ImagePanel ImagePanel;
+	int selectNumber = -1;
 	
 	protected ImagePanel(List<BufferedImage> imageList) {
 		this.imageList = imageList;
+		addMouseListener(this);
 		setPreferredSize(new Dimension(100, imageList.size() * 100));
+	}
+	
+	protected void setImagePanel(List<Integer> numberList, ImagePanel ImagePanel) {
+		this.numberList = numberList;
+		this.ImagePanel = ImagePanel;
 	}
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		for(int i = 0; i < imageList.size(); i++) {
+			if(selectNumber == i) {
+				g.setColor(Color.WHITE);
+				g.fillRect(0, 100 * i, 90, 90);
+			}
 			g.drawImage(imageList.get(i), 0, i * 100, this);
+			g.setColor(Color.BLACK);
+			g.setFont(new Font("Arial", Font.BOLD, 30));
+			g.drawString("" + numberList.get(i), 80, 80 + i * 100);
 		}
+	}
+	
+	protected int getSelectNumber() {
+		return selectNumber;
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+		for(int i = 0; i < imageList.size(); i++) {
+			if(ValueRange.of(10, 10 + DefaultData.SIZE).isValidIntValue(e.getX())
+					&& ValueRange.of(10 + 100 * i, 10 + DefaultData.SIZE + 100 * i).isValidIntValue(e.getY())){
+				selectNumber = (selectNumber == i)? -1: i;
+				ImagePanel.selectNumber = -1;
+				break;
+	    	}
+			if(i == imageList.size() - 1) {
+				selectNumber = -1;
+				ImagePanel.selectNumber = -1;
+			}
+		}
+	}
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
+}
+
+//JListの選択項目を可視化 (初回処理時ensureIndexIsVisibleが入らないため)
+class DelaySelect extends Thread{
+	JList<String> compositionJList;
+	int selectNumber;
+	
+	protected DelaySelect(JList<String> compositionJList, int selectNumber) {
+		this.compositionJList = compositionJList;
+		this.selectNumber = selectNumber;
+	}
+	
+	public void run() {
+		try {
+			Thread.sleep(20);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		compositionJList.ensureIndexIsVisible(selectNumber);
 	}
 }
