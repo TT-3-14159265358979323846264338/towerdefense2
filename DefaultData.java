@@ -6,7 +6,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -29,14 +31,18 @@ public class DefaultData {
 			"image/soldier/normal heal core center.png",
 			"image/soldier/normal speed core center.png"
 			);
+	//ステータスは 最大HP, 残存HP, 攻撃, 防御, 射程, 回復, 攻撃速度, (味方: 足止め数 敵: 移動速度), (味方: 配置コスト 敵: 撃破時コスト増加) の順でリスト化
+	public final static List<List<Double>> CORE_STATUS_LIST = Arrays.asList(
+			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
+			Arrays.asList(1.0, 1.0, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
+			Arrays.asList(1.0, 1.0, 1.0, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0),
+			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.1, 1.0, 1.0, 1.0, 1.0),
+			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0, 1.1, 1.0, 1.0, 1.0),
+			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.1, 1.0, 1.0)
+			);
 	final static List<String> WEAPON_NAME_LIST = Arrays.asList(
 			"image/soldier/Japanese sword.png",
 			"image/soldier/bow.png"
-			);
-	//List① 0: 近接, 1: 遠隔, 2: 遠近 ② 0: 片手, 1: 両手 で登録
-	public final static List<List<Integer>> WEAPON_TYPE= Arrays.asList(
-			Arrays.asList(0, 0),
-			Arrays.asList(1, 1)
 			);
 	final static List<List<String>> RIGHT_WEAPON_NAME_LIST = Arrays.asList(
 			Arrays.asList("image/soldier/Japanese sword right 0.png",
@@ -60,6 +66,25 @@ public class DefaultData {
 					"image/soldier/bow left 3.png",
 					"image/soldier/bow left 4.png",
 					"image/soldier/bow left 5.png")
+			);
+	//武器タイプは① 0: 近接, 1: 遠隔, 2: 遠近 ② 0: 片手, 1: 両手 で登録
+	public final static List<List<Integer>> WEAPON_TYPE= Arrays.asList(
+			Arrays.asList(0, 0),
+			Arrays.asList(1, 1)
+			);
+	public final static Map<Integer, String> DISTANCE_MAP = new HashMap<Integer, String>();{
+		DISTANCE_MAP.put(0,"近接");
+		DISTANCE_MAP.put(1,"遠隔");
+		DISTANCE_MAP.put(2,"遠近");
+	}
+	public final static Map<Integer, String> HANDLE_MAP = new HashMap<Integer, String>();{
+		HANDLE_MAP.put(0,"片手");
+		HANDLE_MAP.put(1,"両手");
+	}
+	//ステータスは 最大HP, 残存HP, 攻撃, 防御, 射程, 回復, 攻撃速度, (味方: 足止め数 敵: 移動速度), (味方: 配置コスト 敵: 撃破時コスト増加) の順でリスト化
+	public final static List<List<Integer>> WEAPON_STATUS_LIST = Arrays.asList(
+			Arrays.asList(1000, 1000, 100, 100, 30, 10, 1000, 1, 5),
+			Arrays.asList(1000, 1000, 200, 100, 150, 10, 1000, 0, 10)
 			);
 	
 	public List<BufferedImage> coreImage(int ratio){

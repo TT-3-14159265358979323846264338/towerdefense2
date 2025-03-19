@@ -8,6 +8,15 @@ import java.util.List;
 //現在の編成状況の保存用
 public class SaveComposition implements Serializable{
 	public transient final static String COMPOSITION_FILE = "composition data.dat";
+	public transient final static List<List<Integer>> DEFAULT = Arrays.asList(
+			Arrays.asList(-1, 0, -1),
+			Arrays.asList(-1, 0, -1),
+			Arrays.asList(-1, 0, -1),
+			Arrays.asList(-1, 0, -1),
+			Arrays.asList(-1, 0, -1),
+			Arrays.asList(-1, 0, -1),
+			Arrays.asList(-1, 0, -1),
+			Arrays.asList(-1, 0, -1));
 	List<List<List<Integer>>> allCompositionList = new ArrayList<>();
 	List<String> compositionNameList = new ArrayList<>();
 	int selectNumber;
@@ -25,15 +34,10 @@ public class SaveComposition implements Serializable{
 	}
 	
 	public void newComposition() {
-		allCompositionList.add(Arrays.asList(
-				Arrays.asList(-1, 0, -1),
-				Arrays.asList(-1, 0, -1),
-				Arrays.asList(-1, 0, -1),
-				Arrays.asList(-1, 0, -1),
-				Arrays.asList(-1, 0, -1),
-				Arrays.asList(-1, 0, -1),
-				Arrays.asList(-1, 0, -1),
-				Arrays.asList(-1, 0, -1)));
+		allCompositionList.add(new ArrayList<>());
+		for(List<Integer> i :DEFAULT) {
+			allCompositionList.get(allCompositionList.size() - 1).add(new ArrayList<>(i));
+		}
 		compositionNameList.add("編成 " + allCompositionList.size());
 		selectNumber = allCompositionList.size() - 1;
 	}
