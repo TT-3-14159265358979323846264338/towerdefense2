@@ -491,9 +491,6 @@ public class MenuComposition extends JPanel implements MouseListener{
 				}else {
 					removeWeapon(i);
 				}
-			}else {
-				CoreImagePanel.selectNumber = -1;
-				WeaponImagePanel.selectNumber = -1;
 			}
 		}
 	}
