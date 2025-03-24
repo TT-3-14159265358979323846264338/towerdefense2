@@ -20,17 +20,23 @@ public class SaveComposition implements Serializable{
 	List<List<List<Integer>>> allCompositionList = new ArrayList<>();
 	List<String> compositionNameList = new ArrayList<>();
 	int selectNumber;
-	List<List<Integer>> selectCompositionList = new ArrayList<>();
+	List<List<Integer>> compositionList = new ArrayList<>();
+	List<List<List<Integer>>> weaponStatusList = new ArrayList<>();
+	List<List<Integer>> unitStatusList = new ArrayList<>();
+	List<Integer> typeList = new ArrayList<>();
 	
 	public SaveComposition() {
 		newComposition();
 	}
 	
-	public SaveComposition(List<List<List<Integer>>> allCompositionList, List<String> compositionNameList, int selectNumber,  List<List<Integer>> selectCompositionList) {
+	public SaveComposition(List<List<List<Integer>>> allCompositionList, List<String> compositionNameList, int selectNumber,  List<List<Integer>> compositionList, List<List<List<Integer>>> weaponStatusList, List<List<Integer>> unitStatusList, List<Integer> typeList) {
 		this.allCompositionList = allCompositionList;
 		this.compositionNameList = compositionNameList;
 		this.selectNumber = selectNumber;
-		this.selectCompositionList = selectCompositionList;
+		this.compositionList = compositionList;
+		this.weaponStatusList = weaponStatusList;
+		this.unitStatusList = unitStatusList;
+		this.typeList = typeList;
 	}
 	
 	public void newComposition() {
@@ -60,7 +66,19 @@ public class SaveComposition implements Serializable{
 		return selectNumber;
 	}
 	
-	public List<List<Integer>> getSelectCompositionList(){
-		return selectCompositionList;
+	public List<List<Integer>> getcompositionList(){
+		return compositionList;
+	}
+	
+	public List<List<List<Integer>>> getWeaponStatusList(){
+		return weaponStatusList;
+	}
+	
+	public List<List<Integer>> getUnitStatusList(){
+		return unitStatusList;
+	}
+	
+	public List<Integer> setTypeList(){
+		return typeList;
 	}
 }

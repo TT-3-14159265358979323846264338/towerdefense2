@@ -31,14 +31,23 @@ public class DefaultData {
 			"image/soldier/normal heal core center.png",
 			"image/soldier/normal speed core center.png"
 			);
-	//ステータスは 最大HP, 残存HP, 攻撃, 防御, 射程, 回復, 攻撃速度, (味方: 足止め数 敵: 移動速度), (味方: 配置コスト 敵: 撃破時コスト増加) の順でリスト化
-	public final static List<List<Double>> CORE_STATUS_LIST = Arrays.asList(
-			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
-			Arrays.asList(1.0, 1.0, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
-			Arrays.asList(1.0, 1.0, 1.0, 1.1, 1.0, 1.0, 1.0, 1.0, 1.0),
-			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.1, 1.0, 1.0, 1.0, 1.0),
-			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0, 1.1, 1.0, 1.0, 1.0),
-			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.1, 1.0, 1.0)
+	//武器ステータスは 攻撃, 射程, 攻撃速度 の順でリスト化
+	public final static List<List<Double>> CORE_WEAPON_STATUS_LIST = Arrays.asList(
+			Arrays.asList(1.0, 1.0, 1.0),
+			Arrays.asList(1.1, 1.0, 1.0),
+			Arrays.asList(1.0, 1.0, 1.0),
+			Arrays.asList(1.0, 1.1, 1.0),
+			Arrays.asList(1.0, 1.0, 1.0),
+			Arrays.asList(1.0, 1.0, 0.9)
+			);
+	//ユニットステータスは 最大HP, 防御, 回復, (味方: 足止め数 敵: 移動速度), (味方: 配置コスト 敵: 撃破時コスト増加) の順でリスト化
+	public final static List<List<Double>> CORE_UNIT_STATUS_LIST = Arrays.asList(
+			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0),
+			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0),
+			Arrays.asList(1.0, 1.1, 1.0, 1.0, 1.0),
+			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0),
+			Arrays.asList(1.0, 1.0, 1.1, 1.0, 1.0),
+			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0)
 			);
 	final static List<String> WEAPON_NAME_LIST = Arrays.asList(
 			"image/soldier/Japanese sword.png",
@@ -68,7 +77,7 @@ public class DefaultData {
 					"image/soldier/bow left 5.png")
 			);
 	//武器タイプは① 0: 近接, 1: 遠隔, 2: 遠近 ② 0: 片手, 1: 両手 で登録
-	public final static List<List<Integer>> WEAPON_TYPE= Arrays.asList(
+	public final static List<List<Integer>> WEAPON_TYPE = Arrays.asList(
 			Arrays.asList(0, 0),
 			Arrays.asList(1, 1)
 			);
@@ -81,10 +90,15 @@ public class DefaultData {
 		HANDLE_MAP.put(0,"片手");
 		HANDLE_MAP.put(1,"両手");
 	}
-	//ステータスは 最大HP, 残存HP, 攻撃, 防御, 射程, 回復, 攻撃速度, (味方: 足止め数 敵: 移動速度), (味方: 配置コスト 敵: 撃破時コスト増加) の順でリスト化
-	public final static List<List<Integer>> WEAPON_STATUS_LIST = Arrays.asList(
-			Arrays.asList(1000, 1000, 100, 100, 30, 10, 1000, 1, 5),
-			Arrays.asList(1000, 1000, 200, 100, 150, 10, 1000, 0, 10)
+	//武器ステータスは 攻撃, 射程, 攻撃速度 の順でリスト化
+	public final static List<List<Integer>> WEAPON_WEAPON_STATUS_LIST = Arrays.asList(
+			Arrays.asList(100, 30, 1000),
+			Arrays.asList(200, 150, 1000)
+			);
+	//ユニットステータスは 最大HP, 防御, 回復, (味方: 足止め数 敵: 移動速度), (味方: 配置コスト 敵: 撃破時コスト増加) の順でリスト化
+	public final static List<List<Integer>> WEAPON_UNIT_STATUS_LIST = Arrays.asList(
+			Arrays.asList(1000, 100, 10, 1, 5),
+			Arrays.asList(1000, 100, 10, 0, 10)
 			);
 	
 	public List<BufferedImage> coreImage(int ratio){
@@ -148,7 +162,7 @@ class InputImage{
 		BufferedImage finalImage = new BufferedImage(resizeWidth, resizeHeight, BufferedImage.TYPE_INT_ARGB);
 		for (int y = 0; y < resizeHeight; y++) {
 			for (int x = 0; x < resizeWidth; x++) {
-				if (resizeImage.getRGB(x, y) == new Color(255, 255 ,255).getRGB()) {
+				if (resizeImage.getRGB(x, y) == new Color(255, 255, 255).getRGB()) {
 					finalImage.setRGB(x, y, 0);
 				}else {
 					finalImage.setRGB(x, y, resizeImage.getRGB(x, y));
