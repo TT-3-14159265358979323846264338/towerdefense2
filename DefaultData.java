@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 
 //デフォルトデータ
 public class DefaultData {
+	//自軍データ
 	public final static int SIZE = 60;
 	final static List<String> CORE_NAME_LIST = Arrays.asList(
 			"image/soldier/normal core.png",
@@ -101,29 +102,70 @@ public class DefaultData {
 			Arrays.asList(1000, 100, 10, 0, 10)
 			);
 	
-	public List<BufferedImage> coreImage(int ratio){
+	//敵軍データ
+	
+	//ガチャデータ
+	final static String BALL = "image/gacha/ball full.png";
+	final static List<String> HALF_BALL = Arrays.asList("image/gacha/ball bottom.png", "image/gacha/ball top.png");
+	final static String HANDLE = "image/gacha/machine handle.png";
+	final static List<String> MACHINE = Arrays.asList("image/gacha/machine bottom.png", "image/gacha/machine top.png");
+	
+	//画像取込み
+	public List<BufferedImage> getCoreImage(int ratio){
 		return new InputImage().inputList(CORE_NAME_LIST, ratio);
 	}
 	
-	public List<BufferedImage> centerCoreImage(int ratio){
+	public List<BufferedImage> getCenterCoreImage(int ratio){
 		return new InputImage().inputList(CENTER_CORE_NAME_LIST, ratio);
 	}
 	
-	public List<BufferedImage> weaponImage(int ratio){
+	public List<BufferedImage> getWeaponImage(int ratio){
 		return new InputImage().inputList(WEAPON_NAME_LIST, ratio);
 	}
 	
-	public List<List<BufferedImage>> rightWeaponImage(int ratio){
+	public List<List<BufferedImage>> getRightWeaponImage(int ratio){
 		return new InputImage().inputList2(RIGHT_WEAPON_NAME_LIST, ratio);
 	}
 	
-	public List<List<BufferedImage>> leftWeaponImage(int ratio){
+	public List<List<BufferedImage>> getLeftWeaponImage(int ratio){
 		return new InputImage().inputList2(LEFT_WEAPON_NAME_LIST, ratio);
+	}
+	
+	public BufferedImage getBallImage(int ratio) {
+		return new InputImage().input(BALL, ratio);
+	}
+	
+	public List<BufferedImage> getHalfBallImage(int ratio){
+		return new InputImage().inputList(HALF_BALL, ratio);
+	}
+	
+	public BufferedImage getHandleImage(int ratio) {
+		return new InputImage().input(HANDLE, ratio);
+	}
+	
+	public List<BufferedImage> getMachineImage(int ratio){
+		return new InputImage().inputList(MACHINE, ratio);
 	}
 }
 
 //画像処理
 class InputImage{
+	protected List<List<BufferedImage>> inputList2(List<List<String>> imageNameList, int ratio){
+		List<List<BufferedImage>> imageList = new ArrayList<>();
+		for(List<String> i: imageNameList) {
+			imageList.add(inputList(i, ratio));
+		}
+		return imageList;
+	}
+	
+	protected List<BufferedImage> inputList(List<String> imageNameList, int ratio){
+		List<BufferedImage> imageList = new ArrayList<>();
+		for(String i : imageNameList) {
+			imageList.add(input(i, ratio));
+		}
+		return imageList;
+	}
+	
 	protected BufferedImage input(String imageName, int ratio) {
 		BufferedImage image = null;
 		try{
@@ -132,22 +174,6 @@ class InputImage{
 			e.printStackTrace();
 		}
 		return image;
-	}
-	
-	protected List<BufferedImage> inputList(List<String> imageNameList, int ratio){
-		List<BufferedImage> imageList = new ArrayList<>();
-		for(String i : imageNameList) {
-			imageList.add(input(i,2));
-		}
-		return imageList;
-	}
-	
-	protected List<List<BufferedImage>> inputList2(List<List<String>> imageNameList, int ratio){
-		List<List<BufferedImage>> imageList = new ArrayList<>();
-		for(List<String> i: imageNameList) {
-			imageList.add(inputList(i,2));
-		}
-		return imageList;
 	}
 	
 	//画像処理

@@ -52,13 +52,13 @@ public class MenuComposition extends JPanel implements MouseListener{
 	JScrollPane compositionScroll = new JScrollPane();
 	JScrollPane coreScroll = new JScrollPane();
 	JScrollPane weaponScroll = new JScrollPane();
-	ImagePanel CoreImagePanel = new ImagePanel(new DefaultData().coreImage(2), true);
-	ImagePanel WeaponImagePanel = new ImagePanel(new DefaultData().weaponImage(2), false);
+	ImagePanel CoreImagePanel = new ImagePanel(new DefaultData().getCoreImage(2), true);
+	ImagePanel WeaponImagePanel = new ImagePanel(new DefaultData().getWeaponImage(2), false);
 	SaveHoldItem SaveHoldItem;
 	SaveComposition SaveComposition;
-	List<List<BufferedImage>> rightWeaponList = new ArrayList<>(new DefaultData().rightWeaponImage(2));
-	List<BufferedImage> ceterCoreList = new ArrayList<>(new DefaultData().centerCoreImage(2));
-	List<List<BufferedImage>> leftWeaponList = new ArrayList<>(new DefaultData().leftWeaponImage(2));
+	List<List<BufferedImage>> rightWeaponList = new ArrayList<>(new DefaultData().getRightWeaponImage(2));
+	List<BufferedImage> ceterCoreList = new ArrayList<>(new DefaultData().getCenterCoreImage(2));
+	List<List<BufferedImage>> leftWeaponList = new ArrayList<>(new DefaultData().getLeftWeaponImage(2));
 	List<Integer> coreNumberList = new ArrayList<>();
 	List<Integer> weaponNumberList = new ArrayList<>();
 	List<Integer> nowCoreNumberList = new ArrayList<>();
@@ -605,10 +605,10 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private ImageIcon getIcon(List<Integer> imageList) {
 		int width = ceterCoreList.get(imageList.get(1)).getWidth();
 		int height = ceterCoreList.get(imageList.get(1)).getHeight();
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		for (int y = 0; y < width; y++) {
 			for (int x = 0; x < height; x++) {
-				image.setRGB(x, y, new Color(238, 238, 238).getRGB());
+				image.setRGB(x, y, 0);
 			}
 		}
 		Graphics graphics = image.getGraphics();

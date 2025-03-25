@@ -27,7 +27,7 @@ public class MainFrame extends JFrame{
 	public void itemGetMenuDraw() {
 		getContentPane().removeAll();
 		setTitle("ガチャ");
-		setSize(1000, 160);
+		setSize(365, 510);
 		add(new MenuItemGet(this));
 		setLocationRelativeTo(null);
 	}
