@@ -3,6 +3,7 @@ package menuitemget;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -14,13 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import defaultdata.DefaultData;
 import mainframe.MainFrame;
 
-//ガチャ
+//ガチャ本体
 public class MenuItemGet extends JPanel implements MouseListener, MouseMotionListener, ActionListener{
 	Timer timer = new Timer(20, this);
 	JButton returnButton = new JButton();
@@ -39,8 +41,7 @@ public class MenuItemGet extends JPanel implements MouseListener, MouseMotionLis
 	int count = 0;
 	
 	public MenuItemGet(MainFrame MainFrame) {
-		addMouseListener(this);
-		addMouseMotionListener(this);
+		activatePanel();
 		editImage();
 		addSelectButton();
 		addReturnButton(MainFrame);
@@ -50,9 +51,16 @@ public class MenuItemGet extends JPanel implements MouseListener, MouseMotionLis
 		super.paintComponent(g);
 		setSelectButton();
 		setReturnButton();
-		setGachaImage(g);
+		drawGachaImage(g);
 	}
 	
+	protected void activatePanel() {
+		addMouseListener(this);
+		addMouseMotionListener(this);
+		returnButton.setEnabled(true);
+		selectButton.setEnabled(true);
+	}
+
 	private void editImage() {
 		machineImage.set(1, machineImage.get(1).getSubimage(0, 0, machineImage.get(1).getWidth(), machineImage.get(1).getHeight() - 70));
 	}
@@ -88,33 +96,25 @@ public class MenuItemGet extends JPanel implements MouseListener, MouseMotionLis
 		button.setFocusable(false);
 	}
 	
-	private void setGachaImage(Graphics g) {
-		double angle = getAngle();
+	private void drawGachaImage(Graphics g) {
+		double angle = getHandleAngle();
 		autoTurn(angle);
 		g.drawImage(machineImage.get(0), 55, 20, null);
-		g.drawImage(machineImage.get(1), 55, 20, null);
-		g.drawImage(gethandleImage(angle), 145, 220, null);
-	}
-	
-	private BufferedImage gethandleImage(double angle) {
-		int width = handleImage.getWidth();
-		int height = handleImage.getHeight();
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				image.setRGB(x, y, 0);
-			}
+		if(70 < count && count <= 120) {
+			Point point = getBallPosition();
+			g.drawImage(getImage(ballImage, count * 0.2), point.x, point.y, null);
 		}
-		Graphics2D g2 =  (Graphics2D) image.getGraphics();
-		AffineTransform rotate = new AffineTransform();
-		rotate.setToRotation(angle, width / 2, height / 2);
-		g2.setTransform(rotate);
-		g2.drawImage(handleImage, 0, 0, null);
-		g2.dispose();
-		return image;
+		g.drawImage(machineImage.get(1), 55, 20, null);
+		g.drawImage(getImage(handleImage, angle), 145, 220, null);
+		if(120 < count){
+			Point point = getBottomBallPosition();
+			g.drawImage(getImage(halfBallImage.get(0), count * -0.1), point.x, point.y, null);
+			point = getTopBallPosition();
+			g.drawImage(getImage(halfBallImage.get(1), count * 0.1), point.x, point.y, null);
+		}
 	}
 	
-	private double getAngle() {
+	private double getHandleAngle() {
 		if(canTurn) {
 			double[] x = {175, activePointX, startPointX};
 			double[] y = {250, activePointY, startPointY};
@@ -134,14 +134,11 @@ public class MenuItemGet extends JPanel implements MouseListener, MouseMotionLis
 	
 	private void autoTurn(double angle) {
 		if(canPlay) {
-			if(100 < count) {
+			if(150 < count) {
 				timer.stop();
 				count = 0;
 				canPlay = false;
-				addMouseListener(this);
-				addMouseMotionListener(this);
-				returnButton.setEnabled(true);
-				selectButton.setEnabled(true);
+				activatePanel();
 			}
 		}else {
 			if(Math.PI / 2 < angle) {
@@ -156,7 +153,43 @@ public class MenuItemGet extends JPanel implements MouseListener, MouseMotionLis
 			}
 		}
 	}
-
+	
+	private Point getBallPosition() {
+		if(count < 90) {
+			return new Point(159, -5 + count * 4);
+		}else if(100 < count) {
+			return new Point(159, 115 + count * 2);
+		}else {
+			return new Point(159, 615 - count * 3);
+		}
+	}
+	
+	private Point getBottomBallPosition() {
+		return new Point(-80 + count * 2, 115 + count * 2);
+	}
+	
+	private Point getTopBallPosition() {
+		return new Point(400 - count * 2, 595 - count * 2);
+	}
+	
+	private BufferedImage getImage(BufferedImage defaultImage, double angle) {
+		int width = defaultImage.getWidth();
+		int height = defaultImage.getHeight();
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				image.setRGB(x, y, 0);
+			}
+		}
+		Graphics2D g2 =  (Graphics2D) image.getGraphics();
+		AffineTransform rotate = new AffineTransform();
+		rotate.setToRotation(angle, width / 2, height / 2);
+		g2.setTransform(rotate);
+		g2.drawImage(defaultImage, 0, 0, null);
+		g2.dispose();
+		return image;
+	}
+	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		activePointX = e.getX();
@@ -196,13 +229,14 @@ public class MenuItemGet extends JPanel implements MouseListener, MouseMotionLis
 		count++;
 		repaint();
 	}
+}
 
+//ガチャ結果画面
+class GachaResult extends JFrame{
 	
-	
-	
-	
-	
-	
-	
+}
+
+//ガチャ結果表示
+class DrawResult extends JPanel{
 	
 }
