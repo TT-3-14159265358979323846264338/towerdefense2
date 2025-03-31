@@ -105,7 +105,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 		setCompositionScroll();
 		setCoreScroll();
 		setWeaponScroll();
-		setComposition(g);
+		drawComposition(g);
 		countNumber();
 	}
 	
@@ -416,7 +416,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 		weaponScroll.setBounds(700, 40, 120, 480);
 	}
 	
-	private void setComposition(Graphics g) {
+	private void drawComposition(Graphics g) {
 		g.setColor(Color.WHITE);
 		g.fillRect(230, 40, 330, 480);
 		for(int i = 0; i < allCompositionList.get(selectNumber).size(); i++) {
@@ -804,7 +804,7 @@ class StatusCalculation{
 	}
 	
 	private List<Integer> defaultUnitStatus(){
-		return Arrays.asList(100, 10, 0, 0, 0);
+		return Arrays.asList(1000, 0, 0, 0, 0);
 	}
 	
 	protected int getType() {

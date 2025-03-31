@@ -109,6 +109,7 @@ public class DefaultData {
 	final static List<String> HALF_BALL = Arrays.asList("image/gacha/ball bottom.png", "image/gacha/ball top.png");
 	final static String HANDLE = "image/gacha/machine handle.png";
 	final static List<String> MACHINE = Arrays.asList("image/gacha/machine bottom.png", "image/gacha/machine top.png");
+	final static String TURN = "image/gacha/turn.png";
 	
 	//画像取込み
 	public List<BufferedImage> getCoreImage(int ratio){
@@ -145,6 +146,10 @@ public class DefaultData {
 	
 	public List<BufferedImage> getMachineImage(int ratio){
 		return new InputImage().inputList(MACHINE, ratio);
+	}
+	
+	public BufferedImage getTurnImage(int ratio) {
+		return new InputImage().input(TURN, ratio);
 	}
 }
 

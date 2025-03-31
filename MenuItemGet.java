@@ -12,6 +12,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -23,28 +24,27 @@ import defaultdata.DefaultData;
 import mainframe.MainFrame;
 
 //ガチャ本体
-public class MenuItemGet extends JPanel implements MouseListener, MouseMotionListener, ActionListener{
-	Timer timer = new Timer(20, this);
+public class MenuItemGet extends JPanel implements ActionListener{
 	JButton returnButton = new JButton();
 	JButton selectButton = new JButton();
 	BufferedImage ballImage = new DefaultData().getBallImage(2);
 	List<BufferedImage> halfBallImage = new ArrayList<>(new DefaultData().getHalfBallImage(2));
 	BufferedImage handleImage = new DefaultData().getHandleImage(2);
 	List<BufferedImage> machineImage = new ArrayList<>(new DefaultData().getMachineImage(2));
+	BufferedImage turnImage = new DefaultData().getTurnImage(2);
 	boolean canRepeat;
-	boolean canTurn;
-	boolean canPlay;
-	int startPointX;
-	int startPointY;
-	int activePointX;
-	int activePointY;
-	int count = 0;
+	OpenBallMotion OpenBallMotion = new OpenBallMotion(this);
+	BallMotion BallMotion = new BallMotion(OpenBallMotion);
+	HandleMotion HandleMotion = new HandleMotion(this, BallMotion);
+	Timer timer = new Timer(50, this);
+	double angle;
+	boolean canPlay = true;
 	
 	public MenuItemGet(MainFrame MainFrame) {
-		activatePanel();
 		editImage();
 		addSelectButton();
 		addReturnButton(MainFrame);
+		timer.start();
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -54,13 +54,6 @@ public class MenuItemGet extends JPanel implements MouseListener, MouseMotionLis
 		drawGachaImage(g);
 	}
 	
-	protected void activatePanel() {
-		addMouseListener(this);
-		addMouseMotionListener(this);
-		returnButton.setEnabled(true);
-		selectButton.setEnabled(true);
-	}
-
 	private void editImage() {
 		machineImage.set(1, machineImage.get(1).getSubimage(0, 0, machineImage.get(1).getWidth(), machineImage.get(1).getHeight() - 70));
 	}
@@ -96,104 +89,115 @@ public class MenuItemGet extends JPanel implements MouseListener, MouseMotionLis
 		button.setFocusable(false);
 	}
 	
+	protected void activatePanel() {
+		returnButton.setEnabled(true);
+		selectButton.setEnabled(true);
+		canPlay = true;
+	}
+	
+	protected void deactivatePanel() {
+		returnButton.setEnabled(false);
+		selectButton.setEnabled(false);
+		canPlay = false;
+	}
+
 	private void drawGachaImage(Graphics g) {
-		double angle = getHandleAngle();
-		autoTurn(angle);
 		g.drawImage(machineImage.get(0), 55, 20, null);
-		if(70 < count && count <= 120) {
-			Point point = getBallPosition();
-			g.drawImage(getImage(ballImage, count * 0.2), point.x, point.y, null);
-		}
+		Point point = BallMotion.getBallPosition();
+		g.drawImage(new EditImage().getImage(ballImage, BallMotion.getBallAngel()), point.x, point.y, null);
 		g.drawImage(machineImage.get(1), 55, 20, null);
-		g.drawImage(getImage(handleImage, angle), 145, 220, null);
-		if(120 < count){
-			Point point = getBottomBallPosition();
-			g.drawImage(getImage(halfBallImage.get(0), count * -0.1), point.x, point.y, null);
-			point = getTopBallPosition();
-			g.drawImage(getImage(halfBallImage.get(1), count * 0.1), point.x, point.y, null);
+		g.drawImage(new EditImage().getImage(handleImage, HandleMotion.getAngle()), 145, 220, null);
+		if(OpenBallMotion.getTimerStatus()) {
+			point = OpenBallMotion.getBottomBallPosition();
+			g.drawImage(new EditImage().getImage(halfBallImage.get(0), OpenBallMotion.getBottomBallAngel()), point.x, point.y, null);
+			point = OpenBallMotion.getTopBallPosition();
+			g.drawImage(new EditImage().getImage(halfBallImage.get(1), OpenBallMotion.getTopBallAngel()), point.x, point.y, null);
+		}
+		if(canPlay) {
+			g.drawImage(new EditImage().getImage(turnImage, angle), 105, 180, null);
 		}
 	}
 	
-	private double getHandleAngle() {
-		if(canTurn) {
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		angle += 0.03;
+		if(Math.PI * 10000 < angle) {
+			angle = 0;
+		}
+	}
+}
+
+//ガチャハンドルの調整
+class HandleMotion implements MouseListener, MouseMotionListener, ActionListener{
+	MenuItemGet MenuItemGet;
+	BallMotion BallMotion;
+	Timer timer = new Timer(20, this);
+	int startPointX;
+	int startPointY;
+	int activePointX;
+	int activePointY;
+	double angle;
+	
+	protected HandleMotion(MenuItemGet MenuItemGet, BallMotion BallMotion) {
+		this.MenuItemGet = MenuItemGet;
+		this.BallMotion = BallMotion;
+		addListener();
+	}
+	
+	protected void addListener() {
+		MenuItemGet.addMouseListener(this);
+		MenuItemGet.addMouseMotionListener(this);
+	}
+	
+	private void removeListener() {
+		MenuItemGet.removeMouseListener(this);
+		MenuItemGet.removeMouseMotionListener(this);
+	}
+	
+	protected double getAngle() {
+		if(timer.isRunning()) {
+			if(Math.PI * 2 < angle) {
+				autoTurnStop();
+			}
+			return angle;
+		}else {
 			double[] x = {175, activePointX, startPointX};
 			double[] y = {250, activePointY, startPointY};
 			double[] distance = new double[3];
 			distance[0] = Math.sqrt(Math.pow(x[1] - x[2], 2) + Math.pow(y[1] - y[2], 2));
 			distance[1] = Math.sqrt(Math.pow(x[0] - x[2], 2) + Math.pow(y[0] - y[2], 2));
 			distance[2] = Math.sqrt(Math.pow(x[0] - x[1], 2) + Math.pow(y[0] - y[1], 2));
-			double angle = Math.acos((Math.pow(distance[0], 2) - Math.pow(distance[1], 2) - Math.pow(distance[2], 2)) / (-2 * distance[1] * distance[2]));
+			angle = Math.acos((Math.pow(distance[0], 2) - Math.pow(distance[1], 2) - Math.pow(distance[2], 2)) / (-2 * distance[1] * distance[2]));
 			return angle;
 		}
-		if(Math.PI * 2 < (double) (count * 0.1)) {
-			return 0;
-		}else {
-			return (double) (count * 0.1);
-		}
 	}
 	
-	private void autoTurn(double angle) {
-		if(canPlay) {
-			if(150 < count) {
-				timer.stop();
-				count = 0;
-				canPlay = false;
-				activatePanel();
-			}
-		}else {
-			if(Math.PI / 2 < angle) {
-				timer.start();
-				count = (int) (Math.PI / 0.1 / 2);
-				canTurn = false;
-				canPlay = true;
-				removeMouseListener(this);
-				removeMouseMotionListener(this);
-				returnButton.setEnabled(false);
-				selectButton.setEnabled(false);
-			}
-		}
+	private void autoTurnStart() {
+		MenuItemGet.deactivatePanel();
+		removeListener();
+		timer.start();
 	}
 	
-	private Point getBallPosition() {
-		if(count < 90) {
-			return new Point(159, -5 + count * 4);
-		}else if(100 < count) {
-			return new Point(159, 115 + count * 2);
-		}else {
-			return new Point(159, 615 - count * 3);
-		}
+	private void autoTurnStop() {
+		timer.stop();
+		BallMotion.timerStart(this);
+		reset();
 	}
 	
-	private Point getBottomBallPosition() {
-		return new Point(-80 + count * 2, 115 + count * 2);
-	}
-	
-	private Point getTopBallPosition() {
-		return new Point(400 - count * 2, 595 - count * 2);
-	}
-	
-	private BufferedImage getImage(BufferedImage defaultImage, double angle) {
-		int width = defaultImage.getWidth();
-		int height = defaultImage.getHeight();
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				image.setRGB(x, y, 0);
-			}
-		}
-		Graphics2D g2 =  (Graphics2D) image.getGraphics();
-		AffineTransform rotate = new AffineTransform();
-		rotate.setToRotation(angle, width / 2, height / 2);
-		g2.setTransform(rotate);
-		g2.drawImage(defaultImage, 0, 0, null);
-		g2.dispose();
-		return image;
+	private void reset() {
+		startPointX = 0;
+		startPointY = 0;
+		activePointX = 0;
+		activePointY = 0;
 	}
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		activePointX = e.getX();
 		activePointY = e.getY();
+		if(Math.PI / 2.0 < getAngle()) {
+			autoTurnStart();
+		}
 	}
 	
 	@Override
@@ -209,14 +213,12 @@ public class MenuItemGet extends JPanel implements MouseListener, MouseMotionLis
 		startPointY = e.getY();
 		activePointX = e.getX();
 		activePointY = e.getY();
-		canTurn = true;
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		canTurn = false;
+		reset();
 	}
-
 	@Override
 	public void mouseEntered(MouseEvent e) {
 	}
@@ -226,8 +228,161 @@ public class MenuItemGet extends JPanel implements MouseListener, MouseMotionLis
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		count++;
-		repaint();
+		angle += 0.1;
+	}
+}
+
+//排出ボールの調整
+class BallMotion implements ActionListener{
+	OpenBallMotion OpenBallMotion;
+	HandleMotion HandleMotion;
+	Timer timer = new Timer(30, this);
+	double angle;
+	Point point;
+	List<Integer> moveList = Arrays.asList(296, 310, 360, 320, 340);
+	List<Integer> distanceList = Arrays.asList(3, 1, 2, -2, 1);
+	int moveNumber;
+	
+	protected BallMotion(OpenBallMotion OpenBallMotion) {
+		this.OpenBallMotion = OpenBallMotion;
+		reset();
+	}
+	
+	protected void timerStart(HandleMotion HandleMotion) {
+		this.HandleMotion = HandleMotion;
+		timer.start();
+	}
+	
+	private void timerStop() {
+		timer.stop();
+		reset();
+	}
+	
+	protected double getBallAngel() {
+		return angle;
+	}
+	
+	protected Point getBallPosition() {
+		return point;
+	}
+	
+	private void reset() {
+		angle = 0;
+		point = new Point(159, 275);
+		moveNumber = 0;
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		angle += 0.2;
+		point.y += moveDistance();
+	}
+	
+	private int moveDistance() {
+		try {
+			if(point.y == moveList.get(moveNumber)) {
+				moveNumber++;
+			}
+			return distanceList.get(moveNumber);
+		}catch(Exception e) {
+			timerStop();
+			OpenBallMotion.timerStart(HandleMotion);
+			return 0;
+		}
+	}
+}
+
+//ボール開封の調整
+class OpenBallMotion implements ActionListener{
+	MenuItemGet MenuItemGet;
+	HandleMotion HandleMotion;
+	Timer timer = new Timer(40, this);
+	double bottomAngle;
+	double topAngle;
+	Point bottmPoint;
+	Point topPoint;
+	
+	protected OpenBallMotion(MenuItemGet MenuItemGet) {
+		this.MenuItemGet = MenuItemGet;
+		reset();
+	}
+	
+	protected void timerStart(HandleMotion HandleMotion) {
+		this.HandleMotion = HandleMotion;
+		timer.start();
+	}
+	
+	private void timerStop() {
+		timer.stop();
+		reset();
+		HandleMotion.addListener();
+		MenuItemGet.activatePanel();
+	}
+	
+	protected boolean getTimerStatus() {
+		return timer.isRunning();
+	}
+	
+	protected double getBottomBallAngel() {
+		return bottomAngle;
+	}
+	
+	protected double getTopBallAngel() {
+		return topAngle;
+	}
+	
+	protected Point getBottomBallPosition() {
+		return bottmPoint;
+	}
+	
+	protected Point getTopBallPosition() {
+		return topPoint;
+	}
+	
+	private void reset() {
+		bottomAngle = 0;
+		topAngle = 0;
+		bottmPoint = new Point(160, 345);
+		topPoint = new Point(160, 335);
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		bottomAngle += 0.04;
+		topAngle += 0.1;
+		bottmPoint.x -= 2;
+		bottmPoint.y += 1;
+		topPoint.x += 2;
+		topPoint.y -= 2;
+		if(1 < bottomAngle) {
+			timerStop();
+		}
+	}
+}
+
+//画像編集
+class EditImage{
+	protected BufferedImage getImage(BufferedImage defaultImage, double angle) {
+		int width = defaultImage.getWidth();
+		int height = defaultImage.getHeight();
+		BufferedImage image = getBlankImage(width, height);
+		Graphics2D g2 =  (Graphics2D) image.getGraphics();
+		AffineTransform rotate = new AffineTransform();
+		rotate.setToRotation(angle, width / 2, height / 2);
+		g2.setTransform(rotate);
+		g2.drawImage(defaultImage, 0, 0, null);
+		g2.dispose();
+		return image;
+	}
+	
+	private BufferedImage getBlankImage(int width, int height) {
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				image.setRGB(x, y, 0);
+			}
+		}
+		return image;
 	}
 }
 
