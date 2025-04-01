@@ -1,8 +1,10 @@
 package menuitemget;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +13,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +36,7 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	BufferedImage handleImage = new DefaultData().getHandleImage(2);
 	List<BufferedImage> machineImage = new ArrayList<>(new DefaultData().getMachineImage(2));
 	BufferedImage turnImage = new DefaultData().getTurnImage(2);
+	BufferedImage effectImage = new DefaultData().getEffectImage(1);
 	boolean canRepeat;
 	OpenBallMotion OpenBallMotion = new OpenBallMotion(this);
 	BallMotion BallMotion = new BallMotion(OpenBallMotion);
@@ -41,7 +46,6 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	boolean canPlay = true;
 	
 	public MenuItemGet(MainFrame MainFrame) {
-		editImage();
 		addSelectButton();
 		addReturnButton(MainFrame);
 		timer.start();
@@ -52,10 +56,6 @@ public class MenuItemGet extends JPanel implements ActionListener{
 		setSelectButton();
 		setReturnButton();
 		drawGachaImage(g);
-	}
-	
-	private void editImage() {
-		machineImage.set(1, machineImage.get(1).getSubimage(0, 0, machineImage.get(1).getWidth(), machineImage.get(1).getHeight() - 70));
 	}
 	
 	private void addSelectButton() {
@@ -112,6 +112,9 @@ public class MenuItemGet extends JPanel implements ActionListener{
 			g.drawImage(new EditImage().getImage(halfBallImage.get(0), OpenBallMotion.getBottomBallAngel()), point.x, point.y, null);
 			point = OpenBallMotion.getTopBallPosition();
 			g.drawImage(new EditImage().getImage(halfBallImage.get(1), OpenBallMotion.getTopBallAngel()), point.x, point.y, null);
+			int expansion = OpenBallMotion.getExpansion();
+			int color = OpenBallMotion.getColor();
+			g.drawImage(new EditImage().getImage(effectImage, expansion, new Color(255, 255, color, color).getRGB()), 30 - expansion / 2, 210 - expansion / 2, null);
 		}
 		if(canPlay) {
 			g.drawImage(new EditImage().getImage(turnImage, angle), 105, 180, null);
@@ -301,6 +304,8 @@ class OpenBallMotion implements ActionListener{
 	double topAngle;
 	Point bottmPoint;
 	Point topPoint;
+	int color;
+	int expansion;
 	
 	protected OpenBallMotion(MenuItemGet MenuItemGet) {
 		this.MenuItemGet = MenuItemGet;
@@ -339,11 +344,21 @@ class OpenBallMotion implements ActionListener{
 		return topPoint;
 	}
 	
+	protected int getColor() {
+		return color;
+	}
+	
+	protected int getExpansion() {
+		return expansion;
+	}
+	
 	private void reset() {
 		bottomAngle = 0;
 		topAngle = 0;
 		bottmPoint = new Point(160, 345);
 		topPoint = new Point(160, 335);
+		color = 0;
+		expansion = -250;
 	}
 	
 	@Override
@@ -354,6 +369,8 @@ class OpenBallMotion implements ActionListener{
 		bottmPoint.y += 1;
 		topPoint.x += 2;
 		topPoint.y -= 2;
+		color += 5;
+		expansion += 20;
 		if(1 < bottomAngle) {
 			timerStop();
 		}
@@ -362,17 +379,43 @@ class OpenBallMotion implements ActionListener{
 
 //画像編集
 class EditImage{
-	protected BufferedImage getImage(BufferedImage defaultImage, double angle) {
-		int width = defaultImage.getWidth();
-		int height = defaultImage.getHeight();
+	protected BufferedImage getImage(BufferedImage originalImage, double angle) {
+		int width = originalImage.getWidth();
+		int height = originalImage.getHeight();
 		BufferedImage image = getBlankImage(width, height);
 		Graphics2D g2 =  (Graphics2D) image.getGraphics();
 		AffineTransform rotate = new AffineTransform();
 		rotate.setToRotation(angle, width / 2, height / 2);
 		g2.setTransform(rotate);
-		g2.drawImage(defaultImage, 0, 0, null);
+		g2.drawImage(originalImage, 0, 0, null);
 		g2.dispose();
 		return image;
+	}
+	
+	protected BufferedImage getImage(BufferedImage originalImage, int expansion, int color) {
+		int width = originalImage.getWidth();
+		int height = originalImage.getHeight();
+		BufferedImage image = getBlankImage(width, height);
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if(originalImage.getRGB(x, y) == new Color(0, 0, 0).getRGB()) {
+					image.setRGB(x, y, color);
+				}
+			}
+		}
+		int resizeWidth = width + expansion;
+		int resizeHeight = height + expansion;
+		BufferedImage resizeImage = getBlankImage(resizeWidth, resizeHeight);
+		resizeImage.createGraphics().drawImage(
+	    	image.getScaledInstance(resizeWidth, resizeHeight, Image.SCALE_AREA_AVERAGING),
+	        0, 0, resizeWidth, resizeHeight, null);
+		int pixel = 9;
+		float[] matrix = new float[pixel * pixel];
+		for(int i = 0; i < matrix.length; i++) {
+			matrix[i] = 1.5f / (pixel * pixel);//透過度あるため、色濃いめの1.5f
+		}
+		ConvolveOp blur = new ConvolveOp(new Kernel(pixel, pixel, matrix), ConvolveOp.EDGE_NO_OP, null);
+		return blur.filter(resizeImage, null);
 	}
 	
 	private BufferedImage getBlankImage(int width, int height) {

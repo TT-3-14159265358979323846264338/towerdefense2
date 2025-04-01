@@ -110,6 +110,7 @@ public class DefaultData {
 	final static String HANDLE = "image/gacha/machine handle.png";
 	final static List<String> MACHINE = Arrays.asList("image/gacha/machine bottom.png", "image/gacha/machine top.png");
 	final static String TURN = "image/gacha/turn.png";
+	final static String EFFECT = "image/gacha/effect.png";
 	
 	//画像取込み
 	public List<BufferedImage> getCoreImage(int ratio){
@@ -151,6 +152,10 @@ public class DefaultData {
 	public BufferedImage getTurnImage(int ratio) {
 		return new InputImage().input(TURN, ratio);
 	}
+	
+	public BufferedImage getEffectImage(int ratio) {
+		return new InputImage().input(EFFECT, ratio);
+	}
 }
 
 //画像処理
@@ -181,25 +186,33 @@ class InputImage{
 		return image;
 	}
 	
-	//画像処理
 	private BufferedImage editImage(BufferedImage originalImage, int ratio) {
-		int resizeWidth = originalImage.getWidth() / ratio;
-		int resizeHeight = originalImage.getHeight() / ratio;
-		BufferedImage resizeImage = new BufferedImage(resizeWidth, resizeHeight, BufferedImage.TYPE_3BYTE_BGR);
-		resizeImage.createGraphics().drawImage(
-	    	originalImage.getScaledInstance(resizeWidth, resizeHeight, Image.SCALE_AREA_AVERAGING),
-	        0, 0, resizeWidth, resizeHeight, null);
-		
-		BufferedImage finalImage = new BufferedImage(resizeWidth, resizeHeight, BufferedImage.TYPE_INT_ARGB);
-		for (int y = 0; y < resizeHeight; y++) {
-			for (int x = 0; x < resizeWidth; x++) {
-				if (resizeImage.getRGB(x, y) == new Color(255, 255, 255).getRGB()) {
-					finalImage.setRGB(x, y, 0);
-				}else {
-					finalImage.setRGB(x, y, resizeImage.getRGB(x, y));
-                }
+		int width = originalImage.getWidth();
+		int height = originalImage.getHeight();
+		BufferedImage image = getBlankImage(width, height);
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if(originalImage.getRGB(x, y) != new Color(255, 255, 255).getRGB()) {
+					image.setRGB(x, y, originalImage.getRGB(x, y));
+				}
 			}
 		}
-		return finalImage;
+		int resizeWidth = width / ratio;
+		int resizeHeight = height / ratio;
+		BufferedImage resizeImage = getBlankImage(resizeWidth, resizeHeight);
+		resizeImage.createGraphics().drawImage(
+	    	image.getScaledInstance(resizeWidth, resizeHeight, Image.SCALE_AREA_AVERAGING),
+	        0, 0, resizeWidth, resizeHeight, null);
+		return resizeImage;
+	}
+	
+	private BufferedImage getBlankImage(int width, int height) {
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				image.setRGB(x, y, 0);
+			}
+		}
+		return image;
 	}
 }
