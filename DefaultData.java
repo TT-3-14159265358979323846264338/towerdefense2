@@ -16,7 +16,15 @@ import javax.imageio.ImageIO;
 public class DefaultData {
 	//自軍データ
 	public final static int SIZE = 60;
-	final static List<String> CORE_NAME_LIST = Arrays.asList(
+	public final static List<String> CORE_NAME_LIST = Arrays.asList(
+			"ノーマルコア",
+			"ノーマルレッドコア",
+			"ノーマルブラックコア",
+			"ノーマルパープルコア",
+			"ノーマルグリーンコア",
+			"ノーマルイエローコア"
+			);
+	final static List<String> CORE_IMAGE_NAME_LIST = Arrays.asList(
 			"image/soldier/normal core.png",
 			"image/soldier/normal atack core.png",
 			"image/soldier/normal defense core.png",
@@ -24,7 +32,7 @@ public class DefaultData {
 			"image/soldier/normal heal core.png",
 			"image/soldier/normal speed core.png"
 			);
-	final static List<String> CENTER_CORE_NAME_LIST = Arrays.asList(
+	final static List<String> CENTER_IMAGE_CORE_NAME_LIST = Arrays.asList(
 			"image/soldier/normal core center.png",
 			"image/soldier/normal atack core center.png",
 			"image/soldier/normal defense core center.png",
@@ -50,11 +58,15 @@ public class DefaultData {
 			Arrays.asList(1.0, 1.0, 1.1, 1.0, 1.0),
 			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0)
 			);
-	final static List<String> WEAPON_NAME_LIST = Arrays.asList(
+	public final static List<String> WEAPON_NAME_LIST = Arrays.asList(
+			"日本刀",
+			"弓"
+			);
+	final static List<String> WEAPON_IMAGE_NAME_LIST = Arrays.asList(
 			"image/soldier/Japanese sword.png",
 			"image/soldier/bow.png"
 			);
-	final static List<List<String>> RIGHT_WEAPON_NAME_LIST = Arrays.asList(
+	final static List<List<String>> RIGHT_IMAGE_WEAPON_NAME_LIST = Arrays.asList(
 			Arrays.asList("image/soldier/Japanese sword right 0.png",
 					"image/soldier/Japanese sword right 1.png",
 					"image/soldier/Japanese sword right 2.png",
@@ -114,19 +126,19 @@ public class DefaultData {
 	
 	//画像取込み
 	public List<BufferedImage> getCoreImage(int ratio){
-		return new InputImage().inputList(CORE_NAME_LIST, ratio);
+		return new InputImage().inputList(CORE_IMAGE_NAME_LIST, ratio);
 	}
 	
 	public List<BufferedImage> getCenterCoreImage(int ratio){
-		return new InputImage().inputList(CENTER_CORE_NAME_LIST, ratio);
+		return new InputImage().inputList(CENTER_IMAGE_CORE_NAME_LIST, ratio);
 	}
 	
 	public List<BufferedImage> getWeaponImage(int ratio){
-		return new InputImage().inputList(WEAPON_NAME_LIST, ratio);
+		return new InputImage().inputList(WEAPON_IMAGE_NAME_LIST, ratio);
 	}
 	
 	public List<List<BufferedImage>> getRightWeaponImage(int ratio){
-		return new InputImage().inputList2(RIGHT_WEAPON_NAME_LIST, ratio);
+		return new InputImage().inputList2(RIGHT_IMAGE_WEAPON_NAME_LIST, ratio);
 	}
 	
 	public List<List<BufferedImage>> getLeftWeaponImage(int ratio){

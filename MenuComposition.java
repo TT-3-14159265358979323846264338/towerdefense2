@@ -705,24 +705,28 @@ class ImagePanel extends JPanel implements MouseListener{
 	private void coreStatus() {
 		List<Double> weaponStatusList = DefaultData.CORE_WEAPON_STATUS_LIST.get(selectNumber);
 		List<Double> unitStatusList = DefaultData.CORE_UNIT_STATUS_LIST.get(selectNumber);
-		String comment = "【武器ステータス倍率】\n"
+		String comment = "【" + DefaultData.CORE_NAME_LIST.get(selectNumber) + "】" + "\n"
+					+ "\n"
+					+ "【武器ステータス倍率】\n"
 					+ "攻撃倍率: " + weaponStatusList.get(0) + "倍\n"
 					+ "射程倍率: " + weaponStatusList.get(1) + "倍\n"
 					+ "攻撃速度倍率: " + weaponStatusList.get(2) + "倍\n"
 					+ "\n"
-					+"【ユニットステータス倍率】\n"
+					+ "【ユニットステータス倍率】\n"
 					+ "HP倍率: " + unitStatusList.get(0) + "倍\n"
 					+ "防御倍率: " + unitStatusList.get(1) + "倍\n"
 					+ "回復倍率: " + unitStatusList.get(2) + "倍\n"
 					+ "足止め数倍率: " + unitStatusList.get(3) + "倍\n"
 					+ "配置コスト倍率: " + unitStatusList.get(4)+ "倍";
-		showMessageDialog(null, comment);
+		showMessageDialog(null, comment, "コア情報", INFORMATION_MESSAGE, new ImageIcon(imageList.get(selectNumber)));
 	}
 	
 	private void weaponStatus() {
 		List<Integer> weaponStatusList = DefaultData.WEAPON_WEAPON_STATUS_LIST.get(selectNumber);
 		List<Integer> unitStatusList = DefaultData.WEAPON_UNIT_STATUS_LIST.get(selectNumber);
-		String comment = "【武器ステータス】\n"
+		String comment = "【" + DefaultData.WEAPON_NAME_LIST.get(selectNumber) + "】" + "\n"
+					+ "\n"
+					+ "【武器ステータス】\n"
 					+ ((0 <= weaponStatusList.get(0))? "攻撃力: ": "回復力: ") + Math.abs(weaponStatusList.get(0)) + "\n"
 					+ "射程: " + weaponStatusList.get(1) + "\n"
 					+ "攻撃速度: " + weaponStatusList.get(2) + " ms\n"
@@ -737,7 +741,7 @@ class ImagePanel extends JPanel implements MouseListener{
 					+ "【武器タイプ】\n"
 					+ "距離タイプ: " + DefaultData.DISTANCE_MAP.get(DefaultData.WEAPON_TYPE.get(selectNumber).get(0)) + "\n"
 					+ "装備タイプ: " + DefaultData.HANDLE_MAP.get(DefaultData.WEAPON_TYPE.get(selectNumber).get(1));
-		showMessageDialog(null, comment);
+		showMessageDialog(null, comment, "コア情報", INFORMATION_MESSAGE, new ImageIcon(imageList.get(selectNumber)));
 	}
 }
 

@@ -10,7 +10,7 @@ import menuselectstage.MenuSelectStage;
 //メイン画面切り替え
 public class MainFrame extends JFrame{
 	public MainFrame() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
 		setVisible(true);
 		mainMenuDraw();
@@ -27,7 +27,7 @@ public class MainFrame extends JFrame{
 	public void itemGetMenuDraw() {
 		getContentPane().removeAll();
 		setTitle("ガチャ");
-		setSize(365, 510);
+		setSize(585, 510);
 		add(new MenuItemGet(this));
 		setLocationRelativeTo(null);
 	}
