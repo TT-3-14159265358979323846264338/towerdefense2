@@ -19,6 +19,7 @@ import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -66,6 +67,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 	List<List<List<Integer>>> allCompositionList = new ArrayList<>();
 	List<String> compositionNameList = new ArrayList<>();
 	int selectNumber;
+	final static int SIZE = 60;
 	
 	public MenuComposition(MainFrame MainFrame) {
 		addMouseListener(this);
@@ -476,8 +478,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 		for(int i = 0; i < allCompositionList.get(selectNumber).size(); i++) {
 			int x = getPositionX(i) + 60;
 			int y = getPositionY(i) + 60;
-			if(ValueRange.of(x, x + DefaultData.SIZE).isValidIntValue(e.getX())
-					&& ValueRange.of(y, y + DefaultData.SIZE).isValidIntValue(e.getY())){
+			if(ValueRange.of(x, x + SIZE).isValidIntValue(e.getX())
+					&& ValueRange.of(y, y + SIZE).isValidIntValue(e.getY())){
 				int selectCore = CoreImagePanel.getSelectNumber();
 				int selectWeapon = WeaponImagePanel.getSelectNumber();
 				if(0 <= selectCore) {
@@ -567,38 +569,39 @@ public class MenuComposition extends JPanel implements MouseListener{
 	}
 	
 	private String getComment(int number, boolean existsRight, boolean existsLeft) {
+		Function<String, String> editComment = (comment) -> {
+			return String.format("%-" + (25 - comment.getBytes().length) + "s", comment);
+		};
+		Function<List<Integer>, String> editWeaponComment = (weaponStatusList) -> {
+			return (editComment.apply((0 <= weaponStatusList.get(0))? "攻撃力:": "回復力:")) + Math.abs(weaponStatusList.get(0)) + "\n"
+					+ editComment.apply("射程:") + weaponStatusList.get(1) + "\n"
+					+ editComment.apply("攻撃速度:") + weaponStatusList.get(2) + " ms\n"
+					+ "\n";
+		};
 		StatusCalculation StatusCalculation = new StatusCalculation(allCompositionList.get(selectNumber).get(number));
 		List<List<Integer>> weaponStatusList =  StatusCalculation.getWeaponStatus();
 		List<Integer> unitStatusList = StatusCalculation.getUnitStatus();
 		String comment = "【武器ステータス】\n";
 		if(existsLeft && existsRight) {
-			comment += "右武器\n" + getWeaponComment(weaponStatusList.get(0));
-			comment += "左武器\n" + getWeaponComment(weaponStatusList.get(1));
+			comment += "右武器\n" + editWeaponComment.apply(weaponStatusList.get(0));
+			comment += "左武器\n" + editWeaponComment.apply(weaponStatusList.get(1));
 		}else if(!existsLeft && !existsRight){
 			comment += "武器無し\n\n";
 		}else {
-			comment += existsRight? getWeaponComment(weaponStatusList.get(0)): getWeaponComment(weaponStatusList.get(1));
+			comment += existsRight? editWeaponComment.apply(weaponStatusList.get(0)): editWeaponComment.apply(weaponStatusList.get(1));
 		}
 		comment += "【ユニットステータス】\n"
-				+ "HP: " + unitStatusList.get(0) + "\n"
-				+ "防御力: " + unitStatusList.get(1) + "\n"
-				+ "回復: " + unitStatusList.get(2) + "\n"
-				+ "足止め数: " + unitStatusList.get(3) + "\n"
-				+ "配置コスト: " + unitStatusList.get(4) + "\n"
+				+ editComment.apply("体力:") + unitStatusList.get(0) + "\n"
+				+ editComment.apply("防御力:") + unitStatusList.get(1) + "\n"
+				+ editComment.apply("回復:") + unitStatusList.get(2) + "\n"
+				+ editComment.apply("足止め数:") + unitStatusList.get(3) + "\n"
+				+ editComment.apply("配置コスト:") + unitStatusList.get(4) + "\n"
 				+ "\n"
 				+ "【武器タイプ】\n"
 				+ DefaultData.DISTANCE_MAP.get(StatusCalculation.getType()) + "\n"
 				+ "\n"
 				+ "↓武器解除する位置を選択してください↓"
 				+ "\n";
-		return comment;
-	}
-	
-	private String getWeaponComment(List<Integer> weaponStatusList) {
-		String comment =((0 <= weaponStatusList.get(0))? "攻撃力: ": "回復力: ") + Math.abs(weaponStatusList.get(0)) + "\n"
-					+ "射程: " + weaponStatusList.get(1) + "\n"
-					+ "攻撃速度: " + weaponStatusList.get(2) + " ms\n"
-					+ "\n";
 		return comment;
 	}
 	
@@ -672,8 +675,8 @@ class ImagePanel extends JPanel implements MouseListener{
 	@Override
 	public void mousePressed(MouseEvent e) {
 		for(int i = 0; i < imageList.size(); i++) {
-			if(ValueRange.of(10, 10 + DefaultData.SIZE).isValidIntValue(e.getX())
-					&& ValueRange.of(10 + 100 * i, 10 + DefaultData.SIZE + 100 * i).isValidIntValue(e.getY())){
+			if(ValueRange.of(10, 10 + MenuComposition.SIZE).isValidIntValue(e.getX())
+					&& ValueRange.of(10 + 100 * i, 10 + MenuComposition.SIZE + 100 * i).isValidIntValue(e.getY())){
 				if(selectNumber == i) {
 					if(existsWhich) {
 						coreStatus();
@@ -703,40 +706,46 @@ class ImagePanel extends JPanel implements MouseListener{
 	}
 	
 	private void coreStatus() {
+		Function<String, String> editComment = (comment) -> {
+			return String.format("%-" + (35 - comment.getBytes().length) + "s", comment);
+		};
 		List<Double> weaponStatusList = DefaultData.CORE_WEAPON_STATUS_LIST.get(selectNumber);
 		List<Double> unitStatusList = DefaultData.CORE_UNIT_STATUS_LIST.get(selectNumber);
 		String comment = "【" + DefaultData.CORE_NAME_LIST.get(selectNumber) + "】" + "\n"
 					+ "\n"
 					+ "【武器ステータス倍率】\n"
-					+ "攻撃倍率: " + weaponStatusList.get(0) + "倍\n"
-					+ "射程倍率: " + weaponStatusList.get(1) + "倍\n"
-					+ "攻撃速度倍率: " + weaponStatusList.get(2) + "倍\n"
+					+ editComment.apply("攻撃倍率:") + weaponStatusList.get(0) + "倍\n"
+					+ editComment.apply("射程倍率:") + weaponStatusList.get(1) + "倍\n"
+					+ editComment.apply("攻撃速度倍率:") + weaponStatusList.get(2) + "倍\n"
 					+ "\n"
 					+ "【ユニットステータス倍率】\n"
-					+ "HP倍率: " + unitStatusList.get(0) + "倍\n"
-					+ "防御倍率: " + unitStatusList.get(1) + "倍\n"
-					+ "回復倍率: " + unitStatusList.get(2) + "倍\n"
-					+ "足止め数倍率: " + unitStatusList.get(3) + "倍\n"
-					+ "配置コスト倍率: " + unitStatusList.get(4)+ "倍";
+					+ editComment.apply("体力倍率:") + unitStatusList.get(0) + "倍\n"
+					+ editComment.apply("防御倍率:") + unitStatusList.get(1) + "倍\n"
+					+ editComment.apply("回復倍率:") + unitStatusList.get(2) + "倍\n"
+					+ editComment.apply("足止め数倍率:") + unitStatusList.get(3) + "倍\n"
+					+ editComment.apply("配置コスト倍率:") + unitStatusList.get(4)+ "倍";
 		showMessageDialog(null, comment, "コア情報", INFORMATION_MESSAGE, new ImageIcon(imageList.get(selectNumber)));
 	}
 	
 	private void weaponStatus() {
+		Function<String, String> editComment = (comment) -> {
+			return String.format("%-" + (25 - comment.getBytes().length) + "s", comment);
+		};
 		List<Integer> weaponStatusList = DefaultData.WEAPON_WEAPON_STATUS_LIST.get(selectNumber);
 		List<Integer> unitStatusList = DefaultData.WEAPON_UNIT_STATUS_LIST.get(selectNumber);
 		String comment = "【" + DefaultData.WEAPON_NAME_LIST.get(selectNumber) + "】" + "\n"
 					+ "\n"
 					+ "【武器ステータス】\n"
-					+ ((0 <= weaponStatusList.get(0))? "攻撃力: ": "回復力: ") + Math.abs(weaponStatusList.get(0)) + "\n"
-					+ "射程: " + weaponStatusList.get(1) + "\n"
-					+ "攻撃速度: " + weaponStatusList.get(2) + " ms\n"
+					+ editComment.apply(((0 <= weaponStatusList.get(0))? "攻撃力:": "回復力:")) + Math.abs(weaponStatusList.get(0)) + "\n"
+					+ editComment.apply("射程:") + weaponStatusList.get(1) + "\n"
+					+ editComment.apply("攻撃速度:") + weaponStatusList.get(2) + " ms\n"
 					+ "\n"
 					+ "【ユニットステータス】\n"
-					+ "HP: " + unitStatusList.get(0) + "\n"
-					+ "防御力: " + unitStatusList.get(1) + "\n"
-					+ "回復: " + unitStatusList.get(2) + "\n"
-					+ "足止め数: " + unitStatusList.get(3) + "\n"
-					+ "配置コスト: " + unitStatusList.get(4) + "\n"
+					+ editComment.apply("体力:") + unitStatusList.get(0) + "\n"
+					+ editComment.apply("防御力:") + unitStatusList.get(1) + "\n"
+					+ editComment.apply("回復:") + unitStatusList.get(2) + "\n"
+					+ editComment.apply("足止め数:") + unitStatusList.get(3) + "\n"
+					+ editComment.apply("配置コスト:") + unitStatusList.get(4) + "\n"
 					+ "\n"
 					+ "【武器タイプ】\n"
 					+ "距離タイプ: " + DefaultData.DISTANCE_MAP.get(DefaultData.WEAPON_TYPE.get(selectNumber).get(0)) + "\n"

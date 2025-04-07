@@ -15,7 +15,6 @@ import javax.imageio.ImageIO;
 //デフォルトデータ
 public class DefaultData {
 	//自軍データ
-	public final static int SIZE = 60;
 	public final static List<String> CORE_NAME_LIST = Arrays.asList(
 			"ノーマルコア",
 			"ノーマルレッドコア",

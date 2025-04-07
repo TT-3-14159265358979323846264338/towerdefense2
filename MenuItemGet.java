@@ -23,6 +23,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -54,8 +57,8 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	}
 	String[] selectGachaName = {
 			"通常闇鍋ガチャ",
-			"コアガチャ",
-			"武器ガチャ"
+			"通常コアガチャ",
+			"通常武器ガチャ"
 	};
 	JList<String> selectGachaJList = new JList<String>(selectGachaName);
 	JScrollPane selectGachaScroll = new JScrollPane();
@@ -163,10 +166,13 @@ public class MenuItemGet extends JPanel implements ActionListener{
 		g.drawImage(machineImage.get(1), 55, 20, null);
 		g.drawImage(new EditImage().getImage(handleImage, HandleMotion.getAngle()), 145, 220, null);
 		if(OpenBallMotion.getTimerStatus()) {
-			point = OpenBallMotion.getBottomBallPosition();
-			g.drawImage(new EditImage().getImage(halfBallImage.get(0), OpenBallMotion.getBottomBallAngel()), point.x, point.y, null);
-			point = OpenBallMotion.getTopBallPosition();
-			g.drawImage(new EditImage().getImage(halfBallImage.get(1), OpenBallMotion.getTopBallAngel()), point.x, point.y, null);
+			List<Double> angle = OpenBallMotion.getBallAngle();
+			List<Point> position = OpenBallMotion.getBallPosition();
+			Consumer<Integer> drawBallOpen = (i) -> {
+				g.drawImage(new EditImage().getImage(halfBallImage.get(i), angle.get(i)), position.get(i).x, position.get(i).y, null);
+			};
+			drawBallOpen.accept(0);
+			drawBallOpen.accept(1);
 			int expansion = OpenBallMotion.getExpansion();
 			int color = OpenBallMotion.getColor();
 			g.drawImage(new EditImage().getImage(effectImage, expansion, new Color(255, 255, color, color).getRGB()), 30 - expansion / 2, 210 - expansion / 2, null);
@@ -274,9 +280,15 @@ class HandleMotion implements MouseListener, MouseMotionListener, ActionListener
 			double[] x = {175, activePointX, startPointX};
 			double[] y = {250, activePointY, startPointY};
 			double[] distance = new double[3];
-			distance[0] = Math.sqrt(Math.pow(x[1] - x[2], 2) + Math.pow(y[1] - y[2], 2));
-			distance[1] = Math.sqrt(Math.pow(x[0] - x[2], 2) + Math.pow(y[0] - y[2], 2));
-			distance[2] = Math.sqrt(Math.pow(x[0] - x[1], 2) + Math.pow(y[0] - y[1], 2));
+			BiFunction<Double, Double, Double> pow = (x1, x2) -> {
+				return Math.pow(x1 - x2, 2);
+			};
+			BiFunction<Integer, Integer, Double> sqrt = (i, j) -> {
+				return Math.sqrt(pow.apply(x[i], x[j]) + pow.apply(y[i], y[j]));
+			};
+			distance[0] = sqrt.apply(1, 2);
+			distance[1] = sqrt.apply(0, 2);
+			distance[2] = sqrt.apply(0, 1);
 			angle = Math.acos((Math.pow(distance[0], 2) - Math.pow(distance[1], 2) - Math.pow(distance[2], 2)) / (-2 * distance[1] * distance[2]));
 			return angle;
 		}
@@ -410,7 +422,7 @@ class OpenBallMotion implements ActionListener{
 	Timer timer = new Timer(40, this);
 	double bottomAngle;
 	double topAngle;
-	Point bottmPoint;
+	Point bottomPoint;
 	Point topPoint;
 	int color;
 	int expansion;
@@ -436,20 +448,12 @@ class OpenBallMotion implements ActionListener{
 		return timer.isRunning();
 	}
 	
-	protected double getBottomBallAngel() {
-		return bottomAngle;
+	protected List<Double> getBallAngle(){
+		return Arrays.asList(bottomAngle, topAngle);
 	}
 	
-	protected double getTopBallAngel() {
-		return topAngle;
-	}
-	
-	protected Point getBottomBallPosition() {
-		return bottmPoint;
-	}
-	
-	protected Point getTopBallPosition() {
-		return topPoint;
+	protected List<Point> getBallPosition(){
+		return Arrays.asList(bottomPoint, topPoint);
 	}
 	
 	protected int getColor() {
@@ -463,7 +467,7 @@ class OpenBallMotion implements ActionListener{
 	private void reset() {
 		bottomAngle = 0;
 		topAngle = 0;
-		bottmPoint = new Point(160, 345);
+		bottomPoint = new Point(160, 345);
 		topPoint = new Point(160, 335);
 		color = 0;
 		expansion = -250;
@@ -473,8 +477,8 @@ class OpenBallMotion implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		bottomAngle += 0.04;
 		topAngle += 0.1;
-		bottmPoint.x -= 2;
-		bottmPoint.y += 1;
+		bottomPoint.x -= 2;
+		bottomPoint.y += 1;
 		topPoint.x += 2;
 		topPoint.y -= 2;
 		color += 5;
@@ -498,7 +502,7 @@ class GachaResult extends JFrame implements WindowListener{
 		setResizable(false);
 		setVisible(true);
 		setTitle("ガチャ結果");
-		setSize(445, 160);
+		setSize(970, 300);
 		setLocationRelativeTo(null);
 		add(new DrawResult(gachaMode));
 	}
@@ -532,26 +536,33 @@ class GachaResult extends JFrame implements WindowListener{
 
 //ガチャ結果表示
 class DrawResult extends JPanel implements MouseListener{
+	DefaultLineup DefaultLineup;
 	List<Integer> getCore = new ArrayList<>();
+	List<Point> corePosition = new ArrayList<>();
 	List<Integer> getWeapon = new ArrayList<>();
+	List<Point> weaponPosition = new ArrayList<>();
+	double total;
+	int position;
+	List<BufferedImage> coreImageList = new DefaultData().getCoreImage(2);
+	List<BufferedImage> weaponImageList = new DefaultData().getWeaponImage(2);
 	
 	protected DrawResult(int[] gachaMode){
 		addMouseListener(this);
 		setBackground(new Color(240, 170, 80));
-		
-		
-		
-		
+		DefaultLineup = new DefaultLineup(gachaMode[1]);
 		switch(gachaMode[0]) {
 		case 0:
+			position = 435;
 			gacha();
 			break;
 		case 1:
+			position = 255;
 			for(int i = 0; i < 5; i++) {
 				gacha();
 			}
 			break;
 		case 2:
+			position = 20;
 			for(int i = 0; i < 10; i++) {
 				gacha();
 			}
@@ -559,28 +570,48 @@ class DrawResult extends JPanel implements MouseListener{
 		default:
 			break;
 		}
-		
-		
-		
-		
-		
-		
 	}
 	
 	private void gacha() {
-		
-		
-		
-		
-		
+		Consumer<List<Point>> addPosition = (list) -> {
+			list.add(new Point(position, 90));
+		};
+		double value = Math.random() * 100;
+		total = 0;
+		if(result(value, DefaultLineup.getCoreLineup(), DefaultLineup.getCoreRatio(), getCore)) {
+			addPosition.accept(corePosition);
+		}else if(result(value, DefaultLineup.getWeaponLineup(), DefaultLineup.getWeaponRatio(), getWeapon)) {
+			addPosition.accept(weaponPosition);
+		}
+		position += 90;
 	}
+	
+	private boolean result(double value, List<Integer> lineupList, List<Double> ratioList, List<Integer> getList) {
+		if(ratioList.size() != 0) {
+			for(int i = 0; i < ratioList.size(); i++) {
+				total += ratioList.get(i);
+				if(value < total) {
+					getList.add(lineupList.get(i));
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		
-		
-		
-		
+		draw(g, getCore, coreImageList, corePosition);
+		draw(g, getWeapon, weaponImageList, weaponPosition);
+	}
+	
+	private void draw(Graphics g, List<Integer> getList, List<BufferedImage> imageList, List<Point> position) {
+		if(getList.size() != 0) {
+			for(int i = 0; i < getList.size(); i++) {
+				g.drawImage(imageList.get(getList.get(i)), position.get(i).x, position.get(i).y, null);
+			}
+		}
 	}
 	
 	@Override
@@ -589,6 +620,10 @@ class DrawResult extends JPanel implements MouseListener{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		
+		
+		
+		
 		
 		
 	}
@@ -602,62 +637,56 @@ class DrawResult extends JPanel implements MouseListener{
 	@Override
 	public void mouseExited(MouseEvent e) {
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
 
 //ガチャ詳細
 class GachaLineup extends JFrame{
-	DefaultLineup DefaultLineup;
-	
 	protected GachaLineup(int mode) {
-		DefaultLineup = new DefaultLineup(mode);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setVisible(true);
 		setTitle("ガチャラインナップ");
 		setSize(300, 600);
 		setLocationRelativeTo(null);
-		add(getLineupScrollPane());
+		add(getLineupScrollPane(new DefaultLineup(mode)));
 	}
 	
-	private JScrollPane getLineupScrollPane() {
+	private JScrollPane getLineupScrollPane(DefaultLineup DefaultLineup) {
+		Function<String, String> getName = (name) -> {
+			return String.format("%-" + (60 - name.getBytes().length) + "s", name);
+		};
+		Function<Double, String> getRatio = (value) -> {
+			return String.format("%.1f", value) + "%";
+		};
 		List<Integer> coreLineup = DefaultLineup.getCoreLineup();
 		List<Double> coreRatio = DefaultLineup.getCoreRatio();
 		List<Integer> weaponLineup = DefaultLineup.getWeaponLineup();
 		List<Double> weaponRatio = DefaultLineup.getWeaponRatio();
 		DefaultListModel<String> lineup = new DefaultListModel<String>();
-		double sum = 0;
-		for(double i: coreRatio) {
-			sum += i;
-		}
-		lineup.addElement("【コア確率】 " + String.format("%.1f", sum) + "%");
+		lineup.addElement("【コア確率】 " + getRatio.apply(getTotal(coreRatio)));
 		lineup.addElement(" ");
 		for(int i = 0; i < coreLineup.size(); i++) {
-			lineup.addElement(DefaultData.CORE_NAME_LIST.get(coreLineup.get(i)) + " " + String.format("%.1f", coreRatio.get(i)) + "%");
+			lineup.addElement(getName.apply(DefaultData.CORE_NAME_LIST.get(coreLineup.get(i))) + getRatio.apply(coreRatio.get(i)));
 		}
-		if(sum != 0) {
+		if(getTotal(coreRatio) != 0) {
 			lineup.addElement(" ");
 		}
-		sum = 0;
-		for(double i: weaponRatio) {
-			sum += i;
-		}
-		lineup.addElement("【武器確率】 " + String.format("%.1f", sum) + "%");
+		lineup.addElement("【武器確率】 " + getRatio.apply(getTotal(weaponRatio)));
 		lineup.addElement(" ");
 		for(int i = 0; i < weaponLineup.size(); i++) {
-			lineup.addElement(DefaultData.WEAPON_NAME_LIST.get(weaponLineup.get(i)) + " " + String.format("%.1f", weaponRatio.get(i)) + "%");
+			lineup.addElement(getName.apply(DefaultData.WEAPON_NAME_LIST.get(weaponLineup.get(i))) + getRatio.apply(weaponRatio.get(i)));
 		}
 		JList<String> lineupJList = new JList<String>(lineup);
 		lineupJList.setEnabled(false);
 		return new JScrollPane(lineupJList);
+	}
+	
+	private double getTotal(List<Double> list) {
+		double total = 0;
+		for(double i: list) {
+			total += i;
+		}
+		return total;
 	}
 }
 
@@ -678,34 +707,31 @@ class DefaultLineup{
 	protected DefaultLineup(int mode) {
 		switch(mode) {
 		case 0:
-			coreLineup = coreLineupSet1;
-			weaponLineup = weaponLineupSet1;
-			for(int i = 0; i < coreLineup.size(); i++) {
-				coreRatio.add(getRatio(50, coreLineup.size()));
-			}
-			for(int i = 0; i < weaponLineup.size(); i++) {
-				weaponRatio.add(getRatio(50, weaponLineup.size()));
-			}
+			coreLineup.addAll(coreLineupSet1);
+			coreRatio.addAll(getRatioList(50, coreLineup.size()));
+			weaponLineup.addAll(weaponLineupSet1);
+			weaponRatio.addAll(getRatioList(50, weaponLineup.size()));
 			break;
 		case 1:
-			coreLineup = coreLineupSet1;
-			for(int i = 0; i < coreLineup.size(); i++) {
-				coreRatio.add(getRatio(100, coreLineup.size()));
-			}
+			coreLineup.addAll(coreLineupSet1);
+			coreRatio.addAll(getRatioList(100, coreLineup.size()));
 			break;
 		case 2:
-			weaponLineup = weaponLineupSet1;
-			for(int i = 0; i < weaponLineup.size(); i++) {
-				weaponRatio.add(getRatio(100, weaponLineup.size()));
-			}
+			weaponLineup.addAll(weaponLineupSet1);
+			weaponRatio.addAll(getRatioList(100, weaponLineup.size()));
 			break;
 		default:
 			break;
 		}
 	}
 	
-	private double getRatio(double allRatio, int count) {
-		return (double) (allRatio / count);
+	private List<Double> getRatioList(double totalRatio, int size){
+		List<Double> ratioList = new ArrayList<>();
+		double ratio = (double) (totalRatio / size);
+		for(int i = 0; i < size; i++) {
+			ratioList.add(ratio);
+		}
+		return ratioList;
 	}
 	
 	protected List<Integer> getCoreLineup(){
