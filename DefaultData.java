@@ -1,6 +1,7 @@
 package defaultdata;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 //デフォルトデータ
 public class DefaultData {
@@ -124,6 +126,27 @@ public class DefaultData {
 	final static String EFFECT = "image/gacha/effect.png";
 	
 	//画像取込み
+	public ImageIcon getIcon(List<Integer> imageNumberList) {
+		BufferedImage ceterImage = new InputImage().input(CENTER_IMAGE_CORE_NAME_LIST.get(imageNumberList.get(1)), 2);
+		BufferedImage image = new InputImage().getBlankImage(ceterImage.getWidth(), ceterImage.getHeight());
+		Graphics graphics = image.getGraphics();
+		try {
+			BufferedImage rightImage = new InputImage().input(RIGHT_IMAGE_WEAPON_NAME_LIST.get(imageNumberList.get(0)).get(0), 2);
+			graphics.drawImage(rightImage, 0, 0, null);
+		}catch(Exception ignore) {
+			//右武器を装備していないので、無視する
+		}
+		graphics.drawImage(ceterImage, 0, 0, null);
+		try {
+			BufferedImage leftImage = new InputImage().input(LEFT_WEAPON_NAME_LIST.get(imageNumberList.get(2)).get(0), 2);
+			graphics.drawImage(leftImage, 0, 0, null);
+		}catch(Exception ignore) {
+			//左武器を装備していないので、無視する
+		}
+		graphics.dispose();
+		return new ImageIcon(image);
+	}
+	
 	public List<BufferedImage> getCoreImage(int ratio){
 		return new InputImage().inputList(CORE_IMAGE_NAME_LIST, ratio);
 	}
@@ -217,7 +240,7 @@ class InputImage{
 		return resizeImage;
 	}
 	
-	private BufferedImage getBlankImage(int width, int height) {
+	protected BufferedImage getBlankImage(int width, int height) {
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {

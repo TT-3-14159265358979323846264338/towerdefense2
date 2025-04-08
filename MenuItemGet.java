@@ -18,6 +18,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
+import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import javax.swing.Timer;
 
 import defaultdata.DefaultData;
 import mainframe.MainFrame;
+import statuscomment.StatusComment;
 
 //ガチャ本体
 public class MenuItemGet extends JPanel implements ActionListener{
@@ -545,6 +547,7 @@ class DrawResult extends JPanel implements MouseListener{
 	int position;
 	List<BufferedImage> coreImageList = new DefaultData().getCoreImage(2);
 	List<BufferedImage> weaponImageList = new DefaultData().getWeaponImage(2);
+	final static int SIZE = 80;
 	
 	protected DrawResult(int[] gachaMode){
 		addMouseListener(this);
@@ -570,6 +573,7 @@ class DrawResult extends JPanel implements MouseListener{
 		default:
 			break;
 		}
+		save();
 	}
 	
 	private void gacha() {
@@ -599,6 +603,18 @@ class DrawResult extends JPanel implements MouseListener{
 		return false;
 	}
 	
+	private void save() {
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	}
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -620,12 +636,16 @@ class DrawResult extends JPanel implements MouseListener{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		
-		
-		
-		
-		
-		
+		int selectNumber = selectCheck(e.getPoint(), corePosition);
+		if(0 <= selectNumber) {
+			new StatusComment().coreStatus(getCore.get(selectNumber), coreImageList);
+			return;
+		}
+		selectNumber = selectCheck(e.getPoint(), weaponPosition);
+		if(0 <= selectNumber) {
+			new StatusComment().weaponStatus(getWeapon.get(selectNumber), weaponImageList);
+			return;
+		}
 	}
 
 	@Override
@@ -636,6 +656,16 @@ class DrawResult extends JPanel implements MouseListener{
 	}
 	@Override
 	public void mouseExited(MouseEvent e) {
+	}
+	
+	private int selectCheck(Point point, List<Point> positionList) {
+		for(int i = 0; i < positionList.size(); i++) {
+			if(ValueRange.of(positionList.get(i).x, positionList.get(i).x + SIZE).isValidIntValue(point.x)
+					&& ValueRange.of(positionList.get(i).y, positionList.get(i).y + SIZE).isValidIntValue(point.y)){
+				return i;
+			}
+		}
+		return -1;
 	}
 }
 
