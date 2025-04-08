@@ -18,6 +18,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +44,7 @@ import javax.swing.Timer;
 
 import defaultdata.DefaultData;
 import mainframe.MainFrame;
+import saveholditem.SaveHoldItem;
 import statuscomment.StatusComment;
 
 //ガチャ本体
@@ -539,6 +546,7 @@ class GachaResult extends JFrame implements WindowListener{
 //ガチャ結果表示
 class DrawResult extends JPanel implements MouseListener{
 	DefaultLineup DefaultLineup;
+	SaveHoldItem SaveHoldItem;
 	List<Integer> getCore = new ArrayList<>();
 	List<Point> corePosition = new ArrayList<>();
 	List<Integer> getWeapon = new ArrayList<>();
@@ -604,16 +612,35 @@ class DrawResult extends JPanel implements MouseListener{
 	}
 	
 	private void save() {
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		try {
+			ObjectInputStream loadItemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
+			SaveHoldItem = (SaveHoldItem) loadItemData.readObject();
+			loadItemData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		List<Integer> coreNumberList = getItemList(SaveHoldItem.getCoreNumberList(), getCore);
+		List<Integer> weaponNumberList = getItemList(SaveHoldItem.getWeaponNumberList(), getWeapon);
+		try {
+			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
+			saveItemData.writeObject(new SaveHoldItem(coreNumberList, weaponNumberList));
+			saveItemData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private List<Integer> getItemList(List<Integer> dataList, List<Integer> getList){
+		List<Integer> finalList = new ArrayList<>();
+		int[] count = new int[dataList.size()];
+		for(int i: getList) {
+			count[i]++;
+		}
+		for(int i = 0; i < count.length; i++) {
+			finalList.add(dataList.get(i) + count[i]);
+		}
+		return finalList;
 	}
 	
 	protected void paintComponent(Graphics g) {
