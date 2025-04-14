@@ -59,6 +59,15 @@ public class DefaultData {
 			Arrays.asList(1.0, 1.0, 1.1, 1.0, 1.0),
 			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0)
 			);
+	//属性カット率はELEMENT_MAPの順でリスト化
+	public final static List<List<Double>> CORE_CUT_STATUS_LIST = Arrays.asList(
+			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+			);
 	public final static List<String> WEAPON_NAME_LIST = Arrays.asList(
 			"日本刀",
 			"弓"
@@ -90,10 +99,10 @@ public class DefaultData {
 					"image/soldier/bow left 4.png",
 					"image/soldier/bow left 5.png")
 			);
-	//武器タイプは① 0: 近接, 1: 遠隔, 2: 遠近 ② 0: 片手, 1: 両手 で登録
+	//武器タイプは ① 距離 ② 装備位置で登録
 	public final static List<List<Integer>> WEAPON_TYPE = Arrays.asList(
-			Arrays.asList(0, 0),
-			Arrays.asList(1, 1)
+			Arrays.asList(0, 0, 0),
+			Arrays.asList(1, 1, 1)
 			);
 	public final static Map<Integer, String> DISTANCE_MAP = new HashMap<Integer, String>();{
 		DISTANCE_MAP.put(0,"近接");
@@ -104,6 +113,24 @@ public class DefaultData {
 		HANDLE_MAP.put(0,"片手");
 		HANDLE_MAP.put(1,"両手");
 	}
+	//全ての武器属性と登録
+	public final static List<List<Integer>> WEAPON_ELEMENT = Arrays.asList(
+			Arrays.asList(0),
+			Arrays.asList(1)
+			);
+	public final static Map<Integer, String> ELEMENT_MAP = new HashMap<Integer, String>();{
+		ELEMENT_MAP.put(0,"斬撃");
+		ELEMENT_MAP.put(1,"刺突");
+		ELEMENT_MAP.put(2,"殴打");
+		ELEMENT_MAP.put(3,"衝撃");
+		ELEMENT_MAP.put(4,"炎");
+		ELEMENT_MAP.put(5,"水");
+		ELEMENT_MAP.put(6,"風");
+		ELEMENT_MAP.put(7,"土");
+		ELEMENT_MAP.put(8,"雷");
+		ELEMENT_MAP.put(9,"聖");
+		ELEMENT_MAP.put(10,"闇");
+	}
 	//武器ステータスは 攻撃, 射程, 攻撃速度 の順でリスト化
 	public final static List<List<Integer>> WEAPON_WEAPON_STATUS_LIST = Arrays.asList(
 			Arrays.asList(100, 30, 1000),
@@ -113,6 +140,11 @@ public class DefaultData {
 	public final static List<List<Integer>> WEAPON_UNIT_STATUS_LIST = Arrays.asList(
 			Arrays.asList(1000, 100, 10, 1, 5),
 			Arrays.asList(1000, 100, 10, 0, 10)
+			);
+	//属性カット率はELEMENT_MAPの順でリスト化
+	public final static List<List<Double>> WEAPON_CUT_STATUS_LIST = Arrays.asList(
+			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
+			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 			);
 	
 	//敵軍データ

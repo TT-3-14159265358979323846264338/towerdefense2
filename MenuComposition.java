@@ -549,17 +549,15 @@ public class MenuComposition extends JPanel implements MouseListener{
 	}
 	
 	private void removeWeapon(int number) {
-		boolean existsRight = (allCompositionList.get(selectNumber).get(number).get(0) == -1)? false: true;
-		boolean existsLeft = (allCompositionList.get(selectNumber).get(number).get(2) == -1)? false: true;
 		StatusCalculation StatusCalculation = new StatusCalculation(allCompositionList.get(selectNumber).get(number));
 		List<List<Integer>> weaponStatusList =  StatusCalculation.getWeaponStatus();
 		List<Integer> unitStatusList = StatusCalculation.getUnitStatus();
 		int type = StatusCalculation.getType();
-		String comment = new StatusComment().getComment(weaponStatusList, unitStatusList, type, existsRight, existsLeft);
+		String comment = new StatusComment().getComment(weaponStatusList, unitStatusList, type);
 		ImageIcon icom = new DefaultData().getIcon(allCompositionList.get(selectNumber).get(number));
 		String[] menu = new String[3];
-		menu[0] = existsLeft? "左": "";
-		menu[1] = existsRight? "右": "";
+		menu[0] = (weaponStatusList.get(2).get(0) != -1)? "左": "";
+		menu[1] = (weaponStatusList.get(0).get(0) != -1)? "右": "";
 		menu[2] = "戻る";
 		int select = showOptionDialog(null, comment, "ステータスと武器解除", OK_CANCEL_OPTION, PLAIN_MESSAGE, icom, menu, menu[0]);
 		switch(select) {
@@ -673,9 +671,11 @@ class DelaySelect extends Thread{
 //ステータス計算
 class StatusCalculation{
 	int rightType;
+	List<Integer> rightElement;
 	List<Integer> rightWeaponStatus;
 	List<Integer> rightUnitStatus;
 	int leftType;
+	List<Integer> leftElement;
 	List<Integer> leftWeaponStatus;
 	List<Integer> leftUnitStatus;
 	List<Double> coreWeaponStatus;
@@ -684,19 +684,23 @@ class StatusCalculation{
 	protected StatusCalculation(List<Integer> unitData) {
 		try {
 			rightType = DefaultData.WEAPON_TYPE.get(unitData.get(0)).get(0);
+			rightElement = DefaultData.WEAPON_ELEMENT.get(unitData.get(0));
 			rightWeaponStatus = DefaultData.WEAPON_WEAPON_STATUS_LIST.get(unitData.get(0));
 			rightUnitStatus = DefaultData.WEAPON_UNIT_STATUS_LIST.get(unitData.get(0));
 		}catch(Exception e) {
 			rightType = defaultType();
+			rightElement = defaultElement();
 			rightWeaponStatus = defaultWeaponStatus();
 			rightUnitStatus = defaultUnitStatus();
 		}
 		try {
 			leftType = DefaultData.WEAPON_TYPE.get(unitData.get(2)).get(0);
+			leftElement = DefaultData.WEAPON_ELEMENT.get(unitData.get(2));
 			leftWeaponStatus = DefaultData.WEAPON_WEAPON_STATUS_LIST.get(unitData.get(2));
 			leftUnitStatus = DefaultData.WEAPON_UNIT_STATUS_LIST.get(unitData.get(2));
 		}catch(Exception e) {
 			leftType = defaultType();
+			leftElement = defaultElement();
 			leftWeaponStatus = defaultWeaponStatus();
 			leftUnitStatus = defaultUnitStatus();
 		}
@@ -706,6 +710,10 @@ class StatusCalculation{
 	
 	private int defaultType() {
 		return -1;
+	}
+	
+	private List<Integer> defaultElement(){
+		return Arrays.asList(-1);
 	}
 	
 	private List<Integer> defaultWeaponStatus(){
@@ -730,7 +738,9 @@ class StatusCalculation{
 	
 	protected List<List<Integer>> getWeaponStatus(){
 		List<List<Integer>> weaponStatus = new ArrayList<>();
+		weaponStatus.add(rightElement);
 		weaponStatus.add(getEachWeaponStatus(rightWeaponStatus));
+		weaponStatus.add(leftElement);
 		weaponStatus.add(getEachWeaponStatus(leftWeaponStatus));
 		return weaponStatus;
 	}
