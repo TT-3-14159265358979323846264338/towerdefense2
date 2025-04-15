@@ -1,1 +1,1 @@
-ゲームで使用する画像はbrunchのimageに保管
+ゲームで使用する画像はbranchの各種imageに保管
