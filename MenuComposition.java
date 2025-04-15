@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -21,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -29,10 +29,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import defaultdata.DefaultData;
+import drawstatus.DrawStatus;
 import mainframe.MainFrame;
 import savecomposition.SaveComposition;
 import saveholditem.SaveHoldItem;
-import statuscomment.StatusComment;
 
 //編成
 public class MenuComposition extends JPanel implements MouseListener{
@@ -141,7 +141,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 	
 	private void save() {
 		List<List<List<Integer>>> weaponStatusList = new ArrayList<>();
-		List<List<Integer>> unitStatusList = new ArrayList<>();
+		List<List<List<Integer>>> unitStatusList = new ArrayList<>();
 		List<Integer> typeList = new ArrayList<>();
 		for(List<Integer> i : allCompositionList.get(selectNumber)) {
 			StatusCalculation StatusCalculation = new StatusCalculation(i);
@@ -491,7 +491,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 						changeWeapon(i, selectWeapon);
 					}
 				}else {
-					removeWeapon(i);
+					unitStstus(i);
 				}
 			}
 		}
@@ -508,6 +508,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 	
 	private void changeCore(int number, int selectCore) {
 		allCompositionList.get(selectNumber).get(number).set(1, selectCore);
+		CoreImagePanel.selectNumber = -1;
 	}
 	
 	private void changeWeapon(int number, int selectWeapon) {
@@ -530,6 +531,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 				break;
 			}
 		}
+		WeaponImagePanel.selectNumber = -1;
 	}
 	
 	private int changeConfirmation(int number, int selectWeapon) {
@@ -548,28 +550,37 @@ public class MenuComposition extends JPanel implements MouseListener{
 		return select;
 	}
 	
-	private void removeWeapon(int number) {
-		StatusCalculation StatusCalculation = new StatusCalculation(allCompositionList.get(selectNumber).get(number));
+	private void unitStstus(int number) {
+		List<Integer> unitData = allCompositionList.get(selectNumber).get(number);
+		StatusCalculation StatusCalculation = new StatusCalculation(unitData);
 		List<List<Integer>> weaponStatusList =  StatusCalculation.getWeaponStatus();
-		List<Integer> unitStatusList = StatusCalculation.getUnitStatus();
-		int type = StatusCalculation.getType();
-		String comment = new StatusComment().getComment(weaponStatusList, unitStatusList, type);
-		ImageIcon icom = new DefaultData().getIcon(allCompositionList.get(selectNumber).get(number));
-		String[] menu = new String[3];
-		menu[0] = (weaponStatusList.get(2).get(0) != -1)? "左": "";
-		menu[1] = (weaponStatusList.get(0).get(0) != -1)? "右": "";
-		menu[2] = "戻る";
-		int select = showOptionDialog(null, comment, "ステータスと武器解除", OK_CANCEL_OPTION, PLAIN_MESSAGE, icom, menu, menu[0]);
-		switch(select) {
-		case 0:
-			allCompositionList.get(selectNumber).get(number).set(2, -1);
-			break;
-		case 1:
-			allCompositionList.get(selectNumber).get(number).set(0, -1);
-			break;
-		default:
-			break;
+		List<List<Integer>> unitStatusList = StatusCalculation.getUnitStatus();
+		new DrawStatus().unit(getImage(unitData), unitData, weaponStatusList, unitStatusList);
+	}
+	
+	private BufferedImage getImage(List<Integer> unitData) {
+		int width = ceterCoreList.get(unitData.get(1)).getWidth();
+		int height = ceterCoreList.get(unitData.get(1)).getHeight();
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				image.setRGB(x, y, 0);
+			}
 		}
+		Graphics2D g2 =  (Graphics2D) image.getGraphics();
+		try {
+			g2.drawImage(rightWeaponList.get(unitData.get(0)).get(0), 0, 0, this);
+		}catch(Exception ignore) {
+			//右武器を装備していないので、無視する
+		}
+		g2.drawImage(ceterCoreList.get(unitData.get(1)), 0, 0, this);
+		try {
+			g2.drawImage(leftWeaponList.get(unitData.get(2)).get(0), 0, 0, this);
+		}catch(Exception ignore) {
+			//左武器を装備していないので、無視する
+		}
+		g2.dispose();
+		return image;
 	}
 }
 
@@ -621,9 +632,9 @@ class ImagePanel extends JPanel implements MouseListener{
 					&& ValueRange.of(10 + 100 * i, 10 + MenuComposition.SIZE + 100 * i).isValidIntValue(e.getY())){
 				if(selectNumber == i) {
 					if(existsWhich) {
-						new StatusComment().coreStatus(selectNumber, imageList);
+						new DrawStatus().core(imageList.get(selectNumber), selectNumber);
 					}else {
-						new StatusComment().weaponStatus(selectNumber, imageList);
+						new DrawStatus().weapon(imageList.get(selectNumber), selectNumber);
 					}
 				}else {
 					selectNumber = i;
@@ -681,31 +692,40 @@ class StatusCalculation{
 	List<Double> coreWeaponStatus;
 	List<Double> coreUnitStatus;
 	
+	List<Integer> rightWeaponCutList;
+	List<Integer> leftWeaponCutList;
+	List<Integer> coreCutList;
+	
 	protected StatusCalculation(List<Integer> unitData) {
 		try {
 			rightType = DefaultData.WEAPON_TYPE.get(unitData.get(0)).get(0);
 			rightElement = DefaultData.WEAPON_ELEMENT.get(unitData.get(0));
 			rightWeaponStatus = DefaultData.WEAPON_WEAPON_STATUS_LIST.get(unitData.get(0));
 			rightUnitStatus = DefaultData.WEAPON_UNIT_STATUS_LIST.get(unitData.get(0));
+			rightWeaponCutList = DefaultData.WEAPON_CUT_STATUS_LIST.get(unitData.get(0));
 		}catch(Exception e) {
 			rightType = defaultType();
 			rightElement = defaultElement();
 			rightWeaponStatus = defaultWeaponStatus();
 			rightUnitStatus = defaultUnitStatus();
+			rightWeaponCutList = defaultCutList();
 		}
 		try {
 			leftType = DefaultData.WEAPON_TYPE.get(unitData.get(2)).get(0);
 			leftElement = DefaultData.WEAPON_ELEMENT.get(unitData.get(2));
 			leftWeaponStatus = DefaultData.WEAPON_WEAPON_STATUS_LIST.get(unitData.get(2));
 			leftUnitStatus = DefaultData.WEAPON_UNIT_STATUS_LIST.get(unitData.get(2));
+			leftWeaponCutList = DefaultData.WEAPON_CUT_STATUS_LIST.get(unitData.get(2));
 		}catch(Exception e) {
 			leftType = defaultType();
 			leftElement = defaultElement();
 			leftWeaponStatus = defaultWeaponStatus();
 			leftUnitStatus = defaultUnitStatus();
+			leftWeaponCutList = defaultCutList();
 		}
 		coreWeaponStatus = DefaultData.CORE_WEAPON_STATUS_LIST.get(unitData.get(1));
 		coreUnitStatus = DefaultData.CORE_UNIT_STATUS_LIST.get(unitData.get(1));
+		coreCutList = DefaultData.CORE_CUT_STATUS_LIST.get(unitData.get(1));
 	}
 	
 	private int defaultType() {
@@ -722,6 +742,10 @@ class StatusCalculation{
 	
 	private List<Integer> defaultUnitStatus(){
 		return Arrays.asList(1000, 0, 0, 0, 0);
+	}
+	
+	private List<Integer> defaultCutList(){
+		return Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	}
 	
 	protected int getType() {
@@ -755,12 +779,17 @@ class StatusCalculation{
 		return statusList;
 	}
 	
-	protected List<Integer> getUnitStatus(){
-		List<Integer> statusList = new ArrayList<>();
+	protected List<List<Integer>> getUnitStatus(){
+		List<List<Integer>> statusList = new ArrayList<>();
 		double status;
+		statusList.add(new ArrayList<>());
+		for(int i = 0; i < coreCutList.size(); i++) {
+			statusList.get(0).add(leftWeaponCutList.get(i) + coreCutList.get(i) + rightWeaponCutList.get(i));
+		}
+		statusList.add(new ArrayList<>());
 		for(int i = 0; i < coreUnitStatus.size(); i++) {
 			status = (double) (rightUnitStatus.get(i) + leftUnitStatus.get(i)) * coreUnitStatus.get(i);
-			statusList.add((int) status);
+			statusList.get(1).add((int) status);
 		}
 		return statusList;
 	}

@@ -60,13 +60,13 @@ public class DefaultData {
 			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0)
 			);
 	//属性カット率はELEMENT_MAPの順でリスト化
-	public final static List<List<Double>> CORE_CUT_STATUS_LIST = Arrays.asList(
-			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+	public final static List<List<Integer>> CORE_CUT_STATUS_LIST = Arrays.asList(
+			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 			);
 	public final static List<String> WEAPON_NAME_LIST = Arrays.asList(
 			"日本刀",
@@ -142,9 +142,9 @@ public class DefaultData {
 			Arrays.asList(1000, 100, 10, 0, 10)
 			);
 	//属性カット率はELEMENT_MAPの順でリスト化
-	public final static List<List<Double>> WEAPON_CUT_STATUS_LIST = Arrays.asList(
-			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
-			Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+	public final static List<List<Integer>> WEAPON_CUT_STATUS_LIST = Arrays.asList(
+			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 			);
 	
 	//敵軍データ

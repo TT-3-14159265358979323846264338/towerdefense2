@@ -12,8 +12,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
@@ -36,16 +34,16 @@ import java.util.function.Function;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
 import defaultdata.DefaultData;
+import drawstatus.DrawStatus;
 import mainframe.MainFrame;
 import saveholditem.SaveHoldItem;
-import statuscomment.StatusComment;
 
 //ガチャ本体
 public class MenuItemGet extends JPanel implements ActionListener{
@@ -450,7 +448,9 @@ class OpenBallMotion implements ActionListener{
 	private void timerStop() {
 		timer.stop();
 		reset();
-		new GachaResult(MenuItemGet, HandleMotion, gachaMode);
+		HandleMotion.addListener();
+		MenuItemGet.activatePanel();
+		new GachaResult(gachaMode);
 	}
 	
 	protected boolean getTimerStatus() {
@@ -499,47 +499,16 @@ class OpenBallMotion implements ActionListener{
 }
 
 //ガチャ結果画面
-class GachaResult extends JFrame implements WindowListener{
-	MenuItemGet MenuItemGet;
-	HandleMotion HandleMotion;
-	
-	protected GachaResult(MenuItemGet MenuItemGet, HandleMotion HandleMotion, int[] gachaMode) {
-		this.MenuItemGet = MenuItemGet;
-		this.HandleMotion = HandleMotion;
-		addWindowListener(this);
+class GachaResult extends JDialog{
+	protected GachaResult(int[] gachaMode) {
+		setModalityType(ModalityType.APPLICATION_MODAL);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setResizable(false);
-		setVisible(true);
 		setTitle("ガチャ結果");
 		setSize(970, 300);
 		setLocationRelativeTo(null);
 		add(new DrawResult(gachaMode));
-	}
-
-	@Override
-	public void windowOpened(WindowEvent e) {
-	}
-	@Override
-	public void windowClosing(WindowEvent e) {
-	}
-	
-	@Override
-	public void windowClosed(WindowEvent e) {
-		HandleMotion.addListener();
-		MenuItemGet.activatePanel();
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e) {
-	}
-	@Override
-	public void windowDeiconified(WindowEvent e) {
-	}
-	@Override
-	public void windowActivated(WindowEvent e) {
-	}
-	@Override
-	public void windowDeactivated(WindowEvent e) {
+		setVisible(true);
 	}
 }
 
@@ -665,12 +634,12 @@ class DrawResult extends JPanel implements MouseListener{
 	public void mousePressed(MouseEvent e) {
 		int selectNumber = selectCheck(e.getPoint(), corePosition);
 		if(0 <= selectNumber) {
-			new StatusComment().coreStatus(getCore.get(selectNumber), coreImageList);
+			new DrawStatus().core(coreImageList.get(getCore.get(selectNumber)), getCore.get(selectNumber));
 			return;
 		}
 		selectNumber = selectCheck(e.getPoint(), weaponPosition);
 		if(0 <= selectNumber) {
-			new StatusComment().weaponStatus(getWeapon.get(selectNumber), weaponImageList);
+			new DrawStatus().weapon(weaponImageList.get(getWeapon.get(selectNumber)), getWeapon.get(selectNumber));
 			return;
 		}
 	}
@@ -697,15 +666,16 @@ class DrawResult extends JPanel implements MouseListener{
 }
 
 //ガチャ詳細
-class GachaLineup extends JFrame{
+class GachaLineup extends JDialog{
 	protected GachaLineup(int mode) {
+		setModalityType(ModalityType.APPLICATION_MODAL);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setResizable(false);
-		setVisible(true);
 		setTitle("ガチャラインナップ");
 		setSize(300, 600);
 		setLocationRelativeTo(null);
 		add(getLineupScrollPane(new DefaultLineup(mode)));
+		setVisible(true);
 	}
 	
 	private JScrollPane getLineupScrollPane(DefaultLineup DefaultLineup) {
