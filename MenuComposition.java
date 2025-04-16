@@ -737,11 +737,11 @@ class StatusCalculation{
 	}
 	
 	private List<Integer> defaultWeaponStatus(){
-		return Arrays.asList(0, 0, 0);
+		return Arrays.asList(0, 0, 0, 0);
 	}
 	
 	private List<Integer> defaultUnitStatus(){
-		return Arrays.asList(1000, 0, 0, 0, 0);
+		return Arrays.asList(1000, 1000, 0, 0, 0, 0);
 	}
 	
 	private List<Integer> defaultCutList(){
