@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.swing.ImageIcon;
@@ -238,15 +239,23 @@ class DrawPanel extends JPanel{
 	}
 	
 	private void setLabelFont() {
-		Consumer<JLabel[]> setLabel = (label) -> {
+		BiConsumer<JLabel[], Integer> setLabel = (label, size) -> {
+			String fontName = "ＭＳ ゴシック";
+			int bold = Font.BOLD;
 			for(int i = 0; i < label.length; i++) {
-				label[i].setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
+				int fontSize = 15;
+				int width = getFontMetrics(new Font(fontName, bold, fontSize)).stringWidth(label[i].getText());
+				while(size < width) {
+					fontSize--;
+					width = getFontMetrics(new Font(fontName, bold, fontSize)).stringWidth(label[i].getText());
+				}
+				label[i].setFont(new Font(fontName, bold, fontSize));
 			}
 		};
-		setLabel.accept(name);
-		setLabel.accept(weapon);
-		setLabel.accept(unit);
-		setLabel.accept(cut);
+		setLabel.accept(name, sizeX * 5);
+		setLabel.accept(weapon, sizeX);
+		setLabel.accept(unit, sizeX);
+		setLabel.accept(cut, sizeX);
 	}
 	
 	private void setLabelHorizontal() {

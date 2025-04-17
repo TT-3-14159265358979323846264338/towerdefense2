@@ -145,7 +145,11 @@ public class DefaultData {
 			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 			);
 	
+	
+	
 	//敵軍データ
+	
+	
 	
 	//ガチャデータ
 	final static String BALL = "image/gacha/ball full.png";
@@ -154,6 +158,8 @@ public class DefaultData {
 	final static List<String> MACHINE = Arrays.asList("image/gacha/machine bottom.png", "image/gacha/machine top.png");
 	final static String TURN = "image/gacha/turn.png";
 	final static String EFFECT = "image/gacha/effect.png";
+	
+	
 	
 	//画像取込み
 	public List<BufferedImage> getCoreImage(int ratio){
