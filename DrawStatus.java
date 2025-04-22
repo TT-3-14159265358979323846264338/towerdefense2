@@ -41,7 +41,7 @@ public class DrawStatus {
 		List<Double> unitStatusList = DefaultData.CORE_UNIT_STATUS_LIST.get(number);
 		List<Integer> cutList = DefaultData.CORE_CUT_STATUS_LIST.get(number);
 		name[0].setText("【名称】");
-		name[1].setText(DefaultData.CORE_NAME_LIST.get(number));
+		name[1].setText(getRarity(DefaultData.CORE_RARITY_LIST.get(number)) + DefaultData.CORE_NAME_LIST.get(number));
 		name[2].setText("【武器ステータス】");
 		name[3].setText("【ユニットステータス】");
 		weapon[1].setText("攻撃倍率");
@@ -75,7 +75,7 @@ public class DrawStatus {
 		List<Integer> unitStatusList = DefaultData.WEAPON_UNIT_STATUS_LIST.get(number);
 		List<Integer> cutList = DefaultData.WEAPON_CUT_STATUS_LIST.get(number);
 		name[0].setText("【名称】");
-		name[1].setText(DefaultData.WEAPON_NAME_LIST.get(number));
+		name[1].setText(getRarity(DefaultData.WEAPON_RARITY_LIST.get(number)) + DefaultData.WEAPON_NAME_LIST.get(number));
 		name[2].setText("【武器ステータス】");
 		name[3].setText("【ユニットステータス】");
 		weapon[1].setText("攻撃力");
@@ -158,16 +158,20 @@ public class DrawStatus {
 		new StstusDialog(image, name, weapon, unit, cut);
 	}
 	
+	private String getRarity(int count) {
+		return "★" + count + " ";
+	}
+	
 	private String getUnitName(List<Integer> compositionList) {
 		String name = "";
 		try {
-			name += DefaultData.WEAPON_NAME_LIST.get(compositionList.get(2)) + " - ";
+			name += getRarity(DefaultData.WEAPON_RARITY_LIST.get(compositionList.get(2))) + DefaultData.WEAPON_NAME_LIST.get(compositionList.get(2)) + " - ";
 		}catch(Exception ignore) {
 			//左武器を装備していないので、無視する
 		}
-		name += DefaultData.CORE_NAME_LIST.get(compositionList.get(1)) + " - ";
+		name += getRarity(DefaultData.CORE_RARITY_LIST.get(compositionList.get(1))) + DefaultData.CORE_NAME_LIST.get(compositionList.get(1)) + " - ";
 		try {
-			name += DefaultData.WEAPON_NAME_LIST.get(compositionList.get(0)) + " - ";
+			name += getRarity(DefaultData.WEAPON_RARITY_LIST.get(compositionList.get(0))) + DefaultData.WEAPON_NAME_LIST.get(compositionList.get(0)) + " - ";
 		}catch(Exception ignore) {
 			//右武器を装備していないので、無視する
 		}

@@ -14,7 +14,7 @@ import javax.imageio.ImageIO;
 
 //デフォルトデータ
 public class DefaultData {
-	//自軍データ
+	//コア画像ファイル
 	public final static List<String> CORE_NAME_LIST = Arrays.asList(
 			"ノーマルコア",
 			"ノーマルレッドコア",
@@ -38,6 +38,15 @@ public class DefaultData {
 			"image/soldier/normal range core center.png",
 			"image/soldier/normal heal core center.png",
 			"image/soldier/normal speed core center.png"
+			);
+	//レアリティ
+	public final static List<Integer> CORE_RARITY_LIST = Arrays.asList(
+			1,
+			1,
+			1,
+			1,
+			1,
+			1
 			);
 	//武器ステータスは 攻撃, 射程, 攻撃速度, 攻撃対象 の順でリスト化
 	public final static List<List<Double>> CORE_WEAPON_STATUS_LIST = Arrays.asList(
@@ -66,6 +75,10 @@ public class DefaultData {
 			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 			);
+	
+	
+	
+	//武器画像ファイル
 	public final static List<String> WEAPON_NAME_LIST = Arrays.asList(
 			"日本刀",
 			"弓"
@@ -97,10 +110,15 @@ public class DefaultData {
 					"image/soldier/bow left 4.png",
 					"image/soldier/bow left 5.png")
 			);
+	//レアリティ
+	public final static List<Integer> WEAPON_RARITY_LIST = Arrays.asList(
+			1,
+			1
+			);
 	//武器タイプは ① 距離 ② 装備位置で登録
 	public final static List<List<Integer>> WEAPON_TYPE = Arrays.asList(
-			Arrays.asList(0, 0, 0),
-			Arrays.asList(1, 1, 1)
+			Arrays.asList(0, 0),
+			Arrays.asList(1, 1)
 			);
 	public final static Map<Integer, String> DISTANCE_MAP = new HashMap<Integer, String>();{
 		DISTANCE_MAP.put(0,"近接");
@@ -111,7 +129,7 @@ public class DefaultData {
 		HANDLE_MAP.put(0,"片手");
 		HANDLE_MAP.put(1,"両手");
 	}
-	//全ての武器属性と登録
+	//全ての武器属性を登録
 	public final static List<List<Integer>> WEAPON_ELEMENT = Arrays.asList(
 			Arrays.asList(0),
 			Arrays.asList(1)
@@ -151,7 +169,7 @@ public class DefaultData {
 	
 	
 	
-	//ガチャデータ
+	//ガチャ画像ファイル
 	final static String BALL = "image/gacha/ball full.png";
 	final static List<String> HALF_BALL = Arrays.asList("image/gacha/ball bottom.png", "image/gacha/ball top.png");
 	final static String HANDLE = "image/gacha/machine handle.png";

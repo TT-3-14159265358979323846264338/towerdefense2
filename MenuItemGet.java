@@ -679,6 +679,9 @@ class GachaLineup extends JDialog{
 	}
 	
 	private JScrollPane getLineupScrollPane(DefaultLineup DefaultLineup) {
+		Function<Integer, String> getRarity = (count) -> {
+			return "★" + count + " ";
+		};
 		Function<String, String> getName = (name) -> {
 			return String.format("%-" + (60 - name.getBytes().length) + "s", name);
 		};
@@ -693,7 +696,8 @@ class GachaLineup extends JDialog{
 		lineup.addElement("【コア確率】 " + getRatio.apply(getTotal(coreRatio)));
 		lineup.addElement(" ");
 		for(int i = 0; i < coreLineup.size(); i++) {
-			lineup.addElement(getName.apply(DefaultData.CORE_NAME_LIST.get(coreLineup.get(i))) + getRatio.apply(coreRatio.get(i)));
+			String coreName = getRarity.apply(DefaultData.CORE_RARITY_LIST.get(coreLineup.get(i))) + DefaultData.CORE_NAME_LIST.get(coreLineup.get(i));
+			lineup.addElement(getName.apply(coreName) + getRatio.apply(coreRatio.get(i)));
 		}
 		if(getTotal(coreRatio) != 0) {
 			lineup.addElement(" ");
@@ -701,7 +705,8 @@ class GachaLineup extends JDialog{
 		lineup.addElement("【武器確率】 " + getRatio.apply(getTotal(weaponRatio)));
 		lineup.addElement(" ");
 		for(int i = 0; i < weaponLineup.size(); i++) {
-			lineup.addElement(getName.apply(DefaultData.WEAPON_NAME_LIST.get(weaponLineup.get(i))) + getRatio.apply(weaponRatio.get(i)));
+			String weaponName = getRarity.apply(DefaultData.WEAPON_RARITY_LIST.get(weaponLineup.get(i))) + DefaultData.WEAPON_NAME_LIST.get(weaponLineup.get(i));
+			lineup.addElement(getName.apply(weaponName) + getRatio.apply(weaponRatio.get(i)));
 		}
 		JList<String> lineupJList = new JList<String>(lineup);
 		lineupJList.setEnabled(false);
