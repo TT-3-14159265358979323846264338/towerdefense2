@@ -13,6 +13,7 @@ import mainframe.MainFrame;
 public class MenuMain extends JPanel{
 	MainFrame MainFrame;
 	JButton itemGetButton = new JButton();
+	JButton itemDisposeButton = new JButton();
 	JButton compositionButton = new JButton();
 	JButton selectStageButton = new JButton();
 	
@@ -20,6 +21,7 @@ public class MenuMain extends JPanel{
 		this.MainFrame = mainFrame2;
 		setBackground(new Color(240, 170, 80));
 		addItemGetButton();
+		addItemDisposeButton();
 		addCompositionButton();
 		addBattleButton();
 	}
@@ -27,6 +29,7 @@ public class MenuMain extends JPanel{
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		setItemGetButton();
+		setItemDisposeButton();
 		setCompositionButton();
 		setBattleButton();
 	}
@@ -44,6 +47,19 @@ public class MenuMain extends JPanel{
 		setButton(itemGetButton);
 	}
 	
+	private void addItemDisposeButton() {
+		add(itemDisposeButton);
+		itemDisposeButton.addActionListener(e->{
+			MainFrame.itemDisposeMenuDraw();
+		});
+	}
+	
+	private void setItemDisposeButton() {
+		itemDisposeButton.setText("リサイクル");
+		itemDisposeButton.setBounds(150, 30, 130, 60);
+		setButton(itemDisposeButton);
+	}
+	
 	private void addCompositionButton() {
 		add(compositionButton);
 		compositionButton.addActionListener(e->{
@@ -53,7 +69,7 @@ public class MenuMain extends JPanel{
 	
 	private void setCompositionButton() {
 		compositionButton.setText("ユニット編成");
-		compositionButton.setBounds(150, 30, 130, 60);
+		compositionButton.setBounds(290, 30, 130, 60);
 		setButton(compositionButton);
 	}
 	
@@ -66,7 +82,7 @@ public class MenuMain extends JPanel{
 	
 	private void setBattleButton() {
 		selectStageButton.setText("ステージ選択");
-		selectStageButton.setBounds(290, 30, 130, 60);
+		selectStageButton.setBounds(430, 30, 130, 60);
 		setButton(selectStageButton);
 	}
 	

@@ -53,8 +53,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 	JScrollPane compositionScroll = new JScrollPane();
 	JScrollPane coreScroll = new JScrollPane();
 	JScrollPane weaponScroll = new JScrollPane();
-	ImagePanel CoreImagePanel = new ImagePanel(new DefaultData().getCoreImage(2), true);
-	ImagePanel WeaponImagePanel = new ImagePanel(new DefaultData().getWeaponImage(2), false);
+	ImagePanel CoreImagePanel = new ImagePanel();
+	ImagePanel WeaponImagePanel = new ImagePanel();
 	SaveHoldItem SaveHoldItem;
 	SaveComposition SaveComposition;
 	List<List<BufferedImage>> rightWeaponList = new ArrayList<>(new DefaultData().getRightWeaponImage(2));
@@ -194,7 +194,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 	
 	private void setWeaponLabel() {
 		weaponLabel.setText("武器");
-		weaponLabel.setBounds(700, 10, 130, 30);
+		weaponLabel.setBounds(720, 10, 130, 30);
 		setLabel(weaponLabel);
 	}
 	
@@ -397,25 +397,25 @@ public class MenuComposition extends JPanel implements MouseListener{
 	}
 	
 	private void addCoreScroll() {
-		CoreImagePanel.setImagePanel(nowCoreNumberList, WeaponImagePanel);
+		CoreImagePanel.setImagePanel(new DefaultData().getCoreImage(2), nowCoreNumberList, WeaponImagePanel, true);
 		coreScroll.getViewport().setView(CoreImagePanel);
     	add(coreScroll);
 	}
 	
 	private void setCoreScroll() {
-		coreScroll.setPreferredSize(new Dimension(120, 480));
-		coreScroll.setBounds(570, 40, 120, 480);
+		coreScroll.setBounds(570, 40, 140, 480);
+		coreScroll.setPreferredSize(coreScroll.getSize());
 	}
 	
 	private void addWeaponScroll() {
-		WeaponImagePanel.setImagePanel(nowWeaponNumberList, CoreImagePanel);
+		WeaponImagePanel.setImagePanel(new DefaultData().getWeaponImage(2), nowWeaponNumberList, CoreImagePanel, false);
 		weaponScroll.getViewport().setView(WeaponImagePanel);
     	add(weaponScroll);
 	}
 	
 	private void setWeaponScroll() {
-		weaponScroll.setPreferredSize(new Dimension(120, 480));
-		weaponScroll.setBounds(700, 40, 120, 480);
+		weaponScroll.setBounds(720, 40, 140, 480);
+		weaponScroll.setPreferredSize(weaponScroll.getSize());
 	}
 	
 	private void drawComposition(Graphics g) {
@@ -508,7 +508,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 	
 	private void changeCore(int number, int selectCore) {
 		allCompositionList.get(selectNumber).get(number).set(1, selectCore);
-		CoreImagePanel.selectNumber = -1;
+		CoreImagePanel.resetSelectNumber();
 	}
 	
 	private void changeWeapon(int number, int selectWeapon) {
@@ -531,7 +531,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 				break;
 			}
 		}
-		WeaponImagePanel.selectNumber = -1;
+		WeaponImagePanel.resetSelectNumber();
 	}
 	
 	private int changeConfirmation(int number, int selectWeapon) {
@@ -590,20 +590,20 @@ class ImagePanel extends JPanel implements MouseListener{
 	List<Integer> numberList;
 	ImagePanel ImagePanel;
 	boolean existsWhich;
-	int selectNumber = -1;
+	int selectNumber;
 	
-	protected ImagePanel(List<BufferedImage> imageList, boolean existsWhich) {
-		this.imageList = imageList;
-		this.existsWhich = existsWhich;
+	protected ImagePanel() {
+		resetSelectNumber();
 		addMouseListener(this);
-		setPreferredSize(new Dimension(100, imageList.size() * 100));
 	}
 	
-	protected void setImagePanel(List<Integer> numberList, ImagePanel ImagePanel) {
+	protected void setImagePanel(List<BufferedImage> imageList, List<Integer> numberList, ImagePanel ImagePanel, boolean existsWhich) {
+		this.imageList = imageList;
 		this.numberList = numberList;
 		this.ImagePanel = ImagePanel;
+		this.existsWhich = existsWhich;
+		setPreferredSize(new Dimension(100, imageList.size() * 100));
 	}
-	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		for(int i = 0; i < imageList.size(); i++) {
@@ -620,6 +620,10 @@ class ImagePanel extends JPanel implements MouseListener{
 	
 	protected int getSelectNumber() {
 		return selectNumber;
+	}
+	
+	protected void resetSelectNumber() {
+		selectNumber = -1;
 	}
 
 	@Override
@@ -638,13 +642,13 @@ class ImagePanel extends JPanel implements MouseListener{
 					}
 				}else {
 					selectNumber = i;
-					ImagePanel.selectNumber = -1;
+					ImagePanel.resetSelectNumber();
 				}
 				break;
 	    	}
 			if(i == imageList.size() - 1) {
-				selectNumber = -1;
-				ImagePanel.selectNumber = -1;
+				resetSelectNumber();
+				ImagePanel.resetSelectNumber();
 			}
 		}
 	}

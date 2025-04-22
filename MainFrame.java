@@ -3,6 +3,7 @@ package mainframe;
 import javax.swing.JFrame;
 
 import menucomposition.MenuComposition;
+import menuitemdispose.MenuItemDispose;
 import menuitemget.MenuItemGet;
 import menumain.MenuMain;
 import menuselectstage.MenuSelectStage;
@@ -19,7 +20,7 @@ public class MainFrame extends JFrame{
 	public void mainMenuDraw() {
 		getContentPane().removeAll();
 		setTitle("メインメニュー");
-		setSize(445, 160);
+		setSize(585, 160);
 		add(new MenuMain(this));
 		setLocationRelativeTo(null);
 	}
@@ -32,10 +33,18 @@ public class MainFrame extends JFrame{
 		setLocationRelativeTo(null);
 	}
 	
+	public void itemDisposeMenuDraw() {
+		getContentPane().removeAll();
+		setTitle("リサイクル");
+		setSize(1075, 640);
+		add(new MenuItemDispose(this));
+		setLocationRelativeTo(null);
+	}
+	
 	public void compositionDraw() {
 		getContentPane().removeAll();
 		setTitle("ユニット編成");
-		setSize(845, 570);
+		setSize(885, 570);
 		add(new MenuComposition(this));
 		setLocationRelativeTo(null);
 	}
