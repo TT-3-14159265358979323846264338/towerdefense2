@@ -56,7 +56,7 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	List<BufferedImage> machineImage = new ArrayList<>(new DefaultData().getMachineImage(2));
 	BufferedImage turnImage = new DefaultData().getTurnImage(2);
 	BufferedImage effectImage = new DefaultData().getEffectImage(1);
-	int[] gachaMode = {0, 0};
+	int[] gachaMode = {0, 0};//① ガチャ回数コード, ② ガチャ種類コード (詳細はDefaultLineupで定義)でリスト化
 	Map<Integer, String> modeMap = new HashMap<Integer, String>();{
 		modeMap.put(0, "1連");
 		modeMap.put(1, "5連");
@@ -151,19 +151,19 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	}
 
 	protected void activatePanel() {
-		returnButton.setEnabled(true);
-		gachaDetailButton.setEnabled(true);
-		repeatButton.setEnabled(true);
-		selectGachaJList.setEnabled(true);
-		canPlay = true;
+		setPanel(true);
 	}
 	
 	protected void deactivatePanel() {
-		returnButton.setEnabled(false);
-		gachaDetailButton.setEnabled(false);
-		repeatButton.setEnabled(false);
-		selectGachaJList.setEnabled(false);
-		canPlay = false;
+		setPanel(false);
+	}
+	
+	private void setPanel(boolean canActivate) {
+		returnButton.setEnabled(canActivate);
+		gachaDetailButton.setEnabled(canActivate);
+		repeatButton.setEnabled(canActivate);
+		selectGachaJList.setEnabled(canActivate);
+		canPlay = canActivate;
 	}
 	
 	private void drawGachaImage(Graphics g) {

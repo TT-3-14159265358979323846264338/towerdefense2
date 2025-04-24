@@ -1,5 +1,7 @@
 package menuitemdispose;
 
+import static javax.swing.JOptionPane.*;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -14,10 +16,16 @@ import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 
 import defaultdata.DefaultData;
 import drawstatus.DrawStatus;
@@ -27,12 +35,11 @@ import saveholditem.SaveHoldItem;
 
 //アイテムのリサイクル
 public class MenuItemDispose extends JPanel{
-	JButton coreSortButton = new JButton();
-	JButton weaponSortButton = new JButton();
+	JButton switchButton = new JButton();
+	JButton sortButton = new JButton();
 	JButton disposeButton = new JButton();
 	JButton returnButton = new JButton();
-	JScrollPane coreScroll = new JScrollPane();
-	JScrollPane weaponScroll = new JScrollPane();
+	JScrollPane itemScroll = new JScrollPane();
 	ImagePanel CoreImagePanel = new ImagePanel();
 	ImagePanel WeaponImagePanel = new ImagePanel();
 	SaveHoldItem SaveHoldItem;
@@ -44,28 +51,29 @@ public class MenuItemDispose extends JPanel{
 	int[] weaponMaxNumber;
 	List<Integer> coreDrawList = new ArrayList<>();
 	List<Integer> weaponDrawList = new ArrayList<>();
+	List<BufferedImage> coreImageList = new DefaultData().getCoreImage(2);
+	List<BufferedImage> weaponImageList = new DefaultData().getWeaponImage(2);
 	
 	public MenuItemDispose(MainFrame MainFrame) {
 		setBackground(new Color(240, 170, 80));
 		load();
 		itemCount();
 		initializeDrawList();
-		addCoreSortButton();
-		addWeaponSortButton();
+		addSwitchButton();
+		addSortButton();
 		addDisposeButton();
 		addReturnButton(MainFrame);
-		addCoreScroll();
-		addWeaponScroll();
+		addScroll();
 	}
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		setCoreSortButton();
-		setWeaponSortButton();
+		setSwitchButton();
+		setSortButton();
 		setDisposeButton();
 		setReturnButton();
-		setCoreScroll();
-		setWeaponScroll();
+		setItemScroll();
+		requestFocus();
 	}
 	
 	private void load() {
@@ -129,12 +137,24 @@ public class MenuItemDispose extends JPanel{
 		initialize.accept(weaponDrawList, weaponNumberList.size());
 	}
 	
-	private void addCoreSortButton() {
-		add(coreSortButton);
-		coreSortButton.addActionListener(e->{
+	private void addSwitchButton() {
+		add(switchButton);
+		switchButton.addActionListener(e->{
+			itemScroll.getViewport().setView((itemScroll.getViewport().getView() == CoreImagePanel)? WeaponImagePanel: CoreImagePanel);
+		});
+	}
+	
+	private void setSwitchButton() {
+		switchButton.setText("表示切替");
+		switchButton.setBounds(20, 530, 150, 60);
+		setButton(switchButton);
+	}
+	
+	private void addSortButton() {
+		add(sortButton);
+		sortButton.addActionListener(e->{
 			
-			
-			
+			//JCheckBox, JRadioButton
 			
 			
 			
@@ -145,53 +165,50 @@ public class MenuItemDispose extends JPanel{
 		});
 	}
 	
-	private void setCoreSortButton() {
-		coreSortButton.setText("ソート (コア)");
-		coreSortButton.setBounds(150, 530, 200, 60);
-		setButton(coreSortButton);
-	}
-	
-	private void addWeaponSortButton() {
-		add(weaponSortButton);
-		weaponSortButton.addActionListener(e->{
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-		});
-	}
-	
-	private void setWeaponSortButton() {
-		weaponSortButton.setText("ソート (武器)");
-		weaponSortButton.setBounds(710, 530, 200, 60);
-		setButton(weaponSortButton);
+	private void setSortButton() {
+		sortButton.setText("ソート");
+		sortButton.setBounds(190, 530, 150, 60);
+		setButton(sortButton);
 	}
 	
 	private void addDisposeButton() {
 		add(disposeButton);
 		disposeButton.addActionListener(e->{
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
+			if(itemScroll.getViewport().getView() == CoreImagePanel) {
+				recycle(CoreImagePanel, coreNumberList, coreMaxNumber, coreDrawList, coreImageList);
+			}else {
+				recycle(WeaponImagePanel, weaponNumberList, weaponMaxNumber, weaponDrawList, weaponImageList);
+			}
 		});
+	}
+	
+	private void recycle(ImagePanel ImagePanel, List<Integer> numberList, int[] maxNumber, List<Integer> drawList, List<BufferedImage> imageList) {
+		Predicate<Integer> selectCheck = (select) -> {
+			if(select < 0) {
+				showMessageDialog(null, "リサイクルする対象が選択されていません");
+				return false;
+			}
+			return true;
+		};
+		Predicate<Integer> numberCheck = (max) -> {
+			if(max == 0) {
+				showMessageDialog(null, "最大所持数まで編成しているため、リサイクルできません");
+				return false;
+			}
+			return true;
+		};
+		int select = ImagePanel.getSelectNumber();
+		if(selectCheck.test(select)) {
+			int max = numberList.get(drawList.get(select)) - maxNumber[drawList.get(select)];
+			if(numberCheck.test(max)) {
+				new RecyclePanel(imageList.get(drawList.get(select)), max);
+			}
+		}
 	}
 	
 	private void setDisposeButton() {
 		disposeButton.setText("リサイクル");
-		disposeButton.setBounds(370, 530, 150, 60);
+		disposeButton.setBounds(360, 530, 150, 60);
 		setButton(disposeButton);
 	}
 	
@@ -204,44 +221,32 @@ public class MenuItemDispose extends JPanel{
 	
 	private void setReturnButton() {
 		returnButton.setText("戻る");
-		returnButton.setBounds(540, 530, 150, 60);
+		returnButton.setBounds(530, 530, 150, 60);
 		setButton(returnButton);
 	}
 	
 	private void setButton(JButton button) {
 		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
-		button.setFocusable(false);
 	}
 	
-	private void addCoreScroll() {
-		CoreImagePanel.setImagePanel(new DefaultData().getCoreImage(2), coreDrawList, coreMaxNumber, coreNumberList, WeaponImagePanel, true);
-		coreScroll.getViewport().setView(CoreImagePanel);
-    	add(coreScroll);
+	private void addScroll() {
+		CoreImagePanel.setImagePanel(coreImageList, coreDrawList, coreNumberList, true);
+		WeaponImagePanel.setImagePanel(weaponImageList, weaponDrawList, weaponNumberList, false);
+		itemScroll.getViewport().setView(CoreImagePanel);
+    	add(itemScroll);
 	}
 	
-	private void setCoreScroll() {
-		coreScroll.setBounds(20, 20, 500, 500);
-		coreScroll.setPreferredSize(coreScroll.getSize());
-	}
-	
-	private void addWeaponScroll() {
-		WeaponImagePanel.setImagePanel(new DefaultData().getWeaponImage(2), weaponDrawList, weaponMaxNumber, weaponNumberList, CoreImagePanel, false);
-		weaponScroll.getViewport().setView(WeaponImagePanel);
-    	add(weaponScroll);
-	}
-	
-	private void setWeaponScroll() {
-		weaponScroll.setBounds(540, 20, 500, 500);
-		weaponScroll.setPreferredSize(weaponScroll.getSize());
+	private void setItemScroll() {
+		itemScroll.setBounds(20, 20, 660, 500);
+		itemScroll.setPreferredSize(itemScroll.getSize());
 	}
 }
 
+//所持リスト表示
 class ImagePanel extends JPanel implements MouseListener{
-	int[] maxNumber;
 	List<BufferedImage> imageList;
 	List<Integer> numberList;
 	List<Integer> drawList;
-	ImagePanel ImagePanel;
 	boolean existsWhich;
 	int selectNumber;
 	final static int SIZE = 60;
@@ -251,27 +256,25 @@ class ImagePanel extends JPanel implements MouseListener{
 		addMouseListener(this);
 	}
 	
-	protected void setImagePanel(List<BufferedImage> imageList, List<Integer> drawList, int[] maxNumber, List<Integer> numberList, ImagePanel ImagePanel, boolean existsWhich) {
+	protected void setImagePanel(List<BufferedImage> imageList, List<Integer> drawList, List<Integer> numberList, boolean existsWhich) {
 		this.imageList = imageList;
 		this.drawList = drawList;
-		this.maxNumber = maxNumber;
 		this.numberList = numberList;
 		this.existsWhich = existsWhich;
-		this.ImagePanel = ImagePanel;
 	}
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		setPreferredSize(new Dimension(400, (drawList.size() / 4 + 1) * 120));
+		setPreferredSize(new Dimension(400, (drawList.size() / 5 + 1) * 120));
 		for(int i = 0; i < drawList.size(); i++) {
 			if(selectNumber == i) {
 				g.setColor(Color.WHITE);
-				g.fillRect(i % 4 * 120, i / 4 * 120, 90, 90);
+				g.fillRect(i % 5 * 120, i / 5 * 120, 90, 90);
 			}
-			g.drawImage(imageList.get(drawList.get(i)), i % 4 * 120, i / 4 * 120, this);
+			g.drawImage(imageList.get(drawList.get(i)), i % 5 * 120, i / 5 * 120, this);
 			g.setColor(Color.BLACK);
 			g.setFont(new Font("Arial", Font.BOLD, 30));
-			g.drawString("" + numberList.get(drawList.get(i)), 80 + i % 4 * 120, 80 + i / 4 * 120);
+			g.drawString("" + numberList.get(drawList.get(i)), 80 + i % 5 * 120, 80 + i / 5 * 120);
 		}
 	}
 	
@@ -289,8 +292,8 @@ class ImagePanel extends JPanel implements MouseListener{
 	@Override
 	public void mousePressed(MouseEvent e) {
 		for(int i = 0; i < drawList.size(); i++) {
-			if(ValueRange.of(10 + i % 4 * 120, 10 + i % 4 * 120 + SIZE).isValidIntValue(e.getX())
-					&& ValueRange.of(10 + i / 4 * 120, 10 + i / 4 * 120 + SIZE).isValidIntValue(e.getY())){
+			if(ValueRange.of(10 + i % 5 * 120, 10 + i % 5 * 120 + SIZE).isValidIntValue(e.getX())
+					&& ValueRange.of(10 + i / 5 * 120, 10 + i / 5 * 120 + SIZE).isValidIntValue(e.getY())){
 				if(selectNumber == i) {
 					if(existsWhich) {
 						new DrawStatus().core(imageList.get(drawList.get(selectNumber)), drawList.get(selectNumber));
@@ -299,13 +302,11 @@ class ImagePanel extends JPanel implements MouseListener{
 					}
 				}else {
 					selectNumber = i;
-					ImagePanel.resetSelectNumber();
 				}
 				break;
 	    	}
 			if(i == imageList.size() - 1) {
 				resetSelectNumber();
-				ImagePanel.resetSelectNumber();
 			}
 		}
 	}
@@ -317,5 +318,110 @@ class ImagePanel extends JPanel implements MouseListener{
 	}
 	@Override
 	public void mouseExited(MouseEvent e) {
+	}
+}
+
+//リサイクル画面表示用ダイアログ
+class RecycleDialog extends JDialog{
+	protected RecycleDialog(RecyclePanel RecyclePanel) {
+		setModalityType(ModalityType.APPLICATION_MODAL);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setResizable(false);
+		setTitle("ステータス");
+		setSize(600, 195);
+		setLocationRelativeTo(null);
+		add(RecyclePanel);
+		setVisible(true);
+	}
+}
+
+//リサイクル数確定画面
+class RecyclePanel extends JPanel{
+	JLabel commentLabel = new JLabel();
+	JSpinner countSpinner = new JSpinner();
+	JButton recycleButton = new JButton();
+	JButton returnButton = new JButton();
+	BufferedImage image;
+	int count;
+	
+	protected RecyclePanel(BufferedImage image, int max) {
+		this.image = image;
+		add(commentLabel);
+		addSpinner(max);
+		addRecycleButton();
+		addReturnButton();
+		new RecycleDialog(this);
+	}
+	
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		drawImage(g);
+		setLabel();
+		setSpinner();
+		setRecycleButton();
+		setReturnButton();
+		requestFocus();
+	}
+	
+	private void drawImage(Graphics g) {
+		g.drawImage(image, 10, 10, null);
+	}
+	
+	private void setLabel() {
+		commentLabel.setText("ガチャメダルへリサイクルする数量を入力してください");
+		commentLabel.setBounds(120, 10, 400, 30);
+		commentLabel.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
+	}
+	
+	private void addSpinner(int max) {
+		add(countSpinner);
+		countSpinner.setModel(new SpinnerNumberModel(1, 1, max, 1));
+		JSpinner.NumberEditor editor = new JSpinner.NumberEditor(countSpinner);
+		editor.getTextField().setEditable(false);
+		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
+		countSpinner.setEditor(editor);
+	}
+	
+	private void setSpinner() {
+		countSpinner.setBounds(250, 50, 100, 30);
+		countSpinner.setPreferredSize(countSpinner.getSize());
+		countSpinner.setFont(new Font("Arail", Font.BOLD, 15));
+	}
+	
+	private void addRecycleButton() {
+		add(recycleButton);
+		recycleButton.addActionListener(e->{
+			count = (int) countSpinner.getValue();
+			
+			
+			
+		});
+	}
+	
+	private void setRecycleButton() {
+		recycleButton.setText("リサイクル");
+		recycleButton.setBounds(170, 100, 120, 40);
+		setButton(recycleButton);
+	}
+	
+	private void addReturnButton() {
+		add(returnButton);
+		returnButton.addActionListener(e->{
+			count = 0;
+			
+			
+			
+			
+		});
+	}
+	
+	private void setReturnButton() {
+		returnButton.setText("戻る");
+		returnButton.setBounds(310, 100, 120, 40);
+		setButton(returnButton);
+	}
+	
+	private void setButton(JButton button) {
+		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
 	}
 }

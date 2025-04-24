@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 
 import defaultdata.DefaultData;
 
+//ユニットデータ取込み
 public class DrawStatus {
 	Consumer<JLabel[]> initialize = (label) -> {
 		for(int i = 0; i < label.length; i++) {
@@ -67,7 +68,7 @@ public class DrawStatus {
 		for(int i = 0; i < cutList.size(); i++) {
 			cut[i + 11].setText(cutList.get(i) + "%");
 		}
-		new StstusDialog(image, name, weapon, unit, cut);
+		new StatusPanel(image, name, weapon, unit, cut);
 	}
 	
 	public void weapon(BufferedImage image, int number) {
@@ -107,7 +108,7 @@ public class DrawStatus {
 		for(int i = 0; i < cutList.size(); i++) {
 			cut[i + 11].setText(cutList.get(i) + "%");
 		}
-		new StstusDialog(image, name, weapon, unit, cut);
+		new StatusPanel(image, name, weapon, unit, cut);
 	}
 	
 	public void unit(BufferedImage image, List<Integer> compositionList, List<List<Integer>> weaponStatusList, List<List<Integer>> unitStatusList) {
@@ -155,7 +156,7 @@ public class DrawStatus {
 		for(int i = 0; i < unitStatusList.get(0).size(); i++) {
 			cut[i + 11].setText(unitStatusList.get(0).get(i) + "%");
 		}
-		new StstusDialog(image, name, weapon, unit, cut);
+		new StatusPanel(image, name, weapon, unit, cut);
 	}
 	
 	private String getRarity(int count) {
@@ -187,20 +188,22 @@ public class DrawStatus {
 	}
 }
 
+//ステータス表示用ダイアログ
 class StstusDialog extends JDialog{
-	protected StstusDialog(BufferedImage image, JLabel[] name, JLabel[] weapon, JLabel[] unit, JLabel[] cut) {
+	protected StstusDialog(StatusPanel StatusPanel) {
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setTitle("ステータス");
 		setSize(720, 680);
 		setLocationRelativeTo(null);
-		add(new DrawPanel(image, name, weapon, unit, cut));
+		add(StatusPanel);
 		setVisible(true);
 	}
 }
 
-class DrawPanel extends JPanel{
+//ステータス表示
+class StatusPanel extends JPanel{
 	JLabel image;
 	JLabel[] name;
 	JLabel[] weapon;
@@ -211,7 +214,7 @@ class DrawPanel extends JPanel{
 	int sizeX = 110;
 	int sizeY = 30;
 	
-	protected DrawPanel(BufferedImage image, JLabel[] name, JLabel[] weapon, JLabel[] unit, JLabel[] cut) {
+	protected StatusPanel(BufferedImage image, JLabel[] name, JLabel[] weapon, JLabel[] unit, JLabel[] cut) {
 		setBackground(new Color(240, 170, 80));
 		this.image = new JLabel(new ImageIcon(image));
 		this.name = name;
@@ -221,6 +224,7 @@ class DrawPanel extends JPanel{
 		addLabel();
 		setLabelFont();
 		setLabelHorizontal();
+		new StstusDialog(this);
 	}
 	
 	protected void paintComponent(Graphics g) {

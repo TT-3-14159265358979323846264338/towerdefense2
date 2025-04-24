@@ -36,7 +36,7 @@ public class MainFrame extends JFrame{
 	public void itemDisposeMenuDraw() {
 		getContentPane().removeAll();
 		setTitle("リサイクル");
-		setSize(1075, 640);
+		setSize(715, 640);
 		add(new MenuItemDispose(this));
 		setLocationRelativeTo(null);
 	}
