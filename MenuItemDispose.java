@@ -10,8 +10,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,7 @@ import saveholditem.SaveHoldItem;
 
 //アイテムのリサイクル
 public class MenuItemDispose extends JPanel{
+	JLabel typeLabel = new JLabel();
 	JButton switchButton = new JButton();
 	JButton sortButton = new JButton();
 	JButton disposeButton = new JButton();
@@ -47,8 +51,8 @@ public class MenuItemDispose extends JPanel{
 	List<Integer> coreNumberList;
 	List<Integer> weaponNumberList;
 	List<List<List<Integer>>> allCompositionList;
-	int[] coreMaxNumber;
-	int[] weaponMaxNumber;
+	int[] usedCoreNumber;
+	int[] usedWeaponNumber;
 	List<Integer> coreDrawList = new ArrayList<>();
 	List<Integer> weaponDrawList = new ArrayList<>();
 	List<BufferedImage> coreImageList = new DefaultData().getCoreImage(2);
@@ -59,6 +63,7 @@ public class MenuItemDispose extends JPanel{
 		load();
 		itemCount();
 		initializeDrawList();
+		add(typeLabel);
 		addSwitchButton();
 		addSortButton();
 		addDisposeButton();
@@ -68,6 +73,7 @@ public class MenuItemDispose extends JPanel{
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		setTypeLabel();
 		setSwitchButton();
 		setSortButton();
 		setDisposeButton();
@@ -93,7 +99,7 @@ public class MenuItemDispose extends JPanel{
 	}
 	
 	private void itemCount() {
-		BiConsumer<int[], int[]> check = (max, count) -> {
+		BiConsumer<int[], int[]> maxNumberUpdate = (max, count) -> {
 			for(int i = 0; i < max.length; i++) {
 				if(max[i] < count[i]) {
 					max[i] = count[i];
@@ -118,23 +124,30 @@ public class MenuItemDispose extends JPanel{
 					//左武器を装備していないので、無視する
 				}
 			}
-			check.accept(coreMax, coreCount);
-			check.accept(weaponMax, weaponCount);
+			maxNumberUpdate.accept(coreMax, coreCount);
+			maxNumberUpdate.accept(weaponMax, weaponCount);
 		}
-		coreMaxNumber = coreMax;
-		weaponMaxNumber = weaponMax;
+		usedCoreNumber = coreMax;
+		usedWeaponNumber = weaponMax;
 	}
 	
 	private void initializeDrawList() {
-		BiConsumer<List<Integer>, Integer> initialize = (list, count) -> {
-			int number = 0;
-			for(int i = 0; i < count; i++) {
-				list.add(number);
-				number++;
+		BiConsumer<List<Integer>, List<Integer>> initialize = (drawList, numberList) -> {
+			for(int i = 0; i < numberList.size(); i++) {
+				if(numberList.get(i) != 0) {
+					drawList.add(i);
+				}
 			}
 		};
-		initialize.accept(coreDrawList, coreNumberList.size());
-		initialize.accept(weaponDrawList, weaponNumberList.size());
+		initialize.accept(coreDrawList, coreNumberList);
+		coreDrawList.remove(0);//初期コアはリサイクル禁止
+		initialize.accept(weaponDrawList, weaponNumberList);
+	}
+	
+	private void setTypeLabel() {
+		typeLabel.setText((itemScroll.getViewport().getView() == CoreImagePanel)? "コアリスト": "武器リスト");
+		typeLabel.setBounds(20, 10, 400, 30);
+		typeLabel.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 25));
 	}
 	
 	private void addSwitchButton() {
@@ -175,14 +188,14 @@ public class MenuItemDispose extends JPanel{
 		add(disposeButton);
 		disposeButton.addActionListener(e->{
 			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				recycle(CoreImagePanel, coreNumberList, coreMaxNumber, coreDrawList, coreImageList);
+				recycle(CoreImagePanel, coreNumberList, usedCoreNumber, coreDrawList, coreImageList, DefaultData.CORE_RARITY_LIST);
 			}else {
-				recycle(WeaponImagePanel, weaponNumberList, weaponMaxNumber, weaponDrawList, weaponImageList);
+				recycle(WeaponImagePanel, weaponNumberList, usedWeaponNumber, weaponDrawList, weaponImageList, DefaultData.WEAPON_RARITY_LIST);
 			}
 		});
 	}
 	
-	private void recycle(ImagePanel ImagePanel, List<Integer> numberList, int[] maxNumber, List<Integer> drawList, List<BufferedImage> imageList) {
+	private void recycle(ImagePanel ImagePanel, List<Integer> numberList, int[] usedNumber, List<Integer> drawList, List<BufferedImage> imageList, List<Integer> rarityList) {
 		Predicate<Integer> selectCheck = (select) -> {
 			if(select < 0) {
 				showMessageDialog(null, "リサイクルする対象が選択されていません");
@@ -199,10 +212,32 @@ public class MenuItemDispose extends JPanel{
 		};
 		int select = ImagePanel.getSelectNumber();
 		if(selectCheck.test(select)) {
-			int max = numberList.get(drawList.get(select)) - maxNumber[drawList.get(select)];
+			int max = numberList.get(drawList.get(select)) - usedNumber[drawList.get(select)];
 			if(numberCheck.test(max)) {
-				new RecyclePanel(imageList.get(drawList.get(select)), max);
+				RecyclePanel RecyclePanel = new RecyclePanel(imageList.get(drawList.get(select)), max, rarityList.get(drawList.get(select)));
+				int quantity = RecyclePanel.getQuantity();
+				int medal = RecyclePanel.getMedal();
+				if(medal !=0) {
+					numberList.set(drawList.get(select), numberList.get(drawList.get(select)) - quantity);
+					
+					//いずれガチャメダルの保存も記述する
+					
+					save();
+				}
 			}
+		}
+	}
+	
+	private void save() {
+		try {
+			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
+			saveItemData.writeObject(new SaveHoldItem(coreNumberList, weaponNumberList));
+			saveItemData.close();
+			
+			//いずれガチャメダルの保存も記述する
+			
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -237,7 +272,7 @@ public class MenuItemDispose extends JPanel{
 	}
 	
 	private void setItemScroll() {
-		itemScroll.setBounds(20, 20, 660, 500);
+		itemScroll.setBounds(20, 50, 660, 470);
 		itemScroll.setPreferredSize(itemScroll.getSize());
 	}
 }
@@ -323,9 +358,9 @@ class ImagePanel extends JPanel implements MouseListener{
 
 //リサイクル画面表示用ダイアログ
 class RecycleDialog extends JDialog{
-	protected RecycleDialog(RecyclePanel RecyclePanel) {
+	protected void setDialog(RecyclePanel RecyclePanel) {
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setResizable(false);
 		setTitle("ステータス");
 		setSize(600, 195);
@@ -333,30 +368,40 @@ class RecycleDialog extends JDialog{
 		add(RecyclePanel);
 		setVisible(true);
 	}
+	
+	protected void disposeDialog() {
+		dispose();
+	}
 }
 
 //リサイクル数確定画面
 class RecyclePanel extends JPanel{
 	JLabel commentLabel = new JLabel();
+	JLabel resultLabel = new JLabel();
 	JSpinner countSpinner = new JSpinner();
 	JButton recycleButton = new JButton();
 	JButton returnButton = new JButton();
+	RecycleDialog RecycleDialog = new RecycleDialog();
 	BufferedImage image;
-	int count;
+	int rarity;
+	int quantity;
 	
-	protected RecyclePanel(BufferedImage image, int max) {
+	protected RecyclePanel(BufferedImage image, int max, int rarity) {
 		this.image = image;
+		this.rarity = rarity;
 		add(commentLabel);
+		add(resultLabel);
 		addSpinner(max);
 		addRecycleButton();
 		addReturnButton();
-		new RecycleDialog(this);
+		RecycleDialog.setDialog(this);
 	}
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		drawImage(g);
-		setLabel();
+		setComenntLabel();
+		setResultLabel();
 		setSpinner();
 		setRecycleButton();
 		setReturnButton();
@@ -367,15 +412,29 @@ class RecyclePanel extends JPanel{
 		g.drawImage(image, 10, 10, null);
 	}
 	
-	private void setLabel() {
+	private void setComenntLabel() {
 		commentLabel.setText("ガチャメダルへリサイクルする数量を入力してください");
 		commentLabel.setBounds(120, 10, 400, 30);
-		commentLabel.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
+		setLabel(commentLabel);
+	}
+	
+	private void setResultLabel() {
+		resultLabel.setText("ガチャメダル: " + getMedal() +  "枚");
+		resultLabel.setBounds(370, 50, 400, 30);
+		setLabel(resultLabel);
+	}
+	
+	private void setLabel(JLabel label) {
+		label.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
 	}
 	
 	private void addSpinner(int max) {
 		add(countSpinner);
+		countSpinner.addChangeListener(e->{
+			importQuantity();
+		});
 		countSpinner.setModel(new SpinnerNumberModel(1, 1, max, 1));
+		importQuantity();
 		JSpinner.NumberEditor editor = new JSpinner.NumberEditor(countSpinner);
 		editor.getTextField().setEditable(false);
 		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
@@ -391,10 +450,9 @@ class RecyclePanel extends JPanel{
 	private void addRecycleButton() {
 		add(recycleButton);
 		recycleButton.addActionListener(e->{
-			count = (int) countSpinner.getValue();
-			
-			
-			
+			if(YES_OPTION == showConfirmDialog(null, (int) countSpinner.getValue() + "個をリサイクルしますか","リサイクル確認",YES_NO_OPTION , QUESTION_MESSAGE)) {
+				RecycleDialog.disposeDialog();
+			}
 		});
 	}
 	
@@ -407,11 +465,8 @@ class RecyclePanel extends JPanel{
 	private void addReturnButton() {
 		add(returnButton);
 		returnButton.addActionListener(e->{
-			count = 0;
-			
-			
-			
-			
+			quantity = 0;
+			RecycleDialog.disposeDialog();
 		});
 	}
 	
@@ -423,5 +478,17 @@ class RecyclePanel extends JPanel{
 	
 	private void setButton(JButton button) {
 		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
+	}
+	
+	private void importQuantity() {
+		quantity = (int) countSpinner.getValue();
+	}
+	
+	protected int getQuantity() {
+		return quantity;
+	}
+	
+	protected int getMedal() {
+		return quantity * rarity;
 	}
 }

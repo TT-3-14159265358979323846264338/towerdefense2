@@ -11,9 +11,19 @@ public class SaveHoldItem implements Serializable{
 	List<Integer> coreNumberList = new ArrayList<>();
 	List<Integer> weaponNumberList = new ArrayList<>();
 	
+	/*
+	非セーブデータの構造
+	HOLD_FILE: セーブデータ保存ファイルの名称
+	
+	セーブデータの構造
+	coreNumberList: 各コアの所持数
+	weaponNumberList: 各武器の所持数
+	これらのListのsize()は、DefaultDataに新規追加されると、TowerDefense2で自動的に追加される
+	*/
+	
 	public SaveHoldItem() {
-		coreNumberList = Arrays.asList(8, 0, 0, 0, 0, 0);
-		weaponNumberList = Arrays.asList(2, 2);
+		coreNumberList = new ArrayList<>(Arrays.asList(8));
+		weaponNumberList = new ArrayList<>(Arrays.asList(2, 2));
 	}
 	
 	public SaveHoldItem(List<Integer> coreNumberList, List<Integer> weaponNumberList) {
