@@ -18,145 +18,36 @@ import javax.swing.JPanel;
 import defaultdata.DefaultData;
 
 //ユニットデータ取込み
-public class DisplayStatus {
-	Consumer<JLabel[]> initialize = (label) -> {
-		for(int i = 0; i < label.length; i++) {
-			label[i] = new JLabel();
-		}
-	};
-	JLabel[] name = new JLabel[4]; {
-		initialize.accept(name);
-	}
-	JLabel[] weapon = new JLabel[24]; {
-		initialize.accept(weapon);
-	}
-	JLabel[] unit = new JLabel[12]; {
-		initialize.accept(unit);
-	}
-	JLabel[] cut = new JLabel[22]; {
-		initialize.accept(cut);
-	}
-	
+public class DisplayStatus extends StatusPanel{
 	public void core(BufferedImage image, int number) {
-		List<Double> weaponStatusList = DefaultData.CORE_WEAPON_STATUS_LIST.get(number);
-		List<Double> unitStatusList = DefaultData.CORE_UNIT_STATUS_LIST.get(number);
-		List<Integer> cutList = DefaultData.CORE_CUT_STATUS_LIST.get(number);
-		name[0].setText("【名称】");
-		name[1].setText(getRarity(DefaultData.CORE_RARITY_LIST.get(number)) + DefaultData.CORE_NAME_LIST.get(number));
-		name[2].setText("【武器ステータス】");
-		name[3].setText("【ユニットステータス】");
-		weapon[1].setText("攻撃倍率");
-		weapon[2].setText("射程倍率");
-		weapon[3].setText("攻撃速度倍率");
-		weapon[4].setText("攻撃対象倍率");
-		weapon[8].setText("武器性能");
-		for(int i = 0; i < weaponStatusList.size(); i++) {
-			weapon[i + 9].setText(weaponStatusList.get(i) + "倍");
-		}
-		unit[0].setText("最大体力倍率");
-		unit[1].setText("体力倍率");
-		unit[2].setText("防御力倍率");
-		unit[3].setText("回復倍率");
-		unit[4].setText("足止め数倍率");
-		unit[5].setText("配置コスト倍率");
-		for(int i = 0; i < unitStatusList.size(); i++) {
-			unit[i + 6].setText("" + unitStatusList.get(i) + "倍");
-		}
-		for(int i = 0; i < cutList.size(); i++) {
-			cut[i].setText(DefaultData.ELEMENT_MAP.get(i) + "耐性");
-		}
-		for(int i = 0; i < cutList.size(); i++) {
-			cut[i + 11].setText(cutList.get(i) + "%");
-		}
-		new StatusPanel(image, name, weapon, unit, cut);
+		setLabelName(getRarity(DefaultData.CORE_RARITY_LIST.get(number)) + DefaultData.CORE_NAME_LIST.get(number));
+		setWeapon(DefaultData.CORE_WEAPON_STATUS_LIST.get(number));
+		setUnit(DefaultData.CORE_UNIT_STATUS_LIST.get(number), "倍");
+		setCut(DefaultData.CORE_CUT_STATUS_LIST.get(number));
+		super.setStatusPanel(image);
 	}
 	
 	public void weapon(BufferedImage image, int number) {
-		List<Integer> weaponStatusList = DefaultData.WEAPON_WEAPON_STATUS_LIST.get(number);
-		List<Integer> unitStatusList = DefaultData.WEAPON_UNIT_STATUS_LIST.get(number);
-		List<Integer> cutList = DefaultData.WEAPON_CUT_STATUS_LIST.get(number);
-		name[0].setText("【名称】");
-		name[1].setText(getRarity(DefaultData.WEAPON_RARITY_LIST.get(number)) + DefaultData.WEAPON_NAME_LIST.get(number));
-		name[2].setText("【武器ステータス】");
-		name[3].setText("【ユニットステータス】");
-		weapon[1].setText("攻撃力");
-		weapon[2].setText("射程");
-		weapon[3].setText("攻撃速度");
-		weapon[4].setText("攻撃対象");
-		weapon[5].setText("距離タイプ");
-		weapon[6].setText("装備タイプ");
-		weapon[7].setText("属性");
-		weapon[8].setText("武器性能");
-		for(int i = 0; i < weaponStatusList.size(); i++) {
-			weapon[i + 9].setText("" + weaponStatusList.get(i));
-		}
-		weapon[13].setText("" + DefaultData.DISTANCE_MAP.get(number));
-		weapon[14].setText("" + DefaultData.HANDLE_MAP.get(number));
-		weapon[15].setText("" + getElement(DefaultData.WEAPON_ELEMENT.get(number)));
-		unit[0].setText("最大体力");
-		unit[1].setText("体力");
-		unit[2].setText("防御力");
-		unit[3].setText("回復");
-		unit[4].setText("足止め数");
-		unit[5].setText("配置コスト");
-		for(int i = 0; i < unitStatusList.size(); i++) {
-			unit[i + 6].setText("" + unitStatusList.get(i));
-		}
-		for(int i = 0; i < cutList.size(); i++) {
-			cut[i].setText(DefaultData.ELEMENT_MAP.get(i) + "耐性");
-		}
-		for(int i = 0; i < cutList.size(); i++) {
-			cut[i + 11].setText(cutList.get(i) + "%");
-		}
-		new StatusPanel(image, name, weapon, unit, cut);
+		setLabelName(getRarity(DefaultData.WEAPON_RARITY_LIST.get(number)) + DefaultData.WEAPON_NAME_LIST.get(number));
+		setWeapon(DefaultData.WEAPON_WEAPON_STATUS_LIST.get(number), number);
+		setUnit(DefaultData.WEAPON_UNIT_STATUS_LIST.get(number));
+		setCut(DefaultData.WEAPON_CUT_STATUS_LIST.get(number));
+		super.setStatusPanel(image);
 	}
 	
 	public void unit(BufferedImage image, List<Integer> compositionList, List<List<Integer>> weaponStatusList, List<List<Integer>> unitStatusList) {
+		setLabelName(getUnitName(compositionList));
+		setWeapon(compositionList, weaponStatusList);
+		setUnit(unitStatusList.get(1));
+		setCut(unitStatusList.get(0));
+		super.setStatusPanel(image);
+	}
+	
+	private void setLabelName(String unitName) {
 		name[0].setText("【名称】");
-		name[1].setText(getUnitName(compositionList));
+		name[1].setText(unitName);
 		name[2].setText("【武器ステータス】");
 		name[3].setText("【ユニットステータス】");
-		weapon[1].setText("攻撃力");
-		weapon[2].setText("射程");
-		weapon[3].setText("攻撃速度");
-		weapon[4].setText("攻撃対象");
-		weapon[5].setText("距離タイプ");
-		weapon[6].setText("装備タイプ");
-		weapon[7].setText("属性");
-		weapon[8].setText("左武器");
-		if(0 <= compositionList.get(2)) {
-			for(int i = 0; i < weaponStatusList.get(3).size(); i++) {
-				weapon[i + 9].setText("" + weaponStatusList.get(3).get(i));;
-			}
-			weapon[13].setText("" + DefaultData.DISTANCE_MAP.get(compositionList.get(2)));
-			weapon[14].setText("" + DefaultData.HANDLE_MAP.get(compositionList.get(2)));
-			weapon[15].setText("" + getElement(DefaultData.WEAPON_ELEMENT.get(compositionList.get(2))));
-		}
-		weapon[16].setText("右武器");
-		if(0 <= compositionList.get(0)) {
-			for(int i = 0; i < weaponStatusList.get(1).size(); i++) {
-				weapon[i + 17].setText("" + weaponStatusList.get(1).get(i));;
-			}
-			weapon[21].setText("" + DefaultData.DISTANCE_MAP.get(compositionList.get(0)));
-			weapon[22].setText("" + DefaultData.HANDLE_MAP.get(compositionList.get(0)));
-			weapon[23].setText("" + getElement(DefaultData.WEAPON_ELEMENT.get(compositionList.get(0))));
-		}
-		unit[0].setText("最大体力");
-		unit[1].setText("体力");
-		unit[2].setText("防御力");
-		unit[3].setText("回復");
-		unit[4].setText("足止め数");
-		unit[5].setText("配置コスト");
-		for(int i = 0; i < unitStatusList.get(1).size(); i++) {
-			unit[i + 6].setText("" + unitStatusList.get(1).get(i));
-		}
-		for(int i = 0; i < unitStatusList.get(0).size(); i++) {
-			cut[i].setText(DefaultData.ELEMENT_MAP.get(i) + "耐性");
-		}
-		for(int i = 0; i < unitStatusList.get(0).size(); i++) {
-			cut[i + 11].setText(unitStatusList.get(0).get(i) + "%");
-		}
-		new StatusPanel(image, name, weapon, unit, cut);
 	}
 	
 	private String getRarity(int count) {
@@ -179,12 +70,84 @@ public class DisplayStatus {
 		return name.substring(0, name.length() - 3);
 	}
 	
+	private void setWeapon(List<Double> statusList) {
+		for(int i = 0; i < statusList.size(); i++) {
+			weapon[i + 1].setText(DefaultData.CORE_WEAPON_MAP.get(i));
+			weapon[i + 9].setText(statusList.get(i) + "倍");
+		}
+		weapon[8].setText("武器性能");
+	}
+	
+	private void setWeapon(List<Integer> statusList, int number) {
+		for(int i = 0; i < statusList.size(); i++) {
+			weapon[i + 1].setText(DefaultData.WEAPON_WEAPON_MAP.get(i));
+			weapon[i + 9].setText("" + statusList.get(i));
+		}
+		weapon[5].setText("距離タイプ");
+		weapon[6].setText("装備タイプ");
+		weapon[7].setText("属性");
+		weapon[8].setText("武器性能");
+		weapon[13].setText("" + DefaultData.DISTANCE_MAP.get(number));
+		weapon[14].setText("" + DefaultData.HANDLE_MAP.get(number));
+		weapon[15].setText("" + getElement(DefaultData.WEAPON_ELEMENT.get(number)));
+	}
+	
+	private void setWeapon(List<Integer> compositionList, List<List<Integer>> weaponStatusList) {
+		for(int i = 0; i < DefaultData.WEAPON_WEAPON_STATUS_LIST.get(0).size(); i++) {
+			weapon[i + 1].setText(DefaultData.WEAPON_WEAPON_MAP.get(i));
+		}
+		weapon[5].setText("距離タイプ");
+		weapon[6].setText("装備タイプ");
+		weapon[7].setText("属性");
+		weapon[8].setText("左武器");
+		if(0 <= compositionList.get(2)) {
+			for(int i = 0; i < weaponStatusList.get(3).size(); i++) {
+				weapon[i + 9].setText("" + weaponStatusList.get(3).get(i));;
+			}
+			weapon[13].setText("" + DefaultData.DISTANCE_MAP.get(compositionList.get(2)));
+			weapon[14].setText("" + DefaultData.HANDLE_MAP.get(compositionList.get(2)));
+			weapon[15].setText("" + getElement(DefaultData.WEAPON_ELEMENT.get(compositionList.get(2))));
+		}
+		weapon[16].setText("右武器");
+		if(0 <= compositionList.get(0)) {
+			for(int i = 0; i < weaponStatusList.get(1).size(); i++) {
+				weapon[i + 17].setText("" + weaponStatusList.get(1).get(i));;
+			}
+			weapon[21].setText("" + DefaultData.DISTANCE_MAP.get(compositionList.get(0)));
+			weapon[22].setText("" + DefaultData.HANDLE_MAP.get(compositionList.get(0)));
+			weapon[23].setText("" + getElement(DefaultData.WEAPON_ELEMENT.get(compositionList.get(0))));
+		}
+	}
+	
 	private String getElement(List<Integer> elementList) {
 		String element = "";
 		for(int i: elementList) {
 			element += DefaultData.ELEMENT_MAP.get(i) + ", ";
 		}
 		return element.substring(0, element.length() - 2);
+	}
+	
+	private void setUnit(List<Double> statusList, String comment) {
+		for(int i = 0; i < statusList.size(); i++) {
+			unit[i].setText(DefaultData.CORE_UNIT_MAP.get(i));
+			unit[i + 6].setText(statusList.get(i) + comment);
+		}
+	}
+	
+	private void setUnit(List<Integer> statusList) {
+		for(int i = 0; i < statusList.size(); i++) {
+			unit[i].setText(DefaultData.WEAPON_UNIT_MAP.get(i));
+			unit[i + 6].setText(statusList.get(i) + "");
+		}
+	}
+	
+	private void setCut(List<Integer> cutList) {
+		for(int i = 0; i < cutList.size(); i++) {
+			cut[i].setText(DefaultData.ELEMENT_MAP.get(i) + "耐性");
+		}
+		for(int i = 0; i < cutList.size(); i++) {
+			cut[i + 11].setText(cutList.get(i) + "%");
+		}
 	}
 }
 
@@ -205,22 +168,31 @@ class StstusDialog extends JDialog{
 //ステータス表示
 class StatusPanel extends JPanel{
 	JLabel image;
-	JLabel[] name;
-	JLabel[] weapon;
-	JLabel[] unit;
-	JLabel[] cut;
+	Consumer<JLabel[]> initialize = (label) -> {
+		for(int i = 0; i < label.length; i++) {
+			label[i] = new JLabel();
+		}
+	};
+	JLabel[] name = new JLabel[4]; {
+		initialize.accept(name);
+	}
+	JLabel[] weapon = new JLabel[24]; {
+		initialize.accept(weapon);
+	}
+	JLabel[] unit = new JLabel[12]; {
+		initialize.accept(unit);
+	}
+	JLabel[] cut = new JLabel[22]; {
+		initialize.accept(cut);
+	}
 	int startX = 20;
 	int startY = 20;
 	int sizeX = 110;
 	int sizeY = 30;
 	
-	protected StatusPanel(BufferedImage image, JLabel[] name, JLabel[] weapon, JLabel[] unit, JLabel[] cut) {
+	protected void setStatusPanel(BufferedImage image) {
 		setBackground(new Color(240, 170, 80));
 		this.image = new JLabel(new ImageIcon(image));
-		this.name = name;
-		this.weapon = weapon;
-		this.unit = unit;
-		this.cut = cut;
 		addLabel();
 		setLabelFont();
 		setLabelHorizontal();

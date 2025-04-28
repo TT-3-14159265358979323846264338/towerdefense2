@@ -14,6 +14,60 @@ import javax.imageio.ImageIO;
 
 //デフォルトデータ
 public class DefaultData {
+	//データコード変換
+	public final static Map<Integer, String> CORE_WEAPON_MAP  = new HashMap<Integer, String>();{
+		CORE_WEAPON_MAP.put(0, "攻撃倍率");
+		CORE_WEAPON_MAP.put(1, "射程倍率");
+		CORE_WEAPON_MAP.put(2, "攻撃速度倍率");
+		CORE_WEAPON_MAP.put(3, "攻撃対象倍率");
+	}
+	public final static Map<Integer, String> CORE_UNIT_MAP  = new HashMap<Integer, String>();{
+		CORE_UNIT_MAP.put(0, "最大HP倍率");
+		CORE_UNIT_MAP.put(1, "HP倍率");
+		CORE_UNIT_MAP.put(2, "防御倍率");
+		CORE_UNIT_MAP.put(3, "回復倍率");
+		CORE_UNIT_MAP.put(4, "足止め数倍率");
+		CORE_UNIT_MAP.put(5, "配置コスト倍率");
+	}
+	public final static Map<Integer, String> WEAPON_WEAPON_MAP  = new HashMap<Integer, String>();{
+		WEAPON_WEAPON_MAP.put(0, "攻撃");
+		WEAPON_WEAPON_MAP.put(1, "射程");
+		WEAPON_WEAPON_MAP.put(2, "攻撃速度");
+		WEAPON_WEAPON_MAP.put(3, "攻撃対象");
+	}
+	public final static Map<Integer, String> WEAPON_UNIT_MAP  = new HashMap<Integer, String>();{
+		WEAPON_UNIT_MAP.put(0, "最大HP");
+		WEAPON_UNIT_MAP.put(1, "HP");
+		WEAPON_UNIT_MAP.put(2, "防御");
+		WEAPON_UNIT_MAP.put(3, "回復");
+		WEAPON_UNIT_MAP.put(4, "足止め数");
+		WEAPON_UNIT_MAP.put(5, "配置コスト");
+	}
+	public final static Map<Integer, String> DISTANCE_MAP = new HashMap<Integer, String>();{
+		DISTANCE_MAP.put(0,"近接");
+		DISTANCE_MAP.put(1,"遠隔");
+		DISTANCE_MAP.put(2,"遠近");
+	}
+	public final static Map<Integer, String> HANDLE_MAP = new HashMap<Integer, String>();{
+		HANDLE_MAP.put(0,"片手");
+		HANDLE_MAP.put(1,"両手");
+	}
+	public final static Map<Integer, String> ELEMENT_MAP = new HashMap<Integer, String>();{
+		ELEMENT_MAP.put(0,"斬撃");
+		ELEMENT_MAP.put(1,"刺突");
+		ELEMENT_MAP.put(2,"殴打");
+		ELEMENT_MAP.put(3,"衝撃");
+		ELEMENT_MAP.put(4,"炎");
+		ELEMENT_MAP.put(5,"水");
+		ELEMENT_MAP.put(6,"風");
+		ELEMENT_MAP.put(7,"土");
+		ELEMENT_MAP.put(8,"雷");
+		ELEMENT_MAP.put(9,"聖");
+		ELEMENT_MAP.put(10,"闇");
+	}
+	
+	
+	
 	//コア画像ファイル
 	public final static List<String> CORE_NAME_LIST = Arrays.asList(
 			"ノーマルコア",
@@ -48,7 +102,7 @@ public class DefaultData {
 			1,
 			1
 			);
-	//武器ステータスは 攻撃, 射程, 攻撃速度, 攻撃対象 の順でリスト化
+	//武器ステータスはCORE_WEAPON_MAPの順でリスト化
 	public final static List<List<Double>> CORE_WEAPON_STATUS_LIST = Arrays.asList(
 			Arrays.asList(1.0, 1.0, 1.0, 1.0),
 			Arrays.asList(1.1, 1.0, 1.0, 1.0),
@@ -57,7 +111,7 @@ public class DefaultData {
 			Arrays.asList(1.0, 1.0, 1.0, 1.0),
 			Arrays.asList(1.0, 1.0, 0.9, 1.0)
 			);
-	//ユニットステータスは 最大HP, HP, 防御, 回復, (味方: 足止め数 敵: 移動速度), (味方: 配置コスト 敵: 撃破時コスト増加) の順でリスト化
+	//ユニットステータスはCORE_UNIT_MAPの順でリスト化
 	public final static List<List<Double>> CORE_UNIT_STATUS_LIST = Arrays.asList(
 			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
 			Arrays.asList(1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
@@ -115,44 +169,22 @@ public class DefaultData {
 			1,
 			1
 			);
-	//武器タイプは ① 距離 ② 装備位置で登録
+	//武器タイプは ① 距離(DISTANCE_MAP) ② 装備位置(HANDLE_MAP)で登録
 	public final static List<List<Integer>> WEAPON_TYPE = Arrays.asList(
 			Arrays.asList(0, 0),
 			Arrays.asList(1, 1)
 			);
-	public final static Map<Integer, String> DISTANCE_MAP = new HashMap<Integer, String>();{
-		DISTANCE_MAP.put(0,"近接");
-		DISTANCE_MAP.put(1,"遠隔");
-		DISTANCE_MAP.put(2,"遠近");
-	}
-	public final static Map<Integer, String> HANDLE_MAP = new HashMap<Integer, String>();{
-		HANDLE_MAP.put(0,"片手");
-		HANDLE_MAP.put(1,"両手");
-	}
-	//全ての武器属性を登録
+	//全ての武器属性(ELEMENT_MAP)を登録
 	public final static List<List<Integer>> WEAPON_ELEMENT = Arrays.asList(
 			Arrays.asList(0),
 			Arrays.asList(1)
 			);
-	public final static Map<Integer, String> ELEMENT_MAP = new HashMap<Integer, String>();{
-		ELEMENT_MAP.put(0,"斬撃");
-		ELEMENT_MAP.put(1,"刺突");
-		ELEMENT_MAP.put(2,"殴打");
-		ELEMENT_MAP.put(3,"衝撃");
-		ELEMENT_MAP.put(4,"炎");
-		ELEMENT_MAP.put(5,"水");
-		ELEMENT_MAP.put(6,"風");
-		ELEMENT_MAP.put(7,"土");
-		ELEMENT_MAP.put(8,"雷");
-		ELEMENT_MAP.put(9,"聖");
-		ELEMENT_MAP.put(10,"闇");
-	}
-	//武器ステータスは 攻撃, 射程, 攻撃速度, 攻撃対象 の順でリスト化
+	//武器ステータスはWEAPON_WEAPON_MAPの順でリスト化
 	public final static List<List<Integer>> WEAPON_WEAPON_STATUS_LIST = Arrays.asList(
 			Arrays.asList(100, 30, 1000, 1),
 			Arrays.asList(200, 150, 1000, 1)
 			);
-	//ユニットステータスは 最大HP, HP, 防御, 回復, (味方: 足止め数 敵: 移動速度), (味方: 配置コスト 敵: 撃破時コスト増加) の順でリスト化
+	//ユニットステータスはWEAPON_UNIT_MAPの順でリスト化
 	public final static List<List<Integer>> WEAPON_UNIT_STATUS_LIST = Arrays.asList(
 			Arrays.asList(1000, 1000, 100, 10, 1, 5),
 			Arrays.asList(1000, 1000, 100, 10, 0, 10)
