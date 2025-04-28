@@ -31,7 +31,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 import defaultdata.DefaultData;
-import drawstatus.DrawStatus;
+import displaystatus.DisplayStatus;
 import mainframe.MainFrame;
 import savecomposition.SaveComposition;
 import saveholditem.SaveHoldItem;
@@ -53,8 +53,8 @@ public class MenuItemDispose extends JPanel{
 	List<List<List<Integer>>> allCompositionList;
 	int[] usedCoreNumber;
 	int[] usedWeaponNumber;
-	List<Integer> coreDrawList = new ArrayList<>();
-	List<Integer> weaponDrawList = new ArrayList<>();
+	List<Integer> coreDisplayList = new ArrayList<>();
+	List<Integer> weaponDisplayList = new ArrayList<>();
 	List<BufferedImage> coreImageList = new DefaultData().getCoreImage(2);
 	List<BufferedImage> weaponImageList = new DefaultData().getWeaponImage(2);
 	
@@ -62,7 +62,7 @@ public class MenuItemDispose extends JPanel{
 		setBackground(new Color(240, 170, 80));
 		load();
 		itemCount();
-		initializeDrawList();
+		initializeDisplayList();
 		add(typeLabel);
 		addSwitchButton();
 		addSortButton();
@@ -131,7 +131,7 @@ public class MenuItemDispose extends JPanel{
 		usedWeaponNumber = weaponMax;
 	}
 	
-	private void initializeDrawList() {
+	private void initializeDisplayList() {
 		BiConsumer<List<Integer>, List<Integer>> initialize = (drawList, numberList) -> {
 			for(int i = 0; i < numberList.size(); i++) {
 				if(numberList.get(i) != 0) {
@@ -139,9 +139,9 @@ public class MenuItemDispose extends JPanel{
 				}
 			}
 		};
-		initialize.accept(coreDrawList, coreNumberList);
-		coreDrawList.remove(0);//初期コアはリサイクル禁止
-		initialize.accept(weaponDrawList, weaponNumberList);
+		initialize.accept(coreDisplayList, coreNumberList);
+		coreDisplayList.remove(0);//初期コアはリサイクル禁止
+		initialize.accept(weaponDisplayList, weaponNumberList);
 	}
 	
 	private void setTypeLabel() {
@@ -188,9 +188,9 @@ public class MenuItemDispose extends JPanel{
 		add(disposeButton);
 		disposeButton.addActionListener(e->{
 			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				recycle(CoreImagePanel, coreNumberList, usedCoreNumber, coreDrawList, coreImageList, DefaultData.CORE_RARITY_LIST);
+				recycle(CoreImagePanel, coreNumberList, usedCoreNumber, coreDisplayList, coreImageList, DefaultData.CORE_RARITY_LIST);
 			}else {
-				recycle(WeaponImagePanel, weaponNumberList, usedWeaponNumber, weaponDrawList, weaponImageList, DefaultData.WEAPON_RARITY_LIST);
+				recycle(WeaponImagePanel, weaponNumberList, usedWeaponNumber, weaponDisplayList, weaponImageList, DefaultData.WEAPON_RARITY_LIST);
 			}
 		});
 	}
@@ -212,13 +212,13 @@ public class MenuItemDispose extends JPanel{
 		};
 		int select = ImagePanel.getSelectNumber();
 		if(selectCheck.test(select)) {
-			int max = numberList.get(drawList.get(select)) - usedNumber[drawList.get(select)];
+			int max = numberList.get(select) - usedNumber[select];
 			if(numberCheck.test(max)) {
-				RecyclePanel RecyclePanel = new RecyclePanel(imageList.get(drawList.get(select)), max, rarityList.get(drawList.get(select)));
+				RecyclePanel RecyclePanel = new RecyclePanel(imageList.get(select), max, rarityList.get(select));
 				int quantity = RecyclePanel.getQuantity();
 				int medal = RecyclePanel.getMedal();
 				if(medal !=0) {
-					numberList.set(drawList.get(select), numberList.get(drawList.get(select)) - quantity);
+					numberList.set(select, numberList.get(select) - quantity);
 					
 					//いずれガチャメダルの保存も記述する
 					
@@ -265,8 +265,8 @@ public class MenuItemDispose extends JPanel{
 	}
 	
 	private void addScroll() {
-		CoreImagePanel.setImagePanel(coreImageList, coreDrawList, coreNumberList, true);
-		WeaponImagePanel.setImagePanel(weaponImageList, weaponDrawList, weaponNumberList, false);
+		CoreImagePanel.setImagePanel(coreImageList, coreDisplayList, coreNumberList, true);
+		WeaponImagePanel.setImagePanel(weaponImageList, weaponDisplayList, weaponNumberList, false);
 		itemScroll.getViewport().setView(CoreImagePanel);
     	add(itemScroll);
 	}
@@ -281,35 +281,39 @@ public class MenuItemDispose extends JPanel{
 class ImagePanel extends JPanel implements MouseListener{
 	List<BufferedImage> imageList;
 	List<Integer> numberList;
-	List<Integer> drawList;
+	List<Integer> displayList;
 	boolean existsWhich;
 	int selectNumber;
-	final static int SIZE = 60;
+	int unitSize = 60;
+	int drawSize = 120;
+	int columns = 5;
 	
 	protected ImagePanel() {
 		resetSelectNumber();
 		addMouseListener(this);
 	}
 	
-	protected void setImagePanel(List<BufferedImage> imageList, List<Integer> drawList, List<Integer> numberList, boolean existsWhich) {
+	protected void setImagePanel(List<BufferedImage> imageList, List<Integer> displayList, List<Integer> numberList, boolean existsWhich) {
 		this.imageList = imageList;
-		this.drawList = drawList;
+		this.displayList = displayList;
 		this.numberList = numberList;
 		this.existsWhich = existsWhich;
 	}
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		setPreferredSize(new Dimension(400, (drawList.size() / 5 + 1) * 120));
-		for(int i = 0; i < drawList.size(); i++) {
-			if(selectNumber == i) {
+		setPreferredSize(new Dimension(400, (displayList.size() / columns + 1) * drawSize));
+		for(int i = 0; i < displayList.size(); i++) {
+			int x = i % columns * drawSize;
+			int y = i / columns * drawSize;
+			if(selectNumber == displayList.get(i)) {
 				g.setColor(Color.WHITE);
-				g.fillRect(i % 5 * 120, i / 5 * 120, 90, 90);
+				g.fillRect(x, y, 90, 90);
 			}
-			g.drawImage(imageList.get(drawList.get(i)), i % 5 * 120, i / 5 * 120, this);
+			g.drawImage(imageList.get(displayList.get(i)), x, y, this);
 			g.setColor(Color.BLACK);
 			g.setFont(new Font("Arial", Font.BOLD, 30));
-			g.drawString("" + numberList.get(drawList.get(i)), 80 + i % 5 * 120, 80 + i / 5 * 120);
+			g.drawString("" + numberList.get(displayList.get(i)), 80 + x, 80 + y);
 		}
 	}
 	
@@ -326,17 +330,19 @@ class ImagePanel extends JPanel implements MouseListener{
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
-		for(int i = 0; i < drawList.size(); i++) {
-			if(ValueRange.of(10 + i % 5 * 120, 10 + i % 5 * 120 + SIZE).isValidIntValue(e.getX())
-					&& ValueRange.of(10 + i / 5 * 120, 10 + i / 5 * 120 + SIZE).isValidIntValue(e.getY())){
-				if(selectNumber == i) {
+		for(int i = 0; i < displayList.size(); i++) {
+			int x = i % columns * drawSize + 10;
+			int y = i / columns * drawSize + 10;
+			if(ValueRange.of(x, x + unitSize).isValidIntValue(e.getX())
+					&& ValueRange.of(y, y + unitSize).isValidIntValue(e.getY())){
+				if(selectNumber == displayList.get(i)) {
 					if(existsWhich) {
-						new DrawStatus().core(imageList.get(drawList.get(selectNumber)), drawList.get(selectNumber));
+						new DisplayStatus().core(imageList.get(selectNumber), selectNumber);
 					}else {
-						new DrawStatus().weapon(imageList.get(drawList.get(selectNumber)), drawList.get(selectNumber));
+						new DisplayStatus().weapon(imageList.get(selectNumber), selectNumber);
 					}
 				}else {
-					selectNumber = i;
+					selectNumber = displayList.get(i);
 				}
 				break;
 	    	}

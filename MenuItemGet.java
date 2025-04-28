@@ -41,7 +41,7 @@ import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
 import defaultdata.DefaultData;
-import drawstatus.DrawStatus;
+import displaystatus.DisplayStatus;
 import mainframe.MainFrame;
 import saveholditem.SaveHoldItem;
 
@@ -91,6 +91,7 @@ public class MenuItemGet extends JPanel implements ActionListener{
 		setReturnButton();
 		setGachaScroll();
 		drawGachaImage(g);
+		requestFocus();
 	}
 	
 	private void addGachaDetailButton() {
@@ -134,7 +135,6 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	
 	private void setButton(JButton button) {
 		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 22));
-		button.setFocusable(false);
 	}
 	
 	private void addGachaScroll() {
@@ -524,7 +524,7 @@ class DrawResult extends JPanel implements MouseListener{
 	int position;
 	List<BufferedImage> coreImageList = new DefaultData().getCoreImage(2);
 	List<BufferedImage> weaponImageList = new DefaultData().getWeaponImage(2);
-	final static int SIZE = 80;
+	int unitSize = 80;
 	
 	protected DrawResult(int[] gachaMode){
 		addMouseListener(this);
@@ -632,14 +632,14 @@ class DrawResult extends JPanel implements MouseListener{
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		int selectNumber = selectCheck(e.getPoint(), corePosition);
+		int selectNumber = getSelectNumber(e.getPoint(), corePosition);
 		if(0 <= selectNumber) {
-			new DrawStatus().core(coreImageList.get(getCore.get(selectNumber)), getCore.get(selectNumber));
+			new DisplayStatus().core(coreImageList.get(getCore.get(selectNumber)), getCore.get(selectNumber));
 			return;
 		}
-		selectNumber = selectCheck(e.getPoint(), weaponPosition);
+		selectNumber = getSelectNumber(e.getPoint(), weaponPosition);
 		if(0 <= selectNumber) {
-			new DrawStatus().weapon(weaponImageList.get(getWeapon.get(selectNumber)), getWeapon.get(selectNumber));
+			new DisplayStatus().weapon(weaponImageList.get(getWeapon.get(selectNumber)), getWeapon.get(selectNumber));
 			return;
 		}
 	}
@@ -654,10 +654,10 @@ class DrawResult extends JPanel implements MouseListener{
 	public void mouseExited(MouseEvent e) {
 	}
 	
-	private int selectCheck(Point point, List<Point> positionList) {
+	private int getSelectNumber(Point point, List<Point> positionList) {
 		for(int i = 0; i < positionList.size(); i++) {
-			if(ValueRange.of(positionList.get(i).x, positionList.get(i).x + SIZE).isValidIntValue(point.x)
-					&& ValueRange.of(positionList.get(i).y, positionList.get(i).y + SIZE).isValidIntValue(point.y)){
+			if(ValueRange.of(positionList.get(i).x, positionList.get(i).x + unitSize).isValidIntValue(point.x)
+					&& ValueRange.of(positionList.get(i).y, positionList.get(i).y + unitSize).isValidIntValue(point.y)){
 				return i;
 			}
 		}

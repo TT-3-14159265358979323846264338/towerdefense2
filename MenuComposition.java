@@ -20,6 +20,7 @@ import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -29,7 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import defaultdata.DefaultData;
-import drawstatus.DrawStatus;
+import displaystatus.DisplayStatus;
 import mainframe.MainFrame;
 import savecomposition.SaveComposition;
 import saveholditem.SaveHoldItem;
@@ -38,8 +39,7 @@ import saveholditem.SaveHoldItem;
 public class MenuComposition extends JPanel implements MouseListener{
 	JLabel compositionNameLabel = new JLabel();
 	JLabel compositionLabel = new JLabel();
-	JLabel coreLabel = new JLabel();
-	JLabel weaponLabel = new JLabel();
+	JLabel typeLabel = new JLabel();
 	JButton newButton = new JButton();
 	JButton removeButton = new JButton();
 	JButton swapButton = new JButton();
@@ -48,11 +48,12 @@ public class MenuComposition extends JPanel implements MouseListener{
 	JButton loadButton = new JButton();
 	JButton resetButton = new JButton();
 	JButton returnButton = new JButton();
+	JButton switchButton = new JButton();
+	JButton sortButton = new JButton();
 	DefaultListModel<String> compositionListModel = new DefaultListModel<String>();
 	JList<String> compositionJList = new JList<String>(compositionListModel);
 	JScrollPane compositionScroll = new JScrollPane();
-	JScrollPane coreScroll = new JScrollPane();
-	JScrollPane weaponScroll = new JScrollPane();
+	JScrollPane itemScroll = new JScrollPane();
 	ImagePanel CoreImagePanel = new ImagePanel();
 	ImagePanel WeaponImagePanel = new ImagePanel();
 	SaveHoldItem SaveHoldItem;
@@ -64,19 +65,21 @@ public class MenuComposition extends JPanel implements MouseListener{
 	List<Integer> weaponNumberList = new ArrayList<>();
 	List<Integer> nowCoreNumberList = new ArrayList<>();
 	List<Integer> nowWeaponNumberList = new ArrayList<>();
+	List<Integer> coreDisplayList = new ArrayList<>();
+	List<Integer> weaponDisplayList = new ArrayList<>();
 	List<List<List<Integer>>> allCompositionList = new ArrayList<>();
 	List<String> compositionNameList = new ArrayList<>();
 	int selectNumber;
-	final static int SIZE = 60;
+	static int unitSize = 60;
 	
 	public MenuComposition(MainFrame MainFrame) {
 		addMouseListener(this);
 		setBackground(new Color(240, 170, 80));
 		load();
+		initializeDisplayList();
 		addCompositionNameLabel();
 		addCompositionLabel();
-		addCoreLabel();
-		addWeaponLabel();
+		addTypeLabel();
 		addNewButton();
 		addRemoveButton();
 		addSwapButton();
@@ -85,17 +88,17 @@ public class MenuComposition extends JPanel implements MouseListener{
 		addLoadButton();
 		addResetButton();
 		addReturnButton(MainFrame);
+		addSwitchButton();
+		addSortButton();
 		addCompositionScroll();
-		addCoreScroll();
-		addWeaponScroll();
+		addItemScroll();
 	}
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		setCompositionNameLabel();
 		setCompositionLabel();
-		setCoreLabel();
-		setWeaponLabel();
+		setTypeLabel();
 		setNewButton();
 		setRemoveButton();
 		setSwapButton();
@@ -105,10 +108,12 @@ public class MenuComposition extends JPanel implements MouseListener{
 		setResetButton();
 		setReturnButton();
 		setCompositionScroll();
-		setCoreScroll();
-		setWeaponScroll();
+		setSwitchButton();
+		setSortButton();
+		setItemScroll();
 		drawComposition(g);
 		countNumber();
+		requestFocus();
 	}
 	
 	private void load() {
@@ -158,6 +163,18 @@ public class MenuComposition extends JPanel implements MouseListener{
 		}
 	}
 	
+	private void initializeDisplayList() {
+		BiConsumer<List<Integer>, List<Integer>> initialize = (displayList, numberList) -> {
+			for(int i = 0; i < numberList.size(); i++) {
+				if(numberList.get(i) != 0) {
+					displayList.add(i);
+				}
+			}
+		};
+		initialize.accept(coreDisplayList, coreNumberList);
+		initialize.accept(weaponDisplayList, weaponNumberList);
+	}
+	
 	private void addCompositionNameLabel() {
 		add(compositionNameLabel);
 	}
@@ -178,24 +195,14 @@ public class MenuComposition extends JPanel implements MouseListener{
 		setLabel(compositionLabel);
 	}
 	
-	private void addCoreLabel() {
-		add(coreLabel);
+	private void addTypeLabel() {
+		add(typeLabel);
 	}
 	
-	private void setCoreLabel() {
-		coreLabel.setText("コア");
-		coreLabel.setBounds(570, 10, 130, 30);
-		setLabel(coreLabel);
-	}
-	
-	private void addWeaponLabel() {
-		add(weaponLabel);
-	}
-	
-	private void setWeaponLabel() {
-		weaponLabel.setText("武器");
-		weaponLabel.setBounds(720, 10, 130, 30);
-		setLabel(weaponLabel);
+	private void setTypeLabel() {
+		typeLabel.setText((itemScroll.getViewport().getView() == CoreImagePanel)? "コアリスト": "武器リスト");
+		typeLabel.setBounds(570, 10, 130, 30);
+		setLabel(typeLabel);
 	}
 	
 	private void setLabel(JLabel label) {
@@ -379,9 +386,42 @@ public class MenuComposition extends JPanel implements MouseListener{
 		setButton(returnButton);
 	}
 	
+	private void addSwitchButton() {
+		add(switchButton);
+		switchButton.addActionListener(e->{
+			itemScroll.getViewport().setView((itemScroll.getViewport().getView() == CoreImagePanel)? WeaponImagePanel: CoreImagePanel);
+		});
+	}
+	
+	private void setSwitchButton() {
+		switchButton.setText("表示切替");
+		switchButton.setBounds(570, 460, 185, 60);
+		setButton(switchButton);
+	}
+	
+	private void addSortButton() {
+		add(sortButton);
+		sortButton.addActionListener(e->{
+			
+			//JCheckBox, JRadioButton
+			
+			
+			
+			
+			
+			
+			
+		});
+	}
+	
+	private void setSortButton() {
+		sortButton.setText("ソート");
+		sortButton.setBounds(765, 460, 185, 60);
+		setButton(sortButton);
+	}
+	
 	private void setButton(JButton button) {
 		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 16));
-		button.setFocusable(false);
 	}
 	
 	private void addCompositionScroll() {
@@ -396,26 +436,16 @@ public class MenuComposition extends JPanel implements MouseListener{
     	selectNumber = compositionJList.getSelectedIndex();
 	}
 	
-	private void addCoreScroll() {
-		CoreImagePanel.setImagePanel(new DefaultData().getCoreImage(2), nowCoreNumberList, WeaponImagePanel, true);
-		coreScroll.getViewport().setView(CoreImagePanel);
-    	add(coreScroll);
+	private void addItemScroll() {
+		CoreImagePanel.setImagePanel(new DefaultData().getCoreImage(2), coreDisplayList, nowCoreNumberList, true);
+		WeaponImagePanel.setImagePanel(new DefaultData().getWeaponImage(2), weaponDisplayList, nowWeaponNumberList, false);
+		itemScroll.getViewport().setView(CoreImagePanel);
+    	add(itemScroll);
 	}
 	
-	private void setCoreScroll() {
-		coreScroll.setBounds(570, 40, 140, 480);
-		coreScroll.setPreferredSize(coreScroll.getSize());
-	}
-	
-	private void addWeaponScroll() {
-		WeaponImagePanel.setImagePanel(new DefaultData().getWeaponImage(2), nowWeaponNumberList, CoreImagePanel, false);
-		weaponScroll.getViewport().setView(WeaponImagePanel);
-    	add(weaponScroll);
-	}
-	
-	private void setWeaponScroll() {
-		weaponScroll.setBounds(720, 40, 140, 480);
-		weaponScroll.setPreferredSize(weaponScroll.getSize());
+	private void setItemScroll() {
+		itemScroll.setBounds(570, 40, 380, 410);
+		itemScroll.setPreferredSize(itemScroll.getSize());
 	}
 	
 	private void drawComposition(Graphics g) {
@@ -478,19 +508,21 @@ public class MenuComposition extends JPanel implements MouseListener{
 		for(int i = 0; i < allCompositionList.get(selectNumber).size(); i++) {
 			int x = getPositionX(i) + 60;
 			int y = getPositionY(i) + 60;
-			if(ValueRange.of(x, x + SIZE).isValidIntValue(e.getX())
-					&& ValueRange.of(y, y + SIZE).isValidIntValue(e.getY())){
-				int selectCore = CoreImagePanel.getSelectNumber();
-				int selectWeapon = WeaponImagePanel.getSelectNumber();
-				if(0 <= selectCore) {
-					if(0 < nowCoreNumberList.get(selectCore)) {
-						changeCore(i, selectCore);
+			if(ValueRange.of(x, x + unitSize).isValidIntValue(e.getX())
+					&& ValueRange.of(y, y + unitSize).isValidIntValue(e.getY())){
+				try {
+					if(itemScroll.getViewport().getView() == CoreImagePanel) {
+						int selectCore = CoreImagePanel.getSelectNumber();
+						if(0 < nowCoreNumberList.get(selectCore)) {
+							changeCore(i, selectCore);
+						}
+					}else {
+						int selectWeapon = WeaponImagePanel.getSelectNumber();
+						if(0 < nowWeaponNumberList.get(selectWeapon)) {
+							changeWeapon(i, selectWeapon);
+						}
 					}
-				}else if(0 <= selectWeapon) {
-					if(0 < nowWeaponNumberList.get(selectWeapon)) {
-						changeWeapon(i, selectWeapon);
-					}
-				}else {
+				}catch(Exception notSelect) {
 					unitStstus(i);
 				}
 			}
@@ -553,9 +585,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void unitStstus(int number) {
 		List<Integer> unitData = allCompositionList.get(selectNumber).get(number);
 		StatusCalculation StatusCalculation = new StatusCalculation(unitData);
-		List<List<Integer>> weaponStatusList =  StatusCalculation.getWeaponStatus();
-		List<List<Integer>> unitStatusList = StatusCalculation.getUnitStatus();
-		new DrawStatus().unit(getImage(unitData), unitData, weaponStatusList, unitStatusList);
+		new DisplayStatus().unit(getImage(unitData), unitData, StatusCalculation.getWeaponStatus(), StatusCalculation.getUnitStatus());
 	}
 	
 	private BufferedImage getImage(List<Integer> unitData) {
@@ -587,34 +617,39 @@ public class MenuComposition extends JPanel implements MouseListener{
 //ユニット表示
 class ImagePanel extends JPanel implements MouseListener{
 	List<BufferedImage> imageList;
+	List<Integer> displayList;
 	List<Integer> numberList;
-	ImagePanel ImagePanel;
 	boolean existsWhich;
 	int selectNumber;
+	int drawSize = 120;
+	int column = 3;
 	
 	protected ImagePanel() {
 		resetSelectNumber();
 		addMouseListener(this);
 	}
 	
-	protected void setImagePanel(List<BufferedImage> imageList, List<Integer> numberList, ImagePanel ImagePanel, boolean existsWhich) {
+	protected void setImagePanel(List<BufferedImage> imageList, List<Integer> displayList, List<Integer> numberList, boolean existsWhich) {
 		this.imageList = imageList;
+		this.displayList = displayList;
 		this.numberList = numberList;
-		this.ImagePanel = ImagePanel;
 		this.existsWhich = existsWhich;
-		setPreferredSize(new Dimension(100, imageList.size() * 100));
 	}
+	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		for(int i = 0; i < imageList.size(); i++) {
-			if(selectNumber == i) {
+		setPreferredSize(new Dimension(100, (displayList.size() / column + 1) * drawSize));
+		for(int i = 0; i < displayList.size(); i++) {
+			int x = i % column * drawSize;
+			int y = i / column * drawSize;
+			if(selectNumber == displayList.get(i)) {
 				g.setColor(Color.WHITE);
-				g.fillRect(0, 100 * i, 90, 90);
+				g.fillRect(x, y, 90, 90);
 			}
-			g.drawImage(imageList.get(i), 0, i * 100, this);
+			g.drawImage(imageList.get(displayList.get(i)), x, y, this);
 			g.setColor(Color.BLACK);
 			g.setFont(new Font("Arial", Font.BOLD, 30));
-			g.drawString("" + numberList.get(i), 80, 80 + i * 100);
+			g.drawString("" + numberList.get(displayList.get(i)), 80 + x, 80 + y);
 		}
 	}
 	
@@ -631,24 +666,24 @@ class ImagePanel extends JPanel implements MouseListener{
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
-		for(int i = 0; i < imageList.size(); i++) {
-			if(ValueRange.of(10, 10 + MenuComposition.SIZE).isValidIntValue(e.getX())
-					&& ValueRange.of(10 + 100 * i, 10 + MenuComposition.SIZE + 100 * i).isValidIntValue(e.getY())){
-				if(selectNumber == i) {
+		for(int i = 0; i < displayList.size(); i++) {
+			int x = i % column * drawSize + 10;
+			int y = i / column * drawSize + 10;
+			if(ValueRange.of(x, x + MenuComposition.unitSize).isValidIntValue(e.getX())
+					&& ValueRange.of(y, y + MenuComposition.unitSize).isValidIntValue(e.getY())){
+				if(selectNumber == displayList.get(i)) {
 					if(existsWhich) {
-						new DrawStatus().core(imageList.get(selectNumber), selectNumber);
+						new DisplayStatus().core(imageList.get(selectNumber), selectNumber);
 					}else {
-						new DrawStatus().weapon(imageList.get(selectNumber), selectNumber);
+						new DisplayStatus().weapon(imageList.get(selectNumber), selectNumber);
 					}
 				}else {
-					selectNumber = i;
-					ImagePanel.resetSelectNumber();
+					selectNumber = displayList.get(i);
 				}
 				break;
 	    	}
 			if(i == imageList.size() - 1) {
 				resetSelectNumber();
-				ImagePanel.resetSelectNumber();
 			}
 		}
 	}
@@ -707,7 +742,7 @@ class StatusCalculation{
 			rightWeaponStatus = DefaultData.WEAPON_WEAPON_STATUS_LIST.get(unitData.get(0));
 			rightUnitStatus = DefaultData.WEAPON_UNIT_STATUS_LIST.get(unitData.get(0));
 			rightWeaponCutList = DefaultData.WEAPON_CUT_STATUS_LIST.get(unitData.get(0));
-		}catch(Exception e) {
+		}catch(Exception noWeapon) {
 			rightType = defaultType();
 			rightElement = defaultElement();
 			rightWeaponStatus = defaultWeaponStatus();
@@ -720,7 +755,7 @@ class StatusCalculation{
 			leftWeaponStatus = DefaultData.WEAPON_WEAPON_STATUS_LIST.get(unitData.get(2));
 			leftUnitStatus = DefaultData.WEAPON_UNIT_STATUS_LIST.get(unitData.get(2));
 			leftWeaponCutList = DefaultData.WEAPON_CUT_STATUS_LIST.get(unitData.get(2));
-		}catch(Exception e) {
+		}catch(Exception noWeapon) {
 			leftType = defaultType();
 			leftElement = defaultElement();
 			leftWeaponStatus = defaultWeaponStatus();
