@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -25,8 +24,8 @@ public class DisplaySort extends SortPanel{
 	
 	public void weapon() {
 		rarityList = DefaultData.WEAPON_RARITY_LIST;
-		weaponStatusList = DefaultData.WEAPON_WEAPON_STATUS_LIST.stream().map(x -> x.stream().map(y -> (double) y).collect(Collectors.toList())).collect(Collectors.toList());
-		unitStatusList = DefaultData.WEAPON_UNIT_STATUS_LIST.stream().map(x -> x.stream().map(y -> (double) y).collect(Collectors.toList())).collect(Collectors.toList());
+		weaponStatusList = DefaultData.WEAPON_WEAPON_STATUS_LIST.stream().map(i -> i.stream().map(j -> (double) j).toList()).toList();
+		unitStatusList = DefaultData.WEAPON_UNIT_STATUS_LIST.stream().map(i -> i.stream().map(j -> (double) j).toList()).toList();
 		cutList = DefaultData.WEAPON_CUT_STATUS_LIST;
 		typeList = DefaultData.WEAPON_TYPE;
 		elementList = DefaultData.WEAPON_ELEMENT;

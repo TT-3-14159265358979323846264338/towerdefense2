@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -260,19 +259,11 @@ public class DefaultData {
 //画像処理
 class InputImage{
 	protected List<List<BufferedImage>> inputList2(List<List<String>> imageNameList, int ratio){
-		List<List<BufferedImage>> imageList = new ArrayList<>();
-		for(List<String> i: imageNameList) {
-			imageList.add(inputList(i, ratio));
-		}
-		return imageList;
+		return imageNameList.stream().map(i -> inputList(i, ratio)).toList();
 	}
 	
 	protected List<BufferedImage> inputList(List<String> imageNameList, int ratio){
-		List<BufferedImage> imageList = new ArrayList<>();
-		for(String i : imageNameList) {
-			imageList.add(input(i, ratio));
-		}
-		return imageList;
+		return imageNameList.stream().map(i -> input(i, ratio)).toList();
 	}
 	
 	protected BufferedImage input(String imageName, int ratio) {

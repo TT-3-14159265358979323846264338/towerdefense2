@@ -20,7 +20,9 @@ import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -164,15 +166,11 @@ public class MenuComposition extends JPanel implements MouseListener{
 	}
 	
 	private void initializeDisplayList() {
-		BiConsumer<List<Integer>, List<Integer>> initialize = (displayList, numberList) -> {
-			for(int i = 0; i < numberList.size(); i++) {
-				if(numberList.get(i) != 0) {
-					displayList.add(i);
-				}
-			}
+		Function<List<Integer>, List<Integer>> getDisplayList = (list) -> {
+			return IntStream.range(0, list.size()).mapToObj(i -> (list.get(i) == 0)? -1: i).filter(i -> i != -1).toList();
 		};
-		initialize.accept(coreDisplayList, coreNumberList);
-		initialize.accept(weaponDisplayList, weaponNumberList);
+		coreDisplayList = getDisplayList.apply(coreNumberList);
+		weaponDisplayList = getDisplayList.apply(weaponNumberList);
 	}
 	
 	private void addCompositionNameLabel() {
@@ -349,7 +347,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 			int select = showConfirmDialog(null, "現在の編成をリセットしますか", "リセット確認", YES_NO_OPTION, QUESTION_MESSAGE);
 			switch(select) {
 			case 0:
-				allCompositionList.set(selectNumber, savecomposition.SaveComposition.DEFAULT);
+				allCompositionList.set(selectNumber, new ArrayList<>(IntStream.range(0, 8).mapToObj(i -> new ArrayList<>(savecomposition.SaveComposition.DEFAULT)).toList()));
 			default:
 				break;
 			}
@@ -490,14 +488,13 @@ public class MenuComposition extends JPanel implements MouseListener{
 				//左武器を装備していないので、無視する
 			}
     	}
+    	BiFunction<List<Integer>, int[], List<Integer>> getNowNumber = (list, count) -> {
+    		return IntStream.range(0, list.size()).mapToObj(i -> list.get(i) - count[i]).toList();
+    	};
     	nowCoreNumberList.clear();
-    	for(int i = 0; i < coreNumberList.size(); i++) {
-    		nowCoreNumberList.add(coreNumberList.get(i) - core[i]);
-    	}
+    	nowCoreNumberList.addAll(getNowNumber.apply(coreNumberList, core));
     	nowWeaponNumberList.clear();
-    	for(int i = 0; i < weaponNumberList.size(); i++) {
-    		nowWeaponNumberList.add(weaponNumberList.get(i) - weapon[i]);
-    	}
+    	nowWeaponNumberList.addAll(getNowNumber.apply(weaponNumberList, weapon));
 	}
 	
 	@Override
@@ -515,11 +512,13 @@ public class MenuComposition extends JPanel implements MouseListener{
 						int selectCore = CoreImagePanel.getSelectNumber();
 						if(0 < nowCoreNumberList.get(selectCore)) {
 							changeCore(i, selectCore);
+							countNumber();
 						}
 					}else {
 						int selectWeapon = WeaponImagePanel.getSelectNumber();
 						if(0 < nowWeaponNumberList.get(selectWeapon)) {
 							changeWeapon(i, selectWeapon);
+							countNumber();
 						}
 					}
 				}catch(Exception notSelect) {
@@ -548,14 +547,14 @@ public class MenuComposition extends JPanel implements MouseListener{
 			allCompositionList.get(selectNumber).get(number).set(2, selectWeapon);
 			allCompositionList.get(selectNumber).get(number).set(0, -1);
 		}else if(allCompositionList.get(selectNumber).get(number).get(2) == -1) {
-			changeConfirmation(number, selectWeapon);
+			change(number, selectWeapon);
 		}else {
 			switch(DefaultData.WEAPON_TYPE.get(allCompositionList.get(selectNumber).get(number).get(2)).get(1)) {
 			case 0:
-				changeConfirmation(number, selectWeapon);
+				change(number, selectWeapon);
 				break;
 			case 1:
-				if(changeConfirmation(number, selectWeapon) == 1) {
+				if(change(number, selectWeapon) == 1) {
 					allCompositionList.get(selectNumber).get(number).set(2, -1);
 				}
 				break;
@@ -566,7 +565,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 		WeaponImagePanel.resetSelectNumber();
 	}
 	
-	private int changeConfirmation(int number, int selectWeapon) {
+	private int change(int number, int selectWeapon) {
 		String[] menu = {"左", "右", "戻る"};
 		int select = showOptionDialog(null, "左右どちらの武器を変更しますか", "武器変更", OK_CANCEL_OPTION, PLAIN_MESSAGE, null, menu, menu[0]);
 		switch(select) {
@@ -800,36 +799,21 @@ class StatusCalculation{
 	}
 	
 	protected List<List<Integer>> getWeaponStatus(){
+		Function<List<Integer>, List<Integer>> getStatus = (list) -> {
+			return IntStream.range(0, list.size()).mapToObj(i -> (int) (list.get(i) * coreWeaponStatus.get(i))).toList();
+		};
 		List<List<Integer>> weaponStatus = new ArrayList<>();
 		weaponStatus.add(rightElement);
-		weaponStatus.add(getEachWeaponStatus(rightWeaponStatus));
+		weaponStatus.add(getStatus.apply(rightWeaponStatus));
 		weaponStatus.add(leftElement);
-		weaponStatus.add(getEachWeaponStatus(leftWeaponStatus));
+		weaponStatus.add(getStatus.apply(leftWeaponStatus));
 		return weaponStatus;
-	}
-	
-	private List<Integer> getEachWeaponStatus(List<Integer> weapontStatus){
-		List<Integer> statusList = new ArrayList<>();
-		double status;
-		for(int i = 0; i < weapontStatus.size(); i++) {
-			status = (double) weapontStatus.get(i) * coreWeaponStatus.get(i);
-			statusList.add((int) status);
-		}
-		return statusList;
 	}
 	
 	protected List<List<Integer>> getUnitStatus(){
 		List<List<Integer>> statusList = new ArrayList<>();
-		double status;
-		statusList.add(new ArrayList<>());
-		for(int i = 0; i < coreCutList.size(); i++) {
-			statusList.get(0).add(leftWeaponCutList.get(i) + coreCutList.get(i) + rightWeaponCutList.get(i));
-		}
-		statusList.add(new ArrayList<>());
-		for(int i = 0; i < coreUnitStatus.size(); i++) {
-			status = (double) (rightUnitStatus.get(i) + leftUnitStatus.get(i)) * coreUnitStatus.get(i);
-			statusList.get(1).add((int) status);
-		}
+		statusList.add(IntStream.range(0, coreCutList.size()).mapToObj(i -> leftWeaponCutList.get(i) + coreCutList.get(i) + rightWeaponCutList.get(i)).toList());
+		statusList.add(IntStream.range(0, coreUnitStatus.size()).mapToObj(i -> (int) ((rightUnitStatus.get(i) + leftUnitStatus.get(i)) * coreUnitStatus.get(i))).toList());
 		return statusList;
 	}
 }

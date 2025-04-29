@@ -19,7 +19,10 @@ import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -132,16 +135,12 @@ public class MenuItemDispose extends JPanel{
 	}
 	
 	private void initializeDisplayList() {
-		BiConsumer<List<Integer>, List<Integer>> initialize = (drawList, numberList) -> {
-			for(int i = 0; i < numberList.size(); i++) {
-				if(numberList.get(i) != 0) {
-					drawList.add(i);
-				}
-			}
+		Function<List<Integer>, List<Integer>> getDisplayList = (list) -> {
+			return IntStream.range(0, list.size()).mapToObj(i -> (list.get(i) == 0)? -1: i).filter(i -> i != -1).collect(Collectors.toList());
 		};
-		initialize.accept(coreDisplayList, coreNumberList);
+		coreDisplayList = getDisplayList.apply(coreNumberList);
 		coreDisplayList.remove(0);//初期コアはリサイクル禁止
-		initialize.accept(weaponDisplayList, weaponNumberList);
+		weaponDisplayList = getDisplayList.apply(weaponNumberList);
 	}
 	
 	private void setTypeLabel() {

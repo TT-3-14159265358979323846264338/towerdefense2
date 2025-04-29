@@ -1,5 +1,7 @@
 package menuitemget;
 
+import static javax.swing.JOptionPane.*;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -31,6 +33,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -601,15 +604,11 @@ class DrawResult extends JPanel implements MouseListener{
 	}
 	
 	private List<Integer> getItemList(List<Integer> dataList, List<Integer> getList){
-		List<Integer> finalList = new ArrayList<>();
 		int[] count = new int[dataList.size()];
 		for(int i: getList) {
 			count[i]++;
 		}
-		for(int i = 0; i < count.length; i++) {
-			finalList.add(dataList.get(i) + count[i]);
-		}
-		return finalList;
+		return IntStream.range(0, count.length).mapToObj(i -> dataList.get(i) + count[i]).toList();
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -722,7 +721,12 @@ class GachaLineup extends JDialog{
 	}
 }
 
-//ガチャのラインナップ
+/*ガチャのラインナップ
+ * LineupSetには、そのセットで排出されるユニット番号をリスト化
+ * その後、各ガチャのmodeでどのLineupSetと排出確率を使用するか指定する(addCore(), addWeapon())
+ * 排出確率は、1つのLineupSet全体の排出確率を指定する
+ * 各ガチャ全体の排出確率を100に必ずすること
+ */
 class DefaultLineup{
 	final List<Integer> coreLineupSet1 = Arrays.asList(1, 2, 3, 4, 5);
 	final List<Integer> coreLineupSet2 = Arrays.asList();
@@ -739,31 +743,40 @@ class DefaultLineup{
 	protected DefaultLineup(int mode) {
 		switch(mode) {
 		case 0:
-			coreLineup.addAll(coreLineupSet1);
-			coreRatio.addAll(getRatioList(50, coreLineup.size()));
-			weaponLineup.addAll(weaponLineupSet1);
-			weaponRatio.addAll(getRatioList(50, weaponLineup.size()));
+			addCore(coreLineupSet1, 50);
+			addWeapon(weaponLineupSet1, 50);
 			break;
 		case 1:
-			coreLineup.addAll(coreLineupSet1);
-			coreRatio.addAll(getRatioList(100, coreLineup.size()));
+			addCore(coreLineupSet1, 100);
 			break;
 		case 2:
-			weaponLineup.addAll(weaponLineupSet1);
-			weaponRatio.addAll(getRatioList(100, weaponLineup.size()));
+			addWeapon(weaponLineupSet1, 100);
 			break;
 		default:
 			break;
 		}
+		aptitudeTest();
 	}
 	
-	private List<Double> getRatioList(double totalRatio, int size){
-		List<Double> ratioList = new ArrayList<>();
-		double ratio = (double) (totalRatio / size);
-		for(int i = 0; i < size; i++) {
-			ratioList.add(ratio);
+	private void addCore(List<Integer> lineupSet, double totalRatio) {
+		coreLineup.addAll(lineupSet);
+		coreRatio.addAll(getRatioList(lineupSet.size(), totalRatio));
+	}
+	
+	private void addWeapon(List<Integer> lineupSet, double totalRatio) {
+		weaponLineup.addAll(lineupSet);
+		weaponRatio.addAll(getRatioList(lineupSet.size(), totalRatio));
+	}
+	
+	private List<Double> getRatioList(int size, double totalRatio){
+		return IntStream.range(0, size).mapToObj(i -> (double) (totalRatio / size)).toList();
+	}
+	
+	private void aptitudeTest() {
+		double sum = coreRatio.stream().mapToDouble(Double::doubleValue).sum() + weaponRatio.stream().mapToDouble(Double::doubleValue).sum();
+		if((int) sum != 100) {
+			showMessageDialog(null, "このガチャモードは使用できません");
 		}
-		return ratioList;
 	}
 	
 	protected List<Integer> getCoreLineup(){
