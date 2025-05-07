@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.swing.DefaultListModel;
@@ -608,7 +609,7 @@ class DrawResult extends JPanel implements MouseListener{
 		for(int i: getList) {
 			count[i]++;
 		}
-		return IntStream.range(0, count.length).mapToObj(i -> dataList.get(i) + count[i]).toList();
+		return IntStream.range(0, count.length).mapToObj(i -> dataList.get(i) + count[i]).collect(Collectors.toList());
 	}
 	
 	protected void paintComponent(Graphics g) {

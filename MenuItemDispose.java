@@ -19,7 +19,6 @@ import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -34,6 +33,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
 import defaultdata.DefaultData;
+import displaysort.DisplaySort;
 import displaystatus.DisplayStatus;
 import mainframe.MainFrame;
 import savecomposition.SaveComposition;
@@ -49,6 +49,8 @@ public class MenuItemDispose extends JPanel{
 	JScrollPane itemScroll = new JScrollPane();
 	ImagePanel CoreImagePanel = new ImagePanel();
 	ImagePanel WeaponImagePanel = new ImagePanel();
+	DisplaySort coreDisplaySort = new DisplaySort();
+	DisplaySort weaponDisplaySort = new DisplaySort();
 	SaveHoldItem SaveHoldItem;
 	SaveComposition SaveComposition;
 	List<Integer> coreNumberList;
@@ -135,12 +137,22 @@ public class MenuItemDispose extends JPanel{
 	}
 	
 	private void initializeDisplayList() {
-		Function<List<Integer>, List<Integer>> getDisplayList = (list) -> {
-			return IntStream.range(0, list.size()).mapToObj(i -> (list.get(i) == 0)? -1: i).filter(i -> i != -1).collect(Collectors.toList());
-		};
-		coreDisplayList = getDisplayList.apply(coreNumberList);
-		coreDisplayList.remove(0);//初期コアはリサイクル禁止
-		weaponDisplayList = getDisplayList.apply(weaponNumberList);
+		coreDisplayList = getCoreDisplayList();
+		weaponDisplayList = getWeaponDisplayList();
+	}
+	
+	private List<Integer> getCoreDisplayList(){
+		List<Integer> displayList = getDisplayList(coreNumberList);
+		displayList.remove(0);//初期コアはリサイクル禁止
+		return displayList;
+	}
+	
+	private List<Integer> getWeaponDisplayList(){
+		return getDisplayList(weaponNumberList);
+	}
+	
+	private List<Integer> getDisplayList(List<Integer> list){
+		return IntStream.range(0, list.size()).mapToObj(i -> (list.get(i) == 0)? -1: i).filter(i -> i != -1).collect(Collectors.toList());
 	}
 	
 	private void setTypeLabel() {
@@ -165,15 +177,11 @@ public class MenuItemDispose extends JPanel{
 	private void addSortButton() {
 		add(sortButton);
 		sortButton.addActionListener(e->{
-			
-			//JCheckBox, JRadioButton
-			
-			
-			
-			
-			
-			
-			
+			if(itemScroll.getViewport().getView() == CoreImagePanel) {
+				coreDisplayList = coreDisplaySort.core(getCoreDisplayList());
+			}else {
+				weaponDisplayList = weaponDisplaySort.weapon(getWeaponDisplayList());
+			}
 		});
 	}
 	
@@ -214,11 +222,10 @@ public class MenuItemDispose extends JPanel{
 			int max = numberList.get(select) - usedNumber[select];
 			if(numberCheck.test(max)) {
 				RecyclePanel RecyclePanel = new RecyclePanel(imageList.get(select), max, rarityList.get(select));
-				int quantity = RecyclePanel.getQuantity();
-				int medal = RecyclePanel.getMedal();
-				if(medal !=0) {
-					numberList.set(select, numberList.get(select) - quantity);
+				if(RecyclePanel.getCanDispose()) {
+					numberList.set(select, numberList.get(select) - RecyclePanel.getQuantity());
 					
+					//int medal = RecyclePanel.getMedal();
 					//いずれガチャメダルの保存も記述する
 					
 					save();
@@ -365,7 +372,7 @@ class ImagePanel extends JPanel implements MouseListener{
 class RecycleDialog extends JDialog{
 	protected void setDialog(RecyclePanel RecyclePanel) {
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setTitle("ステータス");
 		setSize(600, 195);
@@ -390,6 +397,7 @@ class RecyclePanel extends JPanel{
 	BufferedImage image;
 	int rarity;
 	int quantity;
+	boolean canDispose;
 	
 	protected RecyclePanel(BufferedImage image, int max, int rarity) {
 		this.image = image;
@@ -455,7 +463,8 @@ class RecyclePanel extends JPanel{
 	private void addRecycleButton() {
 		add(recycleButton);
 		recycleButton.addActionListener(e->{
-			if(YES_OPTION == showConfirmDialog(null, (int) countSpinner.getValue() + "個をリサイクルしますか","リサイクル確認",YES_NO_OPTION , QUESTION_MESSAGE)) {
+			if(YES_OPTION == showConfirmDialog(null, quantity + "個をリサイクルしますか","リサイクル確認",YES_NO_OPTION , QUESTION_MESSAGE)) {
+				canDispose = true;
 				RecycleDialog.disposeDialog();
 			}
 		});
@@ -470,7 +479,6 @@ class RecyclePanel extends JPanel{
 	private void addReturnButton() {
 		add(returnButton);
 		returnButton.addActionListener(e->{
-			quantity = 0;
 			RecycleDialog.disposeDialog();
 		});
 	}
@@ -487,6 +495,10 @@ class RecyclePanel extends JPanel{
 	
 	private void importQuantity() {
 		quantity = (int) countSpinner.getValue();
+	}
+	
+	protected boolean getCanDispose() {
+		return canDispose;
 	}
 	
 	protected int getQuantity() {

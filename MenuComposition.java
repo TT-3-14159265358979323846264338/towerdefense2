@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.swing.DefaultListModel;
@@ -32,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import defaultdata.DefaultData;
+import displaysort.DisplaySort;
 import displaystatus.DisplayStatus;
 import mainframe.MainFrame;
 import savecomposition.SaveComposition;
@@ -58,6 +60,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 	JScrollPane itemScroll = new JScrollPane();
 	ImagePanel CoreImagePanel = new ImagePanel();
 	ImagePanel WeaponImagePanel = new ImagePanel();
+	DisplaySort coreDisplaySort = new DisplaySort();
+	DisplaySort weaponDisplaySort = new DisplaySort();
 	SaveHoldItem SaveHoldItem;
 	SaveComposition SaveComposition;
 	List<List<BufferedImage>> rightWeaponList = new ArrayList<>(new DefaultData().getRightWeaponImage(2));
@@ -166,11 +170,12 @@ public class MenuComposition extends JPanel implements MouseListener{
 	}
 	
 	private void initializeDisplayList() {
-		Function<List<Integer>, List<Integer>> getDisplayList = (list) -> {
-			return IntStream.range(0, list.size()).mapToObj(i -> (list.get(i) == 0)? -1: i).filter(i -> i != -1).toList();
-		};
-		coreDisplayList = getDisplayList.apply(coreNumberList);
-		weaponDisplayList = getDisplayList.apply(weaponNumberList);
+		coreDisplayList = getDisplayList(coreNumberList);
+		weaponDisplayList = getDisplayList(weaponNumberList);
+	}
+	
+	private List<Integer> getDisplayList(List<Integer> list){
+		return IntStream.range(0, list.size()).mapToObj(i -> (list.get(i) == 0)? -1: i).filter(i -> i != -1).collect(Collectors.toList());
 	}
 	
 	private void addCompositionNameLabel() {
@@ -400,15 +405,11 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void addSortButton() {
 		add(sortButton);
 		sortButton.addActionListener(e->{
-			
-			//JCheckBox, JRadioButton
-			
-			
-			
-			
-			
-			
-			
+			if(itemScroll.getViewport().getView() == CoreImagePanel) {
+				coreDisplayList = coreDisplaySort.core(getDisplayList(coreNumberList));
+			}else {
+				weaponDisplayList = weaponDisplaySort.weapon(getDisplayList(weaponNumberList));
+			}
 		});
 	}
 	
