@@ -16,7 +16,6 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.temporal.ValueRange;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -58,8 +57,6 @@ public class MenuItemDispose extends JPanel{
 	List<List<List<Integer>>> allCompositionList;
 	int[] usedCoreNumber;
 	int[] usedWeaponNumber;
-	List<Integer> coreDisplayList = new ArrayList<>();
-	List<Integer> weaponDisplayList = new ArrayList<>();
 	List<BufferedImage> coreImageList = new DefaultData().getCoreImage(2);
 	List<BufferedImage> weaponImageList = new DefaultData().getWeaponImage(2);
 	
@@ -137,8 +134,8 @@ public class MenuItemDispose extends JPanel{
 	}
 	
 	private void initializeDisplayList() {
-		coreDisplayList = getCoreDisplayList();
-		weaponDisplayList = getWeaponDisplayList();
+		coreDisplaySort.core(getCoreDisplayList());
+		weaponDisplaySort.weapon(getWeaponDisplayList());
 	}
 	
 	private List<Integer> getCoreDisplayList(){
@@ -178,9 +175,9 @@ public class MenuItemDispose extends JPanel{
 		add(sortButton);
 		sortButton.addActionListener(e->{
 			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				coreDisplayList = coreDisplaySort.core(getCoreDisplayList());
+				CoreImagePanel.updateList(coreDisplaySort.getDisplayList());
 			}else {
-				weaponDisplayList = weaponDisplaySort.weapon(getWeaponDisplayList());
+				WeaponImagePanel.updateList(weaponDisplaySort.getDisplayList());
 			}
 		});
 	}
@@ -195,14 +192,14 @@ public class MenuItemDispose extends JPanel{
 		add(disposeButton);
 		disposeButton.addActionListener(e->{
 			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				recycle(CoreImagePanel, coreNumberList, usedCoreNumber, coreDisplayList, coreImageList, DefaultData.CORE_RARITY_LIST);
+				recycle(CoreImagePanel, coreNumberList, usedCoreNumber, coreImageList, DefaultData.CORE_RARITY_LIST);
 			}else {
-				recycle(WeaponImagePanel, weaponNumberList, usedWeaponNumber, weaponDisplayList, weaponImageList, DefaultData.WEAPON_RARITY_LIST);
+				recycle(WeaponImagePanel, weaponNumberList, usedWeaponNumber, weaponImageList, DefaultData.WEAPON_RARITY_LIST);
 			}
 		});
 	}
 	
-	private void recycle(ImagePanel ImagePanel, List<Integer> numberList, int[] usedNumber, List<Integer> drawList, List<BufferedImage> imageList, List<Integer> rarityList) {
+	private void recycle(ImagePanel ImagePanel, List<Integer> numberList, int[] usedNumber, List<BufferedImage> imageList, List<Integer> rarityList) {
 		Predicate<Integer> selectCheck = (select) -> {
 			if(select < 0) {
 				showMessageDialog(null, "リサイクルする対象が選択されていません");
@@ -271,8 +268,8 @@ public class MenuItemDispose extends JPanel{
 	}
 	
 	private void addScroll() {
-		CoreImagePanel.setImagePanel(coreImageList, coreDisplayList, coreNumberList, true);
-		WeaponImagePanel.setImagePanel(weaponImageList, weaponDisplayList, weaponNumberList, false);
+		CoreImagePanel.setImagePanel(coreImageList, getCoreDisplayList(), coreNumberList, true);
+		WeaponImagePanel.setImagePanel(weaponImageList, getWeaponDisplayList(), weaponNumberList, false);
 		itemScroll.getViewport().setView(CoreImagePanel);
     	add(itemScroll);
 	}
@@ -304,6 +301,10 @@ class ImagePanel extends JPanel implements MouseListener{
 		this.displayList = displayList;
 		this.numberList = numberList;
 		this.existsWhich = existsWhich;
+	}
+	
+	protected void updateList(List<Integer> displayList) {
+		this.displayList = displayList;
 	}
 	
 	protected void paintComponent(Graphics g) {

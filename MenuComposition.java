@@ -71,8 +71,6 @@ public class MenuComposition extends JPanel implements MouseListener{
 	List<Integer> weaponNumberList = new ArrayList<>();
 	List<Integer> nowCoreNumberList = new ArrayList<>();
 	List<Integer> nowWeaponNumberList = new ArrayList<>();
-	List<Integer> coreDisplayList = new ArrayList<>();
-	List<Integer> weaponDisplayList = new ArrayList<>();
 	List<List<List<Integer>>> allCompositionList = new ArrayList<>();
 	List<String> compositionNameList = new ArrayList<>();
 	int selectNumber;
@@ -170,8 +168,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 	}
 	
 	private void initializeDisplayList() {
-		coreDisplayList = getDisplayList(coreNumberList);
-		weaponDisplayList = getDisplayList(weaponNumberList);
+		coreDisplaySort.core(getDisplayList(coreNumberList));
+		weaponDisplaySort.weapon(getDisplayList(weaponNumberList));
 	}
 	
 	private List<Integer> getDisplayList(List<Integer> list){
@@ -406,9 +404,9 @@ public class MenuComposition extends JPanel implements MouseListener{
 		add(sortButton);
 		sortButton.addActionListener(e->{
 			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				coreDisplayList = coreDisplaySort.core(getDisplayList(coreNumberList));
+				CoreImagePanel.updateList(coreDisplaySort.getDisplayList());
 			}else {
-				weaponDisplayList = weaponDisplaySort.weapon(getDisplayList(weaponNumberList));
+				WeaponImagePanel.updateList(weaponDisplaySort.getDisplayList());
 			}
 		});
 	}
@@ -436,8 +434,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 	}
 	
 	private void addItemScroll() {
-		CoreImagePanel.setImagePanel(new DefaultData().getCoreImage(2), coreDisplayList, nowCoreNumberList, true);
-		WeaponImagePanel.setImagePanel(new DefaultData().getWeaponImage(2), weaponDisplayList, nowWeaponNumberList, false);
+		CoreImagePanel.setImagePanel(new DefaultData().getCoreImage(2), getDisplayList(coreNumberList), nowCoreNumberList, true);
+		WeaponImagePanel.setImagePanel(new DefaultData().getWeaponImage(2), getDisplayList(weaponNumberList), nowWeaponNumberList, false);
 		itemScroll.getViewport().setView(CoreImagePanel);
     	add(itemScroll);
 	}
@@ -634,6 +632,10 @@ class ImagePanel extends JPanel implements MouseListener{
 		this.displayList = displayList;
 		this.numberList = numberList;
 		this.existsWhich = existsWhich;
+	}
+	
+	protected void updateList(List<Integer> displayList) {
+		this.displayList = displayList;
 	}
 	
 	protected void paintComponent(Graphics g) {
