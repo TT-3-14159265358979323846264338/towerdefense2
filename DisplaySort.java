@@ -5,14 +5,19 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -50,7 +55,7 @@ class SortDialog extends JDialog{
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setResizable(false);
-		setTitle("ソート/並び替え");
+		setTitle("ソート/絞り込み");
 		setSize(835, 535);
 		setLocationRelativeTo(null);
 		add(SortPanel);
@@ -74,7 +79,7 @@ class SortPanel extends JPanel {
 	JButton sortButton = new JButton();
 	JButton resetButton = new JButton();
 	JButton returnButton = new JButton();
-	JRadioButton[] order;
+	JRadioButton[] mode;
 	JRadioButton[] raritySort;
 	JRadioButton[] weapon;
 	JRadioButton[] unit;
@@ -83,6 +88,8 @@ class SortPanel extends JPanel {
 	JRadioButton[] distance;
 	JRadioButton[] handle;
 	JRadioButton[] element;
+	ButtonGroup sortGroup = new ButtonGroup();
+	ButtonGroup itemGroup = new ButtonGroup();
 	SortDialog SortDialog = new SortDialog();
 	List<Integer> rarityList;
 	List<List<Double>> weaponStatusList;
@@ -91,22 +98,19 @@ class SortPanel extends JPanel {
 	List<List<Integer>> typeList;
 	List<List<Integer>> elementList;
 	List<Integer> defaultDisplayList;
-	List<Integer> diaplayList;
 	boolean canSort;
 	
 	protected void setSortPanel(List<Integer> defaultList) {
 		setBackground(new Color(240, 170, 80));
 		this.defaultDisplayList = defaultList;
+		speedInversion();
 		addLabel();
 		addSortButton();
 		addResetButton();
 		addReturnButton();
 		initializeRadioButton();
+		setRadioButtonAction();
 		setRadioButtonName();
-	}
-	
-	protected void display() {
-		SortDialog.setSortDialog(this);
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -115,6 +119,10 @@ class SortPanel extends JPanel {
 		setLabel();
 		setButton();
 		setRadioButton();
+	}
+	
+	private void speedInversion(){//攻撃速度のみは昇降順が逆になっている
+		weaponStatusList = weaponStatusList.stream().map(i -> IntStream.range(0, i.size()).mapToObj(j -> (j == 2)? 1 / i.get(j): i.get(j)).toList()).toList();
 	}
 	
 	private void addLabel(){
@@ -164,7 +172,7 @@ class SortPanel extends JPanel {
 					radio[i].setSelected(false);
 				}
 			};
-			order[0].setSelected(true);
+			mode[0].setSelected(true);
 			raritySort[0].setSelected(true);
 			initialize.accept(rarity);
 			if(Objects.nonNull(typeList)) {
@@ -205,17 +213,15 @@ class SortPanel extends JPanel {
 			}
 		};
 		
-		order = initialize.apply(2);
-		order[0].setSelected(true);
-		ButtonGroup sortGroup = new ButtonGroup();
-		grouping.accept(sortGroup, order);
+		mode = initialize.apply(2);
+		mode[0].setSelected(true);
+		grouping.accept(sortGroup, mode);
 		
 		raritySort = initialize.apply(1);
 		raritySort[0].setSelected(true);
 		weapon = initialize.apply(DefaultData.WEAPON_WEAPON_MAP.size());
 		unit = initialize.apply(DefaultData.WEAPON_UNIT_MAP.size());
 		cut = initialize.apply(DefaultData.ELEMENT_MAP.size());
-		ButtonGroup itemGroup = new ButtonGroup();
 		grouping.accept(itemGroup, raritySort);
 		grouping.accept(itemGroup, weapon);
 		grouping.accept(itemGroup, unit);
@@ -229,14 +235,38 @@ class SortPanel extends JPanel {
 		}
 	}
 	
+	private void setRadioButtonAction() {
+		BiConsumer<JRadioButton[], Map<Integer, String>> setAction = (radio, map) ->{
+			for(int i = 0; i < radio.length; i++) {
+				radio[i].setActionCommand(map.get(i));
+			}
+		};		
+		mode[0].setActionCommand("true");
+		mode[1].setActionCommand("false");
+		
+		raritySort[0].setActionCommand("true");
+		setAction.accept(weapon, DefaultData.WEAPON_WEAPON_MAP);
+		setAction.accept(unit, DefaultData.WEAPON_UNIT_MAP);
+		setAction.accept(cut, DefaultData.ELEMENT_MAP);
+		
+		for(int i = 0; i < rarity.length; i++) {
+			rarity[i].setActionCommand("" + (i + 1));
+		}
+		if(Objects.nonNull(typeList)) {
+			setAction.accept(distance, DefaultData.DISTANCE_MAP);
+			setAction.accept(handle, DefaultData.HANDLE_MAP);
+			setAction.accept(element, DefaultData.ELEMENT_MAP);
+		}
+	}
+	
 	private void setRadioButtonName() {
 		BiConsumer<JRadioButton[], Map<Integer, String>> getName = (radio, map) -> {
 			for(int i = 0; i < radio.length; i++) {
 				radio[i].setText(map.get(i));
 			}
 		};
-		order[0].setText("降順");
-		order[1].setText("昇順");
+		mode[0].setText("降順");
+		mode[1].setText("昇順");
 		raritySort[0].setText("レアリティ");
 		getName.accept(weapon, DefaultData.WEAPON_WEAPON_MAP);
 		getName.accept(unit, DefaultData.WEAPON_UNIT_MAP);
@@ -269,8 +299,8 @@ class SortPanel extends JPanel {
 	private void setRadioButton() {
 		int sizeX = 110;
 		int sizeY = 30;
-		for(int i = 0; i < order.length; i++) {
-			order[i].setBounds(150 + i * sizeX, 50, sizeX, sizeY);
+		for(int i = 0; i < mode.length; i++) {
+			mode[i].setBounds(150 + i * sizeX, 50, sizeX, sizeY);
 		}
 		
 		raritySort[0].setBounds(150, 90, sizeX, sizeY);
@@ -326,17 +356,93 @@ class SortPanel extends JPanel {
 	
 	public List<Integer> getDisplayList(){
 		canSort = false;
-		diaplayList = new ArrayList<>(defaultDisplayList);
 		SortDialog.setSortDialog(this);
 		if(!canSort) {
 			return defaultDisplayList;
 		}
+		return getFilterList(getSortList(defaultDisplayList));
+	}
+	
+	private List<Integer> getSortList(List<Integer> displayList){
+		String radioCommand = itemGroup.getSelection().getActionCommand();
+		Function<Map<Integer, String>, List<String>> getMapList = (map) -> {
+			return IntStream.range(0, map.size()).mapToObj(i -> map.get(i)).toList();
+		};
+		Predicate<List<String>> check = (mapList) -> {
+			return mapList.contains(radioCommand);
+		};
+		BiFunction<List<List<Double>>, List<String>, List<Integer>> getDisplayListDouble = (statusList, mapList) -> {
+			return displayList.stream().sorted(Comparator.comparing(i -> statusList.get(i).get(mapList.indexOf(radioCommand)), getOrderDouble())).collect(Collectors.toList());
+		};
+		BiFunction<List<List<Integer>>, List<String>, List<Integer>> getDisplayListInteger = (statusList, mapList) -> {
+			return displayList.stream().sorted(Comparator.comparing(i -> statusList.get(i).get(mapList.indexOf(radioCommand)), getOrderInteger())).collect(Collectors.toList());
+		};
 		
-		//RadioButtonの状態を見てdiaplayListを作成
-		
-		
-		
-		
-		return diaplayList;
+		if(Boolean.valueOf(radioCommand)) {
+			return displayList.stream().sorted(Comparator.comparing(i -> rarityList.get(i), getOrderInteger())).collect(Collectors.toList());
+		}
+		List<String> mapList = getMapList.apply(DefaultData.WEAPON_WEAPON_MAP);
+		if(check.test(mapList)) {
+			return getDisplayListDouble.apply(weaponStatusList, mapList);
+		}
+		mapList = getMapList.apply(DefaultData.WEAPON_UNIT_MAP);
+		if(check.test(mapList)) {
+			return getDisplayListDouble.apply(unitStatusList, mapList);
+		}
+		mapList = getMapList.apply(DefaultData.ELEMENT_MAP);
+		if(check.test(mapList)) {
+			return getDisplayListInteger.apply(cutList, mapList);
+		}
+		return displayList;
+	}
+	
+	private Comparator<Integer> getOrderInteger() {
+		return Boolean.valueOf(sortGroup.getSelection().getActionCommand())? Comparator.reverseOrder(): Comparator.naturalOrder();
+	}
+	
+	private Comparator<Double> getOrderDouble() {
+		return Boolean.valueOf(sortGroup.getSelection().getActionCommand())? Comparator.reverseOrder(): Comparator.naturalOrder();
+	}
+	
+	private List<Integer> getFilterList(List<Integer> displayList){
+		if(Objects.isNull(typeList)) {
+			return getRarityList(displayList);
+		}
+		displayList = getRarityList(displayList);
+		displayList = getTypeList(displayList, distance, DefaultData.DISTANCE_MAP, 0);
+		displayList = getTypeList(displayList, handle, DefaultData.HANDLE_MAP, 1);
+		return getElementList(displayList);
+	}
+	
+	private List<Integer> getRarityList(List<Integer> displayList){
+		Function<JRadioButton[], Stream<Integer>> getActiveButtonStream = (radio) -> {
+			return Stream.of(radio).filter(i -> i.isSelected()).map(i -> Integer.parseInt(i.getActionCommand()));
+		};
+		if(selectCheck(rarity)) {
+			return displayList;
+		}
+		return displayList.stream().filter(i -> getActiveButtonStream.apply(rarity).anyMatch(j -> rarityList.get(i) == j)).collect(Collectors.toList());
+	}
+	
+	private List<Integer> getTypeList(List<Integer> displayList, JRadioButton[] radio, Map<Integer, String> map, int index){
+		if(selectCheck(radio)) {
+			return displayList;
+		}
+		return displayList.stream().filter(i -> getActiveButtonStream(radio).anyMatch(j -> map.get(typeList.get(i).get(index)).equals(j))).collect(Collectors.toList());
+	}
+	
+	private List<Integer> getElementList(List<Integer> displayList){
+		if(selectCheck(element)) {
+			return displayList;
+		}
+		return displayList.stream().filter(i -> getActiveButtonStream(element).anyMatch(j -> elementList.get(i).stream().anyMatch(k -> DefaultData.ELEMENT_MAP.get(k).equals(j)))).collect(Collectors.toList());
+	}
+	
+	private boolean selectCheck(JRadioButton[] radio) {
+		return !Stream.of(radio).map(i -> i.isSelected()).anyMatch(i -> i);
+	}
+	
+	private Stream<String> getActiveButtonStream(JRadioButton[] radio){
+		return Stream.of(radio).filter(i -> i.isSelected()).map(i -> i.getActionCommand());
 	}
 }
