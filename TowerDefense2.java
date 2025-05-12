@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.stream.IntStream;
 
 import defaultdata.DefaultData;
 import mainframe.MainFrame;
@@ -53,9 +54,7 @@ class FileCheck{
 			return size1 != size2;
 		};
 		BiConsumer<Integer, List<Integer>> addList = (count, list) -> {
-			for(int i = 0; i < count; i++) {
-				list.add(0);
-			}
+			IntStream.range(0, count).forEach(i -> list.add(0));
 		};
 		try {
 			ObjectInputStream loadItemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(saveholditem.SaveHoldItem.HOLD_FILE)));

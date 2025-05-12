@@ -140,9 +140,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 		allCompositionList = SaveComposition.getAllCompositionList();
 		compositionNameList = SaveComposition.getCompositionNameList();
 		compositionListModel.clear();
-		for(String i: compositionNameList) {
-			compositionListModel.addElement(i);
-		}
+		compositionNameList.stream().forEach(i -> compositionListModel.addElement(i));
 		selectNumber = SaveComposition.getSelectNumber();
 		compositionJList.setSelectedIndex(selectNumber);
 		new DelaySelect(compositionJList, selectNumber).start();
@@ -152,12 +150,12 @@ public class MenuComposition extends JPanel implements MouseListener{
 		List<List<List<Integer>>> weaponStatusList = new ArrayList<>();
 		List<List<List<Integer>>> unitStatusList = new ArrayList<>();
 		List<Integer> typeList = new ArrayList<>();
-		for(List<Integer> i : allCompositionList.get(selectNumber)) {
+		allCompositionList.get(selectNumber).stream().forEach(i -> {
 			StatusCalculation StatusCalculation = new StatusCalculation(i);
 			weaponStatusList.add(StatusCalculation.getWeaponStatus());
 			unitStatusList.add(StatusCalculation.getUnitStatus());
 			typeList.add(StatusCalculation.getType());
-		}
+		});
 		try {
 			ObjectOutputStream compositionData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
 			compositionData.writeObject(new SaveComposition(allCompositionList, compositionNameList, selectNumber, allCompositionList.get(selectNumber), weaponStatusList, unitStatusList, typeList));
@@ -448,7 +446,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void drawComposition(Graphics g) {
 		g.setColor(Color.WHITE);
 		g.fillRect(230, 40, 330, 480);
-		for(int i = 0; i < allCompositionList.get(selectNumber).size(); i++) {
+		IntStream.range(0, allCompositionList.get(selectNumber).size()).forEach(i -> {
 			try {
 				g.drawImage(rightWeaponList.get(allCompositionList.get(selectNumber).get(i).get(0)).get(0), getPositionX(i), getPositionY(i), this);
 			}catch(Exception ignore) {
@@ -460,7 +458,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 			}catch(Exception ignore) {
 				//左武器を装備していないので、無視する
 			}
-		}
+		});
 	}
 	
 	private int getPositionX(int i) {
@@ -474,7 +472,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void countNumber() {
 		int[] core = new int[coreNumberList.size()];
     	int[] weapon = new int[weaponNumberList.size()];
-    	for(List<Integer> i: allCompositionList.get(selectNumber)) {
+    	allCompositionList.get(selectNumber).stream().forEach(i -> {
     		core[i.get(1)]++;
     		try {
     			weapon[i.get(0)]++;
@@ -486,7 +484,7 @@ public class MenuComposition extends JPanel implements MouseListener{
     		}catch(Exception ignore) {
 				//左武器を装備していないので、無視する
 			}
-    	}
+    	});
     	BiFunction<List<Integer>, int[], List<Integer>> getNowNumber = (list, count) -> {
     		return IntStream.range(0, list.size()).mapToObj(i -> list.get(i) - count[i]).toList();
     	};
@@ -501,7 +499,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
-		for(int i = 0; i < allCompositionList.get(selectNumber).size(); i++) {
+		IntStream.range(0, allCompositionList.get(selectNumber).size()).forEach(i -> {
 			int x = getPositionX(i) + 60;
 			int y = getPositionY(i) + 60;
 			if(ValueRange.of(x, x + unitSize).isValidIntValue(e.getX())
@@ -524,7 +522,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 					unitStstus(i);
 				}
 			}
-		}
+		});
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {
@@ -590,11 +588,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 		int width = ceterCoreList.get(unitData.get(1)).getWidth();
 		int height = ceterCoreList.get(unitData.get(1)).getHeight();
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				image.setRGB(x, y, 0);
-			}
-		}
+		IntStream.range(0, height).forEach(y -> IntStream.range(0, width).forEach(x -> image.setRGB(x, y, 0)));
 		Graphics2D g2 =  (Graphics2D) image.getGraphics();
 		try {
 			g2.drawImage(rightWeaponList.get(unitData.get(0)).get(0), 0, 0, this);
@@ -641,7 +635,7 @@ class ImagePanel extends JPanel implements MouseListener{
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		setPreferredSize(new Dimension(100, (displayList.size() / column + 1) * drawSize));
-		for(int i = 0; i < displayList.size(); i++) {
+		IntStream.range(0, displayList.size()).forEach(i -> {
 			int x = i % column * drawSize;
 			int y = i / column * drawSize;
 			if(selectNumber == displayList.get(i)) {
@@ -652,7 +646,7 @@ class ImagePanel extends JPanel implements MouseListener{
 			g.setColor(Color.BLACK);
 			g.setFont(new Font("Arial", Font.BOLD, 30));
 			g.drawString("" + numberList.get(displayList.get(i)), 80 + x, 80 + y);
-		}
+		});
 	}
 	
 	protected int getSelectNumber() {

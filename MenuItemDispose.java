@@ -102,18 +102,18 @@ public class MenuItemDispose extends JPanel{
 	
 	private void itemCount() {
 		BiConsumer<int[], int[]> maxNumberUpdate = (max, count) -> {
-			for(int i = 0; i < max.length; i++) {
+			IntStream.range(0, max.length).forEach(i -> {
 				if(max[i] < count[i]) {
 					max[i] = count[i];
 				}
-			}
+			});
 		};
 		int[] coreMax = new int[coreNumberList.size()];
 		int[] weaponMax = new int[weaponNumberList.size()];
-		for(int i = 0; i < allCompositionList.size(); i++) {
+		IntStream.range(0, allCompositionList.size()).forEach(i -> {
 			int[] coreCount = new int[coreNumberList.size()];
 			int[] weaponCount = new int[weaponNumberList.size()];
-			for(int j = 0; j < allCompositionList.get(i).size(); j++) {
+			IntStream.range(0, allCompositionList.get(i).size()).forEach(j -> {
 				try {
 					weaponCount[allCompositionList.get(i).get(j).get(0)]++;
 	    		}catch(Exception ignore) {
@@ -125,10 +125,10 @@ public class MenuItemDispose extends JPanel{
 	    		}catch(Exception ignore) {
 					//左武器を装備していないので、無視する
 				}
-			}
+			});
 			maxNumberUpdate.accept(coreMax, coreCount);
 			maxNumberUpdate.accept(weaponMax, weaponCount);
-		}
+		});
 		usedCoreNumber = coreMax;
 		usedWeaponNumber = weaponMax;
 	}
@@ -310,7 +310,7 @@ class ImagePanel extends JPanel implements MouseListener{
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		setPreferredSize(new Dimension(400, (displayList.size() / columns + 1) * drawSize));
-		for(int i = 0; i < displayList.size(); i++) {
+		IntStream.range(0, displayList.size()).forEach(i -> {
 			int x = i % columns * drawSize;
 			int y = i / columns * drawSize;
 			if(selectNumber == displayList.get(i)) {
@@ -321,7 +321,7 @@ class ImagePanel extends JPanel implements MouseListener{
 			g.setColor(Color.BLACK);
 			g.setFont(new Font("Arial", Font.BOLD, 30));
 			g.drawString("" + numberList.get(displayList.get(i)), 80 + x, 80 + y);
-		}
+		});
 	}
 	
 	protected int getSelectNumber() {

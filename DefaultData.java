@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import javax.imageio.ImageIO;
 
@@ -280,13 +281,11 @@ class InputImage{
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
 		BufferedImage image = getBlankImage(width, height);
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				if(originalImage.getRGB(x, y) != new Color(255, 255, 255).getRGB()) {
-					image.setRGB(x, y, originalImage.getRGB(x, y));
-				}
+		IntStream.range(0, height).forEach(y -> IntStream.range(0, width).forEach(x -> {
+			if(originalImage.getRGB(x, y) != new Color(255, 255, 255).getRGB()) {
+				image.setRGB(x, y, originalImage.getRGB(x, y));
 			}
-		}
+		}));
 		int resizeWidth = width / ratio;
 		int resizeHeight = height / ratio;
 		BufferedImage resizeImage = getBlankImage(resizeWidth, resizeHeight);
@@ -298,11 +297,7 @@ class InputImage{
 	
 	protected BufferedImage getBlankImage(int width, int height) {
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				image.setRGB(x, y, 0);
-			}
-		}
+		IntStream.range(0, height).forEach(y -> IntStream.range(0, width).forEach(x -> image.setRGB(x, y, 0)));
 		return image;
 	}
 }

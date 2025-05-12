@@ -71,11 +71,7 @@ class SortDialog extends JDialog{
 class SortPanel extends JPanel {
 	JLabel sortLabel = new JLabel();
 	JLabel filterLabel = new JLabel();
-	JLabel[] commentLabel = new JLabel[8]; {
-		for(int i = 0; i < commentLabel.length; i++) {
-			commentLabel[i] = new JLabel();
-		}
-	};
+	JLabel[] commentLabel = IntStream.range(0, 8).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
 	JButton sortButton = new JButton();
 	JButton resetButton = new JButton();
 	JButton returnButton = new JButton();
@@ -142,10 +138,10 @@ class SortPanel extends JPanel {
 			commentLabel[6].setText("装備タイプ");
 			commentLabel[7].setText("属性");
 		}
-		for(int i = 0; i < commentLabel.length; i++) {
-			commentLabel[i].setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
-			add(commentLabel[i]);
-		}
+		Stream.of(commentLabel).forEach(i -> {
+				i.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
+				add(i);
+		});
 	}
 	
 	private void setLabel(JLabel label) {
@@ -168,9 +164,7 @@ class SortPanel extends JPanel {
 		add(resetButton);
 		resetButton.addActionListener(e->{
 			Consumer<JRadioButton[]> initialize = (radio) -> {
-				for(int i = 0; i < radio.length; i++) {
-					radio[i].setSelected(false);
-				}
+				Stream.of(radio).forEach(i -> i.setSelected(false));
 			};
 			mode[0].setSelected(true);
 			raritySort[0].setSelected(true);
@@ -198,19 +192,16 @@ class SortPanel extends JPanel {
 	
 	private void initializeRadioButton() {
 		Function<Integer, JRadioButton[]> initialize = (size) -> {
-			JRadioButton[] radio = new JRadioButton[size];
-			for(int i = 0; i < size; i++) {
-				radio[i] = new JRadioButton();
-				radio[i].setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
-				radio[i].setOpaque(false);
-				add(radio[i]);
-			}
+			JRadioButton[] radio = IntStream.range(0, size).mapToObj(i -> new JRadioButton()).toArray(JRadioButton[]::new);
+			Stream.of(radio).forEach(i -> {
+				i.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
+				i.setOpaque(false);
+				add(i);
+			});
 			return radio;
 		};
 		BiConsumer<ButtonGroup, JRadioButton[]> grouping = (group, radio) -> {
-			for(int i = 0; i < radio.length; i++) {
-				group.add(radio[i]);
-			}
+			Stream.of(radio).forEach(i -> group.add(i));
 		};
 		
 		mode = initialize.apply(2);
@@ -237,9 +228,7 @@ class SortPanel extends JPanel {
 	
 	private void setRadioButtonAction() {
 		BiConsumer<JRadioButton[], Map<Integer, String>> setAction = (radio, map) ->{
-			for(int i = 0; i < radio.length; i++) {
-				radio[i].setActionCommand(map.get(i));
-			}
+			IntStream.range(0, radio.length).forEach(i -> radio[i].setActionCommand(map.get(i)));
 		};		
 		mode[0].setActionCommand("true");
 		mode[1].setActionCommand("false");
@@ -249,9 +238,7 @@ class SortPanel extends JPanel {
 		setAction.accept(unit, DefaultData.WEAPON_UNIT_MAP);
 		setAction.accept(cut, DefaultData.ELEMENT_MAP);
 		
-		for(int i = 0; i < rarity.length; i++) {
-			rarity[i].setActionCommand("" + (i + 1));
-		}
+		IntStream.range(0, rarity.length).forEach(i -> rarity[i].setActionCommand("" + (i + 1)));
 		if(Objects.nonNull(typeList)) {
 			setAction.accept(distance, DefaultData.DISTANCE_MAP);
 			setAction.accept(handle, DefaultData.HANDLE_MAP);
@@ -261,9 +248,7 @@ class SortPanel extends JPanel {
 	
 	private void setRadioButtonName() {
 		BiConsumer<JRadioButton[], Map<Integer, String>> getName = (radio, map) -> {
-			for(int i = 0; i < radio.length; i++) {
-				radio[i].setText(map.get(i));
-			}
+			IntStream.range(0, radio.length).forEach(i -> radio[i].setText(map.get(i)));
 		};
 		mode[0].setText("降順");
 		mode[1].setText("昇順");
@@ -271,9 +256,7 @@ class SortPanel extends JPanel {
 		getName.accept(weapon, DefaultData.WEAPON_WEAPON_MAP);
 		getName.accept(unit, DefaultData.WEAPON_UNIT_MAP);
 		getName.accept(cut, DefaultData.ELEMENT_MAP);
-		for(int i = 0; i < rarity.length; i++) {
-			rarity[i].setText("★" + (i + 1));
-		}
+		IntStream.range(0, rarity.length).forEach(i -> rarity[i].setText("★" + (i + 1)));
 		if(Objects.nonNull(typeList)) {
 			getName.accept(distance, DefaultData.DISTANCE_MAP);
 			getName.accept(handle, DefaultData.HANDLE_MAP);
@@ -284,10 +267,10 @@ class SortPanel extends JPanel {
 	private void setLabel(){
 		sortLabel.setBounds(10, 10, 300, 40);
 		filterLabel.setBounds(10, 240, 300, 40);
-		for(int i = 0; i < commentLabel.length / 2; i++) {
+		IntStream.range(0, commentLabel.length / 2).forEach(i -> {
 			commentLabel[i].setBounds(10, 90 + 30 * (i % 4), 300, 30);
 			commentLabel[i + 4].setBounds(10, 280 + 30 * (i % 4), 300, 30);
-		}
+		});
 	}
 	
 	private void setButton() {
@@ -299,34 +282,18 @@ class SortPanel extends JPanel {
 	private void setRadioButton() {
 		int sizeX = 110;
 		int sizeY = 30;
-		for(int i = 0; i < mode.length; i++) {
-			mode[i].setBounds(150 + i * sizeX, 50, sizeX, sizeY);
-		}
+		IntStream.range(0, mode.length).forEach(i -> mode[i].setBounds(150 + i * sizeX, 50, sizeX, sizeY));
 		
 		raritySort[0].setBounds(150, 90, sizeX, sizeY);
-		for(int i = 0; i < weapon.length; i++) {
-			weapon[i].setBounds(150 + i * sizeX, 90 + sizeY, sizeX, sizeY);
-		}
-		for(int i = 0; i < unit.length; i++) {
-			unit[i].setBounds(150 + i * sizeX, 90 + sizeY * 2, sizeX, sizeY);
-		}
-		for(int i = 0; i < cut.length; i++) {
-			cut[i].setBounds(150 + i % 6 * sizeX, 90 + sizeY * (3 + i / 6), sizeX, sizeY);
-		}
+		IntStream.range(0, weapon.length).forEach(i -> weapon[i].setBounds(150 + i * sizeX, 90 + sizeY, sizeX, sizeY));
+		IntStream.range(0, unit.length).forEach(i -> unit[i].setBounds(150 + i * sizeX, 90 + sizeY * 2, sizeX, sizeY));
+		IntStream.range(0, cut.length).forEach(i -> cut[i].setBounds(150 + i % 6 * sizeX, 90 + sizeY * (3 + i / 6), sizeX, sizeY));
 		
-		for(int i = 0; i < rarity.length; i++) {
-			rarity[i].setBounds(150 + i * sizeX, 280, sizeX, sizeY);
-		}
+		IntStream.range(0, rarity.length).forEach(i -> rarity[i].setBounds(150 + i * sizeX, 280, sizeX, sizeY));
 		if(Objects.nonNull(typeList)) {
-			for(int i = 0; i < distance.length; i++) {
-				distance[i].setBounds(150 + i * sizeX, 280 + sizeY, sizeX, sizeY);
-			}
-			for(int i = 0; i < handle.length; i++) {
-				handle[i].setBounds(150 + i * sizeX, 280 + sizeY * 2, sizeX, sizeY);
-			}
-			for(int i = 0; i < element.length; i++) {
-				element[i].setBounds(150 + i % 6 * sizeX, 280 + sizeY * (3 + i / 6), sizeX, sizeY);
-			}
+			IntStream.range(0, distance.length).forEach(i -> distance[i].setBounds(150 + i * sizeX, 280 + sizeY, sizeX, sizeY));
+			IntStream.range(0, handle.length).forEach(i -> handle[i].setBounds(150 + i * sizeX, 280 + sizeY * 2, sizeX, sizeY));
+			IntStream.range(0, element.length).forEach(i -> element[i].setBounds(150 + i % 6 * sizeX, 280 + sizeY * (3 + i / 6), sizeX, sizeY));
 		}
 	}
 	
@@ -342,13 +309,9 @@ class SortPanel extends JPanel {
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setStroke(new BasicStroke(2));
 		g.drawRect(150, 50, 220, 30);
-		for(int i = 0; i < 3; i++) {
-			g.drawRect(5, 90 + i * 30, 800, 30);
-		}
+		IntStream.range(0, 3).forEach(i -> g.drawRect(5, 90 + i * 30, 800, 30));
 		g.drawRect(5, 180, 800, 60);
-		for(int i = 0; i < 3; i++) {
-			g.drawRect(5, 280 + i * 30, 800, 30);
-		}
+		IntStream.range(0, 3).forEach(i -> g.drawRect(5, 280 + i * 30, 800, 30));
 		g.drawRect(5, 370, 800, 60);
 		g.drawLine(150, 90, 150, 240);
 		g.drawLine(150, 280, 150, 430);

@@ -221,13 +221,11 @@ class EditImage{
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
 		BufferedImage image = getBlankImage(width, height);
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				if(originalImage.getRGB(x, y) == new Color(0, 0, 0).getRGB()) {
-					image.setRGB(x, y, color);
-				}
+		IntStream.range(0, height).forEach(y -> IntStream.range(0, width).forEach(x -> {
+			if(originalImage.getRGB(x, y) == new Color(0, 0, 0).getRGB()) {
+				image.setRGB(x, y, color);
 			}
-		}
+		}));
 		int resizeWidth = width + expansion;
 		int resizeHeight = height + expansion;
 		BufferedImage resizeImage = getBlankImage(resizeWidth, resizeHeight);
@@ -236,20 +234,14 @@ class EditImage{
 	        0, 0, resizeWidth, resizeHeight, null);
 		int pixel = 9;
 		float[] matrix = new float[pixel * pixel];
-		for(int i = 0; i < matrix.length; i++) {
-			matrix[i] = 1.5f / (pixel * pixel);//透過度あるため、色濃いめの1.5f
-		}
+		IntStream.range(0, matrix.length).forEach(i -> matrix[i] = 1.5f / (pixel * pixel));//透過度あるため、色濃いめの1.5f
 		ConvolveOp blur = new ConvolveOp(new Kernel(pixel, pixel, matrix), ConvolveOp.EDGE_NO_OP, null);
 		return blur.filter(resizeImage, null);
 	}
 	
 	private BufferedImage getBlankImage(int width, int height) {
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				image.setRGB(x, y, 0);
-			}
-		}
+		IntStream.range(0, height).forEach(y -> IntStream.range(0, width).forEach(x -> image.setRGB(x, y, 0)));
 		return image;
 	}
 }
@@ -541,15 +533,11 @@ class DrawResult extends JPanel implements MouseListener{
 			break;
 		case 1:
 			position = 255;
-			for(int i = 0; i < 5; i++) {
-				gacha();
-			}
+			IntStream.range(0, 5).forEach(i -> gacha());
 			break;
 		case 2:
 			position = 20;
-			for(int i = 0; i < 10; i++) {
-				gacha();
-			}
+			IntStream.range(0, 10).forEach(i -> gacha());
 			break;
 		default:
 			break;
@@ -606,9 +594,7 @@ class DrawResult extends JPanel implements MouseListener{
 	
 	private List<Integer> getItemList(List<Integer> dataList, List<Integer> getList){
 		int[] count = new int[dataList.size()];
-		for(int i: getList) {
-			count[i]++;
-		}
+		getList.stream().forEach(i -> count[i]++);
 		return IntStream.range(0, count.length).mapToObj(i -> dataList.get(i) + count[i]).collect(Collectors.toList());
 	}
 	
@@ -620,9 +606,7 @@ class DrawResult extends JPanel implements MouseListener{
 	
 	private void draw(Graphics g, List<Integer> getList, List<BufferedImage> imageList, List<Point> position) {
 		if(getList.size() != 0) {
-			for(int i = 0; i < getList.size(); i++) {
-				g.drawImage(imageList.get(getList.get(i)), position.get(i).x, position.get(i).y, null);
-			}
+			IntStream.range(0, getList.size()).forEach(i -> g.drawImage(imageList.get(getList.get(i)), position.get(i).x, position.get(i).y, null));
 		}
 	}
 	
@@ -695,30 +679,26 @@ class GachaLineup extends JDialog{
 		DefaultListModel<String> lineup = new DefaultListModel<String>();
 		lineup.addElement("【コア確率】 " + getRatio.apply(getTotal(coreRatio)));
 		lineup.addElement(" ");
-		for(int i = 0; i < coreLineup.size(); i++) {
+		IntStream.range(0, coreLineup.size()).forEach(i -> {
 			String coreName = getRarity.apply(DefaultData.CORE_RARITY_LIST.get(coreLineup.get(i))) + DefaultData.CORE_NAME_LIST.get(coreLineup.get(i));
 			lineup.addElement(getName.apply(coreName) + getRatio.apply(coreRatio.get(i)));
-		}
+		});
 		if(getTotal(coreRatio) != 0) {
 			lineup.addElement(" ");
 		}
 		lineup.addElement("【武器確率】 " + getRatio.apply(getTotal(weaponRatio)));
 		lineup.addElement(" ");
-		for(int i = 0; i < weaponLineup.size(); i++) {
+		IntStream.range(0, weaponLineup.size()).forEach(i -> {
 			String weaponName = getRarity.apply(DefaultData.WEAPON_RARITY_LIST.get(weaponLineup.get(i))) + DefaultData.WEAPON_NAME_LIST.get(weaponLineup.get(i));
 			lineup.addElement(getName.apply(weaponName) + getRatio.apply(weaponRatio.get(i)));
-		}
+		});
 		JList<String> lineupJList = new JList<String>(lineup);
 		lineupJList.setEnabled(false);
 		return new JScrollPane(lineupJList);
 	}
 	
 	private double getTotal(List<Double> list) {
-		double total = 0;
-		for(double i: list) {
-			total += i;
-		}
-		return total;
+		return list.stream().mapToDouble(i -> i).sum();
 	}
 }
 
