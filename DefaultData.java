@@ -1,16 +1,12 @@
 package defaultdata;
 
-import java.awt.Color;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
-import javax.imageio.ImageIO;
+import editimage.EditImage;
 
 //デフォルトデータ
 public class DefaultData {
@@ -195,12 +191,6 @@ public class DefaultData {
 			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 			);
 	
-	
-	
-	//敵軍データ
-	
-	
-	
 	//ガチャ画像ファイル
 	final static String BALL = "image/gacha/ball full.png";
 	final static List<String> HALF_BALL = Arrays.asList("image/gacha/ball bottom.png", "image/gacha/ball top.png");
@@ -209,95 +199,48 @@ public class DefaultData {
 	final static String TURN = "image/gacha/turn.png";
 	final static String EFFECT = "image/gacha/effect.png";
 	
-	
-	
 	//画像取込み
 	public List<BufferedImage> getCoreImage(int ratio){
-		return new InputImage().inputList(CORE_IMAGE_NAME_LIST, ratio);
+		return new EditImage().inputList(CORE_IMAGE_NAME_LIST, ratio);
 	}
 	
 	public List<BufferedImage> getCenterCoreImage(int ratio){
-		return new InputImage().inputList(CENTER_IMAGE_CORE_NAME_LIST, ratio);
+		return new EditImage().inputList(CENTER_IMAGE_CORE_NAME_LIST, ratio);
 	}
 	
 	public List<BufferedImage> getWeaponImage(int ratio){
-		return new InputImage().inputList(WEAPON_IMAGE_NAME_LIST, ratio);
+		return new EditImage().inputList(WEAPON_IMAGE_NAME_LIST, ratio);
 	}
 	
 	public List<List<BufferedImage>> getRightWeaponImage(int ratio){
-		return new InputImage().inputList2(RIGHT_IMAGE_WEAPON_NAME_LIST, ratio);
+		return new EditImage().inputList2(RIGHT_IMAGE_WEAPON_NAME_LIST, ratio);
 	}
 	
 	public List<List<BufferedImage>> getLeftWeaponImage(int ratio){
-		return new InputImage().inputList2(LEFT_WEAPON_NAME_LIST, ratio);
+		return new EditImage().inputList2(LEFT_WEAPON_NAME_LIST, ratio);
 	}
 	
 	public BufferedImage getBallImage(int ratio) {
-		return new InputImage().input(BALL, ratio);
+		return new EditImage().input(BALL, ratio);
 	}
 	
 	public List<BufferedImage> getHalfBallImage(int ratio){
-		return new InputImage().inputList(HALF_BALL, ratio);
+		return new EditImage().inputList(HALF_BALL, ratio);
 	}
 	
 	public BufferedImage getHandleImage(int ratio) {
-		return new InputImage().input(HANDLE, ratio);
+		return new EditImage().input(HANDLE, ratio);
 	}
 	
 	public List<BufferedImage> getMachineImage(int ratio){
-		return new InputImage().inputList(MACHINE, ratio);
+		return new EditImage().inputList(MACHINE, ratio);
 	}
 	
 	public BufferedImage getTurnImage(int ratio) {
-		return new InputImage().input(TURN, ratio);
+		return new EditImage().input(TURN, ratio);
 	}
 	
 	public BufferedImage getEffectImage(int ratio) {
-		return new InputImage().input(EFFECT, ratio);
-	}
-}
-
-//画像処理
-class InputImage{
-	protected List<List<BufferedImage>> inputList2(List<List<String>> imageNameList, int ratio){
-		return imageNameList.stream().map(i -> inputList(i, ratio)).toList();
-	}
-	
-	protected List<BufferedImage> inputList(List<String> imageNameList, int ratio){
-		return imageNameList.stream().map(i -> input(i, ratio)).toList();
-	}
-	
-	protected BufferedImage input(String imageName, int ratio) {
-		BufferedImage image = null;
-		try{
-			image = editImage(ImageIO.read(new File(imageName)), ratio);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return image;
-	}
-	
-	private BufferedImage editImage(BufferedImage originalImage, int ratio) {
-		int width = originalImage.getWidth();
-		int height = originalImage.getHeight();
-		BufferedImage image = getBlankImage(width, height);
-		IntStream.range(0, height).forEach(y -> IntStream.range(0, width).forEach(x -> {
-			if(originalImage.getRGB(x, y) != new Color(255, 255, 255).getRGB()) {
-				image.setRGB(x, y, originalImage.getRGB(x, y));
-			}
-		}));
-		int resizeWidth = width / ratio;
-		int resizeHeight = height / ratio;
-		BufferedImage resizeImage = getBlankImage(resizeWidth, resizeHeight);
-		resizeImage.createGraphics().drawImage(
-	    	image.getScaledInstance(resizeWidth, resizeHeight, Image.SCALE_AREA_AVERAGING),
-	        0, 0, resizeWidth, resizeHeight, null);
-		return resizeImage;
-	}
-	
-	protected BufferedImage getBlankImage(int width, int height) {
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		IntStream.range(0, height).forEach(y -> IntStream.range(0, width).forEach(x -> image.setRGB(x, y, 0)));
-		return image;
+		return new EditImage().input(EFFECT, ratio);
 	}
 }

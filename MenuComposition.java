@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -35,6 +34,7 @@ import javax.swing.JScrollPane;
 import defaultdata.DefaultData;
 import displaysort.DisplaySort;
 import displaystatus.DisplayStatus;
+import editimage.EditImage;
 import mainframe.MainFrame;
 import savecomposition.SaveComposition;
 import saveholditem.SaveHoldItem;
@@ -581,28 +581,23 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void unitStstus(int number) {
 		List<Integer> unitData = allCompositionList.get(selectNumber).get(number);
 		StatusCalculation StatusCalculation = new StatusCalculation(unitData);
-		new DisplayStatus().unit(getImage(unitData), unitData, StatusCalculation.getWeaponStatus(), StatusCalculation.getUnitStatus());
+		new DisplayStatus().unit(new EditImage().compositeImage(getImageList(unitData)), unitData, StatusCalculation.getWeaponStatus(), StatusCalculation.getUnitStatus());
 	}
 	
-	private BufferedImage getImage(List<Integer> unitData) {
-		int width = ceterCoreList.get(unitData.get(1)).getWidth();
-		int height = ceterCoreList.get(unitData.get(1)).getHeight();
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		IntStream.range(0, height).forEach(y -> IntStream.range(0, width).forEach(x -> image.setRGB(x, y, 0)));
-		Graphics2D g2 =  (Graphics2D) image.getGraphics();
+	private List<BufferedImage> getImageList(List<Integer> unitData){
+		List<BufferedImage> originalImage = new ArrayList<>();
 		try {
-			g2.drawImage(rightWeaponList.get(unitData.get(0)).get(0), 0, 0, this);
-		}catch(Exception ignore) {
-			//右武器を装備していないので、無視する
+			originalImage.add(rightWeaponList.get(unitData.get(0)).get(0));
+		}catch(Exception e) {
+			originalImage.add(null);
 		}
-		g2.drawImage(ceterCoreList.get(unitData.get(1)), 0, 0, this);
+		originalImage.add(ceterCoreList.get(unitData.get(1)));
 		try {
-			g2.drawImage(leftWeaponList.get(unitData.get(2)).get(0), 0, 0, this);
-		}catch(Exception ignore) {
-			//左武器を装備していないので、無視する
+			originalImage.add(leftWeaponList.get(unitData.get(2)).get(0));
+		}catch(Exception e) {
+			originalImage.add(null);
 		}
-		g2.dispose();
-		return image;
+		return originalImage;
 	}
 }
 
