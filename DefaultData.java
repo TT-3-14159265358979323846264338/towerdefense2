@@ -192,6 +192,7 @@ public class DefaultData {
 			);
 	
 	//ガチャ画像ファイル
+	final static String TITLE = "image/gacha/title.png";
 	final static String BALL = "image/gacha/ball full.png";
 	final static List<String> HALF_BALL = Arrays.asList("image/gacha/ball bottom.png", "image/gacha/ball top.png");
 	final static String HANDLE = "image/gacha/machine handle.png";
@@ -218,6 +219,10 @@ public class DefaultData {
 	
 	public List<List<BufferedImage>> getLeftWeaponImage(int ratio){
 		return new EditImage().inputList2(LEFT_WEAPON_NAME_LIST, ratio);
+	}
+	
+	public BufferedImage getTitleImage(int ratio) {
+		return new EditImage().input(TITLE, ratio);
 	}
 	
 	public BufferedImage getBallImage(int ratio) {
