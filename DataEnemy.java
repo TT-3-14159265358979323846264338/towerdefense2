@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import dataunit.DataUnit;
 import editimage.EditImage;
@@ -109,7 +110,8 @@ public class DataEnemy {
 		return new EditImage().inputList(ENEMY_IMAGE_NAME_LIST, ratio);
 	}
 	
-	public List<List<BufferedImage>> getEnemyMotionImage(int ratio){
-		return new EditImage().inputList2(ENEMY_MOTION_NAME_LIST, ratio);
+	public List<List<BufferedImage>> getEnemyImage(List<List<Integer>> enemyList, int ratio){
+		List<List<String>> extractionList = IntStream.range(0, ENEMY_MOTION_NAME_LIST.size()).mapToObj(i -> (enemyList.stream().anyMatch(j -> i == j.get(0)))? ENEMY_MOTION_NAME_LIST.get(i): null).toList();
+		return new EditImage().inputList2(extractionList, ratio);
 	}
 }

@@ -64,9 +64,9 @@ public class MenuComposition extends JPanel implements MouseListener{
 	DisplaySort weaponDisplaySort = new DisplaySort();
 	SaveHoldItem SaveHoldItem;
 	SaveComposition SaveComposition;
-	List<List<BufferedImage>> rightWeaponList = new ArrayList<>(new DataUnit().getRightWeaponImage(2));
+	List<BufferedImage> rightWeaponList = new ArrayList<>(new DataUnit().getRightWeaponImage(2));
 	List<BufferedImage> ceterCoreList = new ArrayList<>(new DataUnit().getCenterCoreImage(2));
-	List<List<BufferedImage>> leftWeaponList = new ArrayList<>(new DataUnit().getLeftWeaponImage(2));
+	List<BufferedImage> leftWeaponList = new ArrayList<>(new DataUnit().getLeftWeaponImage(2));
 	List<Integer> coreNumberList = new ArrayList<>();
 	List<Integer> weaponNumberList = new ArrayList<>();
 	List<Integer> nowCoreNumberList = new ArrayList<>();
@@ -448,13 +448,13 @@ public class MenuComposition extends JPanel implements MouseListener{
 		g.fillRect(230, 40, 330, 480);
 		IntStream.range(0, allCompositionList.get(selectNumber).size()).forEach(i -> {
 			try {
-				g.drawImage(rightWeaponList.get(allCompositionList.get(selectNumber).get(i).get(0)).get(0), getPositionX(i), getPositionY(i), this);
+				g.drawImage(rightWeaponList.get(allCompositionList.get(selectNumber).get(i).get(0)), getPositionX(i), getPositionY(i), this);
 			}catch(Exception ignore) {
 				//右武器を装備していないので、無視する
 			}
 			g.drawImage(ceterCoreList.get(allCompositionList.get(selectNumber).get(i).get(1)), getPositionX(i), getPositionY(i), this);
 			try {
-				g.drawImage(leftWeaponList.get(allCompositionList.get(selectNumber).get(i).get(2)).get(0), getPositionX(i), getPositionY(i), this);
+				g.drawImage(leftWeaponList.get(allCompositionList.get(selectNumber).get(i).get(2)), getPositionX(i), getPositionY(i), this);
 			}catch(Exception ignore) {
 				//左武器を装備していないので、無視する
 			}
@@ -587,13 +587,13 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private List<BufferedImage> getImageList(List<Integer> unitData){
 		List<BufferedImage> originalImage = new ArrayList<>();
 		try {
-			originalImage.add(rightWeaponList.get(unitData.get(0)).get(0));
+			originalImage.add(rightWeaponList.get(unitData.get(0)));
 		}catch(Exception e) {
 			originalImage.add(null);
 		}
 		originalImage.add(ceterCoreList.get(unitData.get(1)));
 		try {
-			originalImage.add(leftWeaponList.get(unitData.get(2)).get(0));
+			originalImage.add(leftWeaponList.get(unitData.get(2)));
 		}catch(Exception e) {
 			originalImage.add(null);
 		}

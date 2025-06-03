@@ -17,6 +17,9 @@ import javax.imageio.ImageIO;
 //画像処理
 public class EditImage{
 	public BufferedImage input(String imageName, int ratio) {
+		if(imageName == null) {
+			return null;
+		}
 		BufferedImage image = null;
 		try{
 			image = getImage(ImageIO.read(new File(imageName)), ratio);
@@ -27,11 +30,11 @@ public class EditImage{
 	}
 	
 	public List<BufferedImage> inputList(List<String> imageNameList, int ratio){
-		return imageNameList.stream().map(i -> input(i, ratio)).toList();
+		return imageNameList.stream().map(i -> (i == null)? null: input(i, ratio)).toList();
 	}
 	
 	public List<List<BufferedImage>> inputList2(List<List<String>> imageNameList, int ratio){
-		return imageNameList.stream().map(i -> inputList(i, ratio)).toList();
+		return imageNameList.stream().map(i -> (i == null)? null: inputList(i, ratio)).toList();
 	}
 	
 	private BufferedImage getImage(BufferedImage originalImage, int ratio) {

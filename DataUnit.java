@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import editimage.EditImage;
 
@@ -137,6 +138,7 @@ public class DataUnit {
 			"image/soldier/Japanese sword.png",
 			"image/soldier/bow.png"
 			);
+	//片手武器の時は右武器のlistにEmptyのlistを入れる
 	final static List<List<String>> RIGHT_WEAPON_NAME_LIST = Arrays.asList(
 			Arrays.asList("image/soldier/Japanese sword right 0.png",
 					"image/soldier/Japanese sword right 1.png",
@@ -202,15 +204,32 @@ public class DataUnit {
 		return new EditImage().inputList(CENTER_IMAGE_CORE_NAME_LIST, ratio);
 	}
 	
+	public List<BufferedImage> getCenterCoreImage(List<List<Integer>> compositionList, int ratio){
+		List<String> extractionList = IntStream.range(0, CENTER_IMAGE_CORE_NAME_LIST.size()).mapToObj(i -> (compositionList.stream().anyMatch(j -> i == j.get(1)))? CENTER_IMAGE_CORE_NAME_LIST.get(i): null).toList();
+		return new EditImage().inputList(extractionList, ratio);
+	}
+	
 	public List<BufferedImage> getWeaponImage(int ratio){
 		return new EditImage().inputList(WEAPON_IMAGE_NAME_LIST, ratio);
 	}
 	
-	public List<List<BufferedImage>> getRightWeaponImage(int ratio){
-		return new EditImage().inputList2(RIGHT_WEAPON_NAME_LIST, ratio);
+	public List<BufferedImage> getRightWeaponImage(int ratio){
+		return new EditImage().inputList(RIGHT_WEAPON_NAME_LIST.stream().map(i -> (i.isEmpty())? null: i.get(0)).toList(), ratio);
 	}
 	
-	public List<List<BufferedImage>> getLeftWeaponImage(int ratio){
-		return new EditImage().inputList2(LEFT_WEAPON_NAME_LIST, ratio);
+	public List<List<BufferedImage>> getRightWeaponImage(List<List<Integer>> compositionList, int ratio){
+		return new EditImage().inputList2(extraction(RIGHT_WEAPON_NAME_LIST, compositionList, 0), ratio);
+	}
+	
+	public List<BufferedImage> getLeftWeaponImage(int ratio){
+		return new EditImage().inputList(LEFT_WEAPON_NAME_LIST.stream().map(i -> i.get(0)).toList(), ratio);
+	}
+	
+	public List<List<BufferedImage>> getLeftWeaponImage(List<List<Integer>> compositionList, int ratio){
+		return new EditImage().inputList2(extraction(LEFT_WEAPON_NAME_LIST, compositionList, 2), ratio);
+	}
+	
+	private List<List<String>> extraction(List<List<String>> nameList, List<List<Integer>> compositionList, int position){
+		return IntStream.range(0, nameList.size()).mapToObj(i -> (compositionList.stream().anyMatch(j -> i == j.get(position)))? nameList.get(i): null).toList();
 	}
 }
