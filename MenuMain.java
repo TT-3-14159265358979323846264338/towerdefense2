@@ -57,6 +57,7 @@ public class MenuMain extends JPanel implements ActionListener{
 	private void addItemGetButton() {
 		add(itemGetButton);
 		itemGetButton.addActionListener(e->{
+			timerStop();
 			MainFrame.itemGetMenuDraw();
 		});
 	}
@@ -70,6 +71,7 @@ public class MenuMain extends JPanel implements ActionListener{
 	private void addItemDisposeButton() {
 		add(itemDisposeButton);
 		itemDisposeButton.addActionListener(e->{
+			timerStop();
 			MainFrame.itemDisposeMenuDraw();
 		});
 	}
@@ -83,6 +85,7 @@ public class MenuMain extends JPanel implements ActionListener{
 	private void addCompositionButton() {
 		add(compositionButton);
 		compositionButton.addActionListener(e->{
+			timerStop();
 			MainFrame.compositionDraw();
 		});
 	}
@@ -96,6 +99,7 @@ public class MenuMain extends JPanel implements ActionListener{
 	private void addBattleButton() {
 		add(selectStageButton);
 		selectStageButton.addActionListener(e->{
+			timerStop();
 			MainFrame.selectStageDraw();
 		});
 	}
@@ -104,6 +108,12 @@ public class MenuMain extends JPanel implements ActionListener{
 		selectStageButton.setText("ステージ選択");
 		selectStageButton.setBounds(430, 400, 130, 60);
 		setButton(selectStageButton);
+	}
+	
+	private void timerStop() {
+		Stream.of(FallMotion).forEach(i -> i.timerStop());
+		Stream.of(FinalMotion).forEach(i -> i.timerStop());
+		timer.stop();
 	}
 	
 	private void setButton(JButton button) {
@@ -145,6 +155,10 @@ class FallMotion implements ActionListener{
 		timer.start();
 	}
 	
+	protected void timerStop() {
+		timer.stop();
+	}
+	
 	protected boolean getTimerStatus() {
 		return timer.isRunning();
 	}
@@ -166,7 +180,7 @@ class FallMotion implements ActionListener{
 		angle += 0.1;
 		y += 10;
 		if(450 < y) {
-			timer.stop();
+			timerStop();
 		}
 	}
 }
@@ -189,6 +203,10 @@ class FinalMotion implements ActionListener{
 		timer.start();
 	}
 	
+	protected void timerStop() {
+		timer.stop();
+	}
+	
 	protected int getX() {
 		return x;
 	}
@@ -202,7 +220,7 @@ class FinalMotion implements ActionListener{
 		y -= 10 * (number / 5);
 		count ++;
 		if(10 < count) {
-			timer.stop();
+			timerStop();
 		}
 	}
 }
