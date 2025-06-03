@@ -52,7 +52,7 @@ public class MainFrame extends JFrame{
 	public void selectStageDraw() {
 		getContentPane().removeAll();
 		setTitle("ステージ選択");
-		setSize(1235, 600);
+		setSize(975, 570);
 		add(new MenuSelectStage(this));
 		setLocationRelativeTo(null);
 	}

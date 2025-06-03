@@ -26,25 +26,25 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import defaultdata.DefaultData;
+import dataunit.DataUnit;
 
 //ソート画面振り分け
 public class DisplaySort extends SortPanel{
 	public void core(List<Integer> defaultList) {
-		rarityList = DefaultData.CORE_RARITY_LIST;
-		weaponStatusList = DefaultData.CORE_WEAPON_STATUS_LIST;
-		unitStatusList = DefaultData.CORE_UNIT_STATUS_LIST;
-		cutList = DefaultData.CORE_CUT_STATUS_LIST;
+		rarityList = DataUnit.CORE_RARITY_LIST;
+		weaponStatusList = DataUnit.CORE_WEAPON_STATUS_LIST;
+		unitStatusList = DataUnit.CORE_UNIT_STATUS_LIST;
+		cutList = DataUnit.CORE_CUT_STATUS_LIST;
 		super.setSortPanel(defaultList);
 	}
 	
 	public void weapon(List<Integer> defaultList) {
-		rarityList = DefaultData.WEAPON_RARITY_LIST;
-		weaponStatusList = DefaultData.WEAPON_WEAPON_STATUS_LIST.stream().map(i -> i.stream().map(j -> (double) j).toList()).toList();
-		unitStatusList = DefaultData.WEAPON_UNIT_STATUS_LIST.stream().map(i -> i.stream().map(j -> (double) j).toList()).toList();
-		cutList = DefaultData.WEAPON_CUT_STATUS_LIST;
-		typeList = DefaultData.WEAPON_TYPE;
-		elementList = DefaultData.WEAPON_ELEMENT;
+		rarityList = DataUnit.WEAPON_RARITY_LIST;
+		weaponStatusList = DataUnit.WEAPON_WEAPON_STATUS_LIST.stream().map(i -> i.stream().map(j -> (double) j).toList()).toList();
+		unitStatusList = DataUnit.WEAPON_UNIT_STATUS_LIST.stream().map(i -> i.stream().map(j -> (double) j).toList()).toList();
+		cutList = DataUnit.WEAPON_CUT_STATUS_LIST;
+		typeList = DataUnit.WEAPON_TYPE;
+		elementList = DataUnit.WEAPON_ELEMENT;
 		super.setSortPanel(defaultList);
 	}
 }
@@ -210,9 +210,9 @@ class SortPanel extends JPanel {
 		
 		raritySort = initialize.apply(1);
 		raritySort[0].setSelected(true);
-		weapon = initialize.apply(DefaultData.WEAPON_WEAPON_MAP.size());
-		unit = initialize.apply(DefaultData.WEAPON_UNIT_MAP.size());
-		cut = initialize.apply(DefaultData.ELEMENT_MAP.size());
+		weapon = initialize.apply(DataUnit.WEAPON_WEAPON_MAP.size());
+		unit = initialize.apply(DataUnit.WEAPON_UNIT_MAP.size());
+		cut = initialize.apply(DataUnit.ELEMENT_MAP.size());
 		grouping.accept(itemGroup, raritySort);
 		grouping.accept(itemGroup, weapon);
 		grouping.accept(itemGroup, unit);
@@ -220,9 +220,9 @@ class SortPanel extends JPanel {
 		
 		rarity = initialize.apply(Collections.max(rarityList));
 		if(Objects.nonNull(typeList)) {
-			distance = initialize.apply(DefaultData.DISTANCE_MAP.size());
-			handle = initialize.apply(DefaultData.HANDLE_MAP.size());
-			element = initialize.apply(DefaultData.ELEMENT_MAP.size());
+			distance = initialize.apply(DataUnit.DISTANCE_MAP.size());
+			handle = initialize.apply(DataUnit.HANDLE_MAP.size());
+			element = initialize.apply(DataUnit.ELEMENT_MAP.size());
 		}
 	}
 	
@@ -234,15 +234,15 @@ class SortPanel extends JPanel {
 		mode[1].setActionCommand("false");
 		
 		raritySort[0].setActionCommand("true");
-		setAction.accept(weapon, DefaultData.WEAPON_WEAPON_MAP);
-		setAction.accept(unit, DefaultData.WEAPON_UNIT_MAP);
-		setAction.accept(cut, DefaultData.ELEMENT_MAP);
+		setAction.accept(weapon, DataUnit.WEAPON_WEAPON_MAP);
+		setAction.accept(unit, DataUnit.WEAPON_UNIT_MAP);
+		setAction.accept(cut, DataUnit.ELEMENT_MAP);
 		
 		IntStream.range(0, rarity.length).forEach(i -> rarity[i].setActionCommand("" + (i + 1)));
 		if(Objects.nonNull(typeList)) {
-			setAction.accept(distance, DefaultData.DISTANCE_MAP);
-			setAction.accept(handle, DefaultData.HANDLE_MAP);
-			setAction.accept(element, DefaultData.ELEMENT_MAP);
+			setAction.accept(distance, DataUnit.DISTANCE_MAP);
+			setAction.accept(handle, DataUnit.HANDLE_MAP);
+			setAction.accept(element, DataUnit.ELEMENT_MAP);
 		}
 	}
 	
@@ -253,14 +253,14 @@ class SortPanel extends JPanel {
 		mode[0].setText("降順");
 		mode[1].setText("昇順");
 		raritySort[0].setText("レアリティ");
-		getName.accept(weapon, DefaultData.WEAPON_WEAPON_MAP);
-		getName.accept(unit, DefaultData.WEAPON_UNIT_MAP);
-		getName.accept(cut, DefaultData.ELEMENT_MAP);
+		getName.accept(weapon, DataUnit.WEAPON_WEAPON_MAP);
+		getName.accept(unit, DataUnit.WEAPON_UNIT_MAP);
+		getName.accept(cut, DataUnit.ELEMENT_MAP);
 		IntStream.range(0, rarity.length).forEach(i -> rarity[i].setText("★" + (i + 1)));
 		if(Objects.nonNull(typeList)) {
-			getName.accept(distance, DefaultData.DISTANCE_MAP);
-			getName.accept(handle, DefaultData.HANDLE_MAP);
-			getName.accept(element, DefaultData.ELEMENT_MAP);
+			getName.accept(distance, DataUnit.DISTANCE_MAP);
+			getName.accept(handle, DataUnit.HANDLE_MAP);
+			getName.accept(element, DataUnit.ELEMENT_MAP);
 		}
 	}
 	
@@ -344,15 +344,15 @@ class SortPanel extends JPanel {
 		if(Boolean.valueOf(radioCommand)) {
 			return displayList.stream().sorted(Comparator.comparing(i -> rarityList.get(i), getOrderInteger())).collect(Collectors.toList());
 		}
-		List<String> mapList = getMapList.apply(DefaultData.WEAPON_WEAPON_MAP);
+		List<String> mapList = getMapList.apply(DataUnit.WEAPON_WEAPON_MAP);
 		if(check.test(mapList)) {
 			return getDisplayListDouble.apply(weaponStatusList, mapList);
 		}
-		mapList = getMapList.apply(DefaultData.WEAPON_UNIT_MAP);
+		mapList = getMapList.apply(DataUnit.WEAPON_UNIT_MAP);
 		if(check.test(mapList)) {
 			return getDisplayListDouble.apply(unitStatusList, mapList);
 		}
-		mapList = getMapList.apply(DefaultData.ELEMENT_MAP);
+		mapList = getMapList.apply(DataUnit.ELEMENT_MAP);
 		if(check.test(mapList)) {
 			return getDisplayListInteger.apply(cutList, mapList);
 		}
@@ -372,8 +372,8 @@ class SortPanel extends JPanel {
 			return getRarityList(displayList);
 		}
 		displayList = getRarityList(displayList);
-		displayList = getTypeList(displayList, distance, DefaultData.DISTANCE_MAP, 0);
-		displayList = getTypeList(displayList, handle, DefaultData.HANDLE_MAP, 1);
+		displayList = getTypeList(displayList, distance, DataUnit.DISTANCE_MAP, 0);
+		displayList = getTypeList(displayList, handle, DataUnit.HANDLE_MAP, 1);
 		return getElementList(displayList);
 	}
 	
@@ -398,7 +398,7 @@ class SortPanel extends JPanel {
 		if(selectCheck(element)) {
 			return displayList;
 		}
-		return displayList.stream().filter(i -> getActiveButtonStream(element).anyMatch(j -> elementList.get(i).stream().anyMatch(k -> DefaultData.ELEMENT_MAP.get(k).equals(j)))).collect(Collectors.toList());
+		return displayList.stream().filter(i -> getActiveButtonStream(element).anyMatch(j -> elementList.get(i).stream().anyMatch(k -> DataUnit.ELEMENT_MAP.get(k).equals(j)))).collect(Collectors.toList());
 	}
 	
 	private boolean selectCheck(JRadioButton[] radio) {

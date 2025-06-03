@@ -1,0 +1,52 @@
+package dataother;
+
+import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.List;
+
+import editimage.EditImage;
+
+//その他のデータ
+public class DataOther {
+	//タイトル画像ファイル
+	final static String TITLE = "image/gacha/title.png";
+
+	//ガチャ画像ファイル
+	final static String BALL = "image/gacha/ball full.png";
+	final static List<String> HALF_BALL = Arrays.asList("image/gacha/ball bottom.png", "image/gacha/ball top.png");
+	final static String HANDLE = "image/gacha/machine handle.png";
+	final static List<String> MACHINE = Arrays.asList("image/gacha/machine bottom.png", "image/gacha/machine top.png");
+	final static String TURN = "image/gacha/turn.png";
+	final static String EFFECT = "image/gacha/effect.png";
+	
+	
+	
+	//画像取込み
+	public BufferedImage getTitleImage(int ratio) {
+		return new EditImage().input(TITLE, ratio);
+	}
+
+	public BufferedImage getBallImage(int ratio) {
+		return new EditImage().input(BALL, ratio);
+	}
+
+	public List<BufferedImage> getHalfBallImage(int ratio) {
+		return new EditImage().inputList(HALF_BALL, ratio);
+	}
+
+	public BufferedImage getHandleImage(int ratio) {
+		return new EditImage().input(HANDLE, ratio);
+	}
+
+	public List<BufferedImage> getMachineImage(int ratio) {
+		return new EditImage().inputList(MACHINE, ratio);
+	}
+
+	public BufferedImage getTurnImage(int ratio) {
+		return new EditImage().input(TURN, ratio);
+	}
+
+	public BufferedImage getEffectImage(int ratio) {
+		return new EditImage().input(EFFECT, ratio);
+	}
+}

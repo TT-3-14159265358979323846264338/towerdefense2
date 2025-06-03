@@ -13,7 +13,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.stream.IntStream;
 
-import defaultdata.DefaultData;
+import dataunit.DataUnit;
 import mainframe.MainFrame;
 import savecomposition.SaveComposition;
 import saveholditem.SaveHoldItem;
@@ -64,12 +64,12 @@ class FileCheck{
 			e.printStackTrace();
 		}
 		List<Integer> coreNumberList = SaveHoldItem.getCoreNumberList();
-		if(check.test(DefaultData.CORE_NAME_LIST.size(), coreNumberList.size())) {
-			addList.accept(DefaultData.CORE_NAME_LIST.size() - coreNumberList.size(), coreNumberList);
+		if(check.test(DataUnit.CORE_NAME_LIST.size(), coreNumberList.size())) {
+			addList.accept(DataUnit.CORE_NAME_LIST.size() - coreNumberList.size(), coreNumberList);
 		}
 		List<Integer> weaponNumberList = SaveHoldItem.getWeaponNumberList();
-		if(check.test(DefaultData.WEAPON_NAME_LIST.size(), weaponNumberList.size())) {
-			addList.accept(DefaultData.WEAPON_NAME_LIST.size() - weaponNumberList.size(), weaponNumberList);
+		if(check.test(DataUnit.WEAPON_NAME_LIST.size(), weaponNumberList.size())) {
+			addList.accept(DataUnit.WEAPON_NAME_LIST.size() - weaponNumberList.size(), weaponNumberList);
 		}
 		try {
 			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(saveholditem.SaveHoldItem.HOLD_FILE)));

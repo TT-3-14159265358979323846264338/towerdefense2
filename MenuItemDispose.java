@@ -31,7 +31,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-import defaultdata.DefaultData;
+import dataunit.DataUnit;
 import displaysort.DisplaySort;
 import displaystatus.DisplayStatus;
 import mainframe.MainFrame;
@@ -57,8 +57,8 @@ public class MenuItemDispose extends JPanel{
 	List<List<List<Integer>>> allCompositionList;
 	int[] usedCoreNumber;
 	int[] usedWeaponNumber;
-	List<BufferedImage> coreImageList = new DefaultData().getCoreImage(2);
-	List<BufferedImage> weaponImageList = new DefaultData().getWeaponImage(2);
+	List<BufferedImage> coreImageList = new DataUnit().getCoreImage(2);
+	List<BufferedImage> weaponImageList = new DataUnit().getWeaponImage(2);
 	
 	public MenuItemDispose(MainFrame MainFrame) {
 		setBackground(new Color(240, 170, 80));
@@ -192,9 +192,9 @@ public class MenuItemDispose extends JPanel{
 		add(disposeButton);
 		disposeButton.addActionListener(e->{
 			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				recycle(CoreImagePanel, coreNumberList, usedCoreNumber, coreImageList, DefaultData.CORE_RARITY_LIST);
+				recycle(CoreImagePanel, coreNumberList, usedCoreNumber, coreImageList, DataUnit.CORE_RARITY_LIST);
 			}else {
-				recycle(WeaponImagePanel, weaponNumberList, usedWeaponNumber, weaponImageList, DefaultData.WEAPON_RARITY_LIST);
+				recycle(WeaponImagePanel, weaponNumberList, usedWeaponNumber, weaponImageList, DataUnit.WEAPON_RARITY_LIST);
 			}
 		});
 	}

@@ -39,7 +39,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
-import defaultdata.DefaultData;
+import dataother.DataOther;
+import dataunit.DataUnit;
 import displaystatus.DisplayStatus;
 import editimage.EditImage;
 import mainframe.MainFrame;
@@ -50,12 +51,12 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	JButton gachaDetailButton = new JButton();
 	JButton repeatButton = new JButton();
 	JButton returnButton = new JButton();
-	BufferedImage ballImage = new DefaultData().getBallImage(2);
-	List<BufferedImage> halfBallImage = new ArrayList<>(new DefaultData().getHalfBallImage(2));
-	BufferedImage handleImage = new DefaultData().getHandleImage(2);
-	List<BufferedImage> machineImage = new ArrayList<>(new DefaultData().getMachineImage(2));
-	BufferedImage turnImage = new DefaultData().getTurnImage(2);
-	BufferedImage effectImage = new DefaultData().getEffectImage(1);
+	BufferedImage ballImage = new DataOther().getBallImage(2);
+	List<BufferedImage> halfBallImage = new ArrayList<>(new DataOther().getHalfBallImage(2));
+	BufferedImage handleImage = new DataOther().getHandleImage(2);
+	List<BufferedImage> machineImage = new ArrayList<>(new DataOther().getMachineImage(2));
+	BufferedImage turnImage = new DataOther().getTurnImage(2);
+	BufferedImage effectImage = new DataOther().getEffectImage(1);
 	int[] gachaMode = {0, 0};//① ガチャ回数コード, ② ガチャ種類コード (詳細はDefaultLineupで定義)でリスト化
 	Map<Integer, String> modeMap = new HashMap<Integer, String>();{
 		modeMap.put(0, "1連");
@@ -470,8 +471,8 @@ class DrawResult extends JPanel implements MouseListener{
 	List<Point> weaponPosition = new ArrayList<>();
 	double total;
 	int position;
-	List<BufferedImage> coreImageList = new DefaultData().getCoreImage(2);
-	List<BufferedImage> weaponImageList = new DefaultData().getWeaponImage(2);
+	List<BufferedImage> coreImageList = new DataUnit().getCoreImage(2);
+	List<BufferedImage> weaponImageList = new DataUnit().getWeaponImage(2);
 	int unitSize = 80;
 	
 	protected DrawResult(int[] gachaMode){
@@ -632,7 +633,7 @@ class GachaLineup extends JDialog{
 		lineup.addElement("【コア確率】 " + getRatio.apply(getTotal(coreRatio)));
 		lineup.addElement(" ");
 		IntStream.range(0, coreLineup.size()).forEach(i -> {
-			String coreName = getRarity.apply(DefaultData.CORE_RARITY_LIST.get(coreLineup.get(i))) + DefaultData.CORE_NAME_LIST.get(coreLineup.get(i));
+			String coreName = getRarity.apply(DataUnit.CORE_RARITY_LIST.get(coreLineup.get(i))) + DataUnit.CORE_NAME_LIST.get(coreLineup.get(i));
 			lineup.addElement(getName.apply(coreName) + getRatio.apply(coreRatio.get(i)));
 		});
 		if(getTotal(coreRatio) != 0) {
@@ -641,7 +642,7 @@ class GachaLineup extends JDialog{
 		lineup.addElement("【武器確率】 " + getRatio.apply(getTotal(weaponRatio)));
 		lineup.addElement(" ");
 		IntStream.range(0, weaponLineup.size()).forEach(i -> {
-			String weaponName = getRarity.apply(DefaultData.WEAPON_RARITY_LIST.get(weaponLineup.get(i))) + DefaultData.WEAPON_NAME_LIST.get(weaponLineup.get(i));
+			String weaponName = getRarity.apply(DataUnit.WEAPON_RARITY_LIST.get(weaponLineup.get(i))) + DataUnit.WEAPON_NAME_LIST.get(weaponLineup.get(i));
 			lineup.addElement(getName.apply(weaponName) + getRatio.apply(weaponRatio.get(i)));
 		});
 		JList<String> lineupJList = new JList<String>(lineup);
