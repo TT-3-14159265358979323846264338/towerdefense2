@@ -15,7 +15,11 @@ public class DataStage {
 			"image/field/all placement.png"
 			);
 	//ステージ画像ファイル
-	public final static List<List<String>> STAGE_NAME_LIST = Arrays.asList(
+	public final static List<String> STAGE_NAME_LIST = Arrays.asList(
+			"stage 1",
+			"stage 2"
+			);
+	public final static List<List<String>> STAGE_IMAGE_NAME_LIST = Arrays.asList(
 			Arrays.asList("image/field/stage 1-1.png",
 					"image/field/stage 1-2.png",
 					"image/field/stage 1-3.png",
@@ -38,10 +42,10 @@ public class DataStage {
 	}
 	
 	public List<BufferedImage> getStageImage(int number, int ratio){
-		return new EditImage().inputList(STAGE_NAME_LIST.get(number), ratio);
+		return new EditImage().inputList(STAGE_IMAGE_NAME_LIST.get(number), ratio);
 	}
 	
 	public List<BufferedImage> getStageImage(int ratio){
-		return new EditImage().inputList(STAGE_NAME_LIST.stream().map(i -> i.get(0)).toList(), ratio);
+		return new EditImage().inputList(STAGE_IMAGE_NAME_LIST.stream().map(i -> i.get(0)).toList(), ratio);
 	}
 }

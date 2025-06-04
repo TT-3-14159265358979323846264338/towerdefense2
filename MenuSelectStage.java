@@ -3,10 +3,16 @@ package menuselectstage;
 import static javax.swing.JOptionPane.*;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.time.temporal.ValueRange;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -73,7 +79,7 @@ public class MenuSelectStage extends JPanel{
 	
 	private void setInformationLabel() {
 		informationLabel.setText("ステージ情報");
-		informationLabel.setBounds(220, 10, 200, 30);
+		informationLabel.setBounds(170, 10, 200, 30);
 		setLabel(informationLabel);
 	}
 	
@@ -90,7 +96,7 @@ public class MenuSelectStage extends JPanel{
 	
 	private void setReturnButton() {
 		returnButton.setText("戻る");
-		returnButton.setBounds(10, 460, 200, 60);
+		returnButton.setBounds(10, 460, 150, 60);
 		setButton(returnButton);
 	}
 	
@@ -103,7 +109,7 @@ public class MenuSelectStage extends JPanel{
 	
 	private void setNormalModeButton() {
 		normalModeButton.setText("normal");
-		normalModeButton.setBounds(630, 460, 155, 60);
+		normalModeButton.setBounds(580, 460, 155, 60);
 		setButton(normalModeButton);
 	}
 	
@@ -116,7 +122,7 @@ public class MenuSelectStage extends JPanel{
 	
 	private void setHardModeButton() {
 		hardModeButton.setText("hard");
-		hardModeButton.setBounds(795, 460, 155, 60);
+		hardModeButton.setBounds(745, 460, 155, 60);
 		setButton(hardModeButton);
 	}
 	
@@ -130,7 +136,7 @@ public class MenuSelectStage extends JPanel{
 	}
 	
 	private void setStageScroll() {
-		stageScroll.setBounds(10, 40, 200, 410);
+		stageScroll.setBounds(10, 40, 150, 410);
 		stageScroll.setPreferredSize(stageScroll.getSize());
 	}
 	
@@ -140,7 +146,7 @@ public class MenuSelectStage extends JPanel{
 	}
 	
 	private void setMeritScroll() {
-		meritScroll.setBounds(220, 275, 400, 245);
+		meritScroll.setBounds(170, 275, 400, 245);
 		meritScroll.setPreferredSize(meritScroll.getSize());
 	}
 	
@@ -150,28 +156,79 @@ public class MenuSelectStage extends JPanel{
 	}
 	
 	private void setEnemyScroll() {
-		enemyScroll.setBounds(630, 40, 320, 410);
+		enemyScroll.setBounds(580, 40, 320, 410);
 		enemyScroll.setPreferredSize(enemyScroll.getSize());
 	}
 	
 	private void drawField(Graphics g){
-		//フィールド画像を表示
-		//現在の画像はテスト用
-		g.drawImage(stageImage.get(0), 220, 40, this);
+		g.drawImage(stageImage.get(StagePanel.getSelelct()), 170, 40, this);
 	}
 }
 
 //ステージ切り替え
-class StagePanel extends JPanel{
+class StagePanel extends JPanel implements MouseListener{
+	JLabel[] nameLabel = IntStream.range(0, DataStage.STAGE_NAME_LIST.size()).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
+	List<BufferedImage> stageImage = new DataStage().getStageImage(18);
+	int select = 0;
 	
+	protected StagePanel() {
+		addMouseListener(this);
+		setPreferredSize(new Dimension(100, 85 * stageImage.size()));
+		Stream.of(nameLabel).forEach(i -> addLabel(i));
+	}
 	
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		IntStream.range(0, nameLabel.length).forEach(i -> setLabel(i));
+		IntStream.range(0, stageImage.size()).forEach(i -> drawField(i, g));
+	}
 	
+	private void addLabel(JLabel label) {
+		add(label);
+		label.setHorizontalAlignment(JLabel.CENTER);
+		label.setForeground(Color.RED);
+	}
 	
+	private void setLabel(int number) {
+		nameLabel[number].setText(DataStage.STAGE_NAME_LIST.get(number));
+		nameLabel[number].setBounds(0, 25 + 85 * number, 130, 30);
+		nameLabel[number].setFont(new Font("Arial", Font.BOLD, 20));
+	}
 	
+	private void drawField(int number, Graphics g) {
+		if(select == number) {
+			g.setColor(Color.WHITE);
+			g.fillRect(0, 85 * number, 135, 85);
+		}
+		g.drawImage(stageImage.get(number), 10, 10 + 85 * number, this);
+	}
 	
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+		for(int i = 0; i < stageImage.size(); i++) {
+			if(ValueRange.of(10, 125).isValidIntValue(e.getX())
+					&& ValueRange.of(10 + 85 * i, -10 + 85 * (i + 1)).isValidIntValue(e.getY())) {
+				select = i;
+				break;
+			}
+		}
+	}
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
 	
-	
-	
+	protected int getSelelct() {
+		return select;
+	}
 }
 
 //戦功情報
