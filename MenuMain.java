@@ -148,7 +148,7 @@ public class MenuMain extends JPanel implements ActionListener{
 //落下コアの位置調整
 class FallMotion implements ActionListener{
 	Timer timer = new Timer(20, this);
-	double angle = (double) (new Random().nextInt(314) / 100);
+	double angle = (double) (new Random().nextInt((int)(Math.PI * 2 * 100)) / 100);
 	int x = new Random().nextInt(400);
 	int y = -100;
 	
