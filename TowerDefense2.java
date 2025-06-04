@@ -10,12 +10,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import datastage.DataStage;
 import dataunit.DataUnit;
 import mainframe.MainFrame;
 import savecomposition.SaveComposition;
+import savegameprogress.SaveGameProgress;
 import saveholditem.SaveHoldItem;
 
 public class TowerDefense2 {
@@ -28,14 +30,17 @@ public class TowerDefense2 {
 //データ保存用ファイルの確認
 class FileCheck{
 	SaveHoldItem SaveHoldItem;
+	SaveGameProgress SaveGameProgress;
 	
 	protected FileCheck() {
 		fileExistenceCheck();
-		internalDataCheck();
+		itemDataCheck();
+		progressDataCheck();
 	}
 	
+	//ファイルの存在確認
 	private void fileExistenceCheck() {
-		if(Files.notExists(Paths.get(saveholditem.SaveHoldItem.HOLD_FILE)) || Files.notExists(Paths.get(SaveComposition.COMPOSITION_FILE))) {
+		if(Files.notExists(Paths.get(saveholditem.SaveHoldItem.HOLD_FILE)) || Files.notExists(Paths.get(SaveComposition.COMPOSITION_FILE)) || Files.notExists(Paths.get(savegameprogress.SaveGameProgress.PROGRESS_FILE))) {
 			try {
 				ObjectOutputStream itemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
 				itemData.writeObject(new SaveHoldItem());
@@ -43,19 +48,21 @@ class FileCheck{
 				ObjectOutputStream compositionData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(SaveComposition.COMPOSITION_FILE)));
 				compositionData.writeObject(new SaveComposition());
 				compositionData.close();
+				ObjectOutputStream gameProgress = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+				gameProgress.writeObject(new SaveGameProgress());
+				gameProgress.close();
 			}catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	private void internalDataCheck() {
-		BiPredicate<Integer, Integer> check = (size1, size2) -> {
-			return size1 != size2;
-		};
+	//item dataのデータ数確認
+	private void itemDataCheck() {
 		BiConsumer<Integer, List<Integer>> addList = (count, list) -> {
 			IntStream.range(0, count).forEach(i -> list.add(0));
 		};
+		//データのロード
 		try {
 			ObjectInputStream loadItemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
 			SaveHoldItem = (SaveHoldItem) loadItemData.readObject();
@@ -63,14 +70,16 @@ class FileCheck{
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
+		//データ数を確認し、足りなければ追加
 		List<Integer> coreNumberList = SaveHoldItem.getCoreNumberList();
-		if(check.test(DataUnit.CORE_NAME_LIST.size(), coreNumberList.size())) {
+		if(checkSize(DataUnit.CORE_NAME_LIST.size(), coreNumberList.size())) {
 			addList.accept(DataUnit.CORE_NAME_LIST.size() - coreNumberList.size(), coreNumberList);
 		}
 		List<Integer> weaponNumberList = SaveHoldItem.getWeaponNumberList();
-		if(check.test(DataUnit.WEAPON_NAME_LIST.size(), weaponNumberList.size())) {
+		if(checkSize(DataUnit.WEAPON_NAME_LIST.size(), weaponNumberList.size())) {
 			addList.accept(DataUnit.WEAPON_NAME_LIST.size() - weaponNumberList.size(), weaponNumberList);
 		}
+		//データの保存
 		try {
 			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
 			saveItemData.writeObject(new SaveHoldItem(coreNumberList, weaponNumberList));
@@ -78,5 +87,47 @@ class FileCheck{
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	//progress dataのデータ数確認
+	private void progressDataCheck() {
+		//データのロード
+		try {
+			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+			SaveGameProgress = (SaveGameProgress) loadProgressData.readObject();
+			loadProgressData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		//データ数を確認し、足りなければ追加
+		List<Boolean> clearStatus = SaveGameProgress.getClearStatus();
+		if(checkSize(DataStage.STAGE_NAME_LIST.size(), clearStatus.size())) {
+			IntStream.range(0, DataStage.STAGE_NAME_LIST.size() - clearStatus.size()).forEach(i -> clearStatus.add(false));
+		}
+		List<List<Boolean>> meritStatus = SaveGameProgress.getMeritStatus();
+		IntStream.range(0, DataStage.MERIT_INFORMATION.size()).forEach(i -> {
+			try {
+				//meritStatusの内側のListのデータ数を確認し、足りなければ追加
+				if(checkSize(DataStage.MERIT_INFORMATION.get(i).size(), meritStatus.get(i).size())) {
+					IntStream.range(0, DataStage.MERIT_INFORMATION.get(i).size() - meritStatus.get(i).size()).forEach(j -> meritStatus.get(i).add(false));
+				}
+			}catch(Exception e) {
+				//エラーが起こる時はList<Boolean>の数が足りない時である
+				//その時はList<Boolean>を追加
+				meritStatus.add(DataStage.MERIT_INFORMATION.get(i).stream().map(j -> false).collect(Collectors.toList()));
+			}
+			});
+		//データの保存
+		try {
+			ObjectOutputStream saveProgressData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+			saveProgressData.writeObject(new SaveGameProgress(clearStatus, meritStatus, SaveGameProgress.getMedal(), SaveGameProgress.getSelectStage()));
+			saveProgressData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private boolean checkSize(int size1, int size2) {
+		return size2 < size1;
 	}
 }
