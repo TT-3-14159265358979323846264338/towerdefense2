@@ -54,33 +54,22 @@ public class MenuComposition extends JPanel implements MouseListener{
 	JButton returnButton = new JButton();
 	JButton switchButton = new JButton();
 	JButton sortButton = new JButton();
-	DefaultListModel<String> compositionListModel = new DefaultListModel<String>();
-	JList<String> compositionJList = new JList<String>(compositionListModel);
+	DefaultListModel<String> compositionListModel = new DefaultListModel<>();
+	JList<String> compositionJList = new JList<>(compositionListModel);
 	JScrollPane compositionScroll = new JScrollPane();
 	JScrollPane itemScroll = new JScrollPane();
 	ImagePanel CoreImagePanel = new ImagePanel();
 	ImagePanel WeaponImagePanel = new ImagePanel();
-	DisplaySort coreDisplaySort = new DisplaySort();
-	DisplaySort weaponDisplaySort = new DisplaySort();
-	SaveHoldItem SaveHoldItem;
-	SaveComposition SaveComposition;
+	SaveData SaveData = new SaveData();
+	DisplayListCreation DisplayListCreation = new DisplayListCreation(SaveData);
 	List<BufferedImage> rightWeaponList = new ArrayList<>(new DataUnit().getRightWeaponImage(2));
 	List<BufferedImage> ceterCoreList = new ArrayList<>(new DataUnit().getCenterCoreImage(2));
 	List<BufferedImage> leftWeaponList = new ArrayList<>(new DataUnit().getLeftWeaponImage(2));
-	List<Integer> coreNumberList = new ArrayList<>();
-	List<Integer> weaponNumberList = new ArrayList<>();
-	List<Integer> nowCoreNumberList = new ArrayList<>();
-	List<Integer> nowWeaponNumberList = new ArrayList<>();
-	List<List<List<Integer>>> allCompositionList = new ArrayList<>();
-	List<String> compositionNameList = new ArrayList<>();
-	int selectNumber;
 	static int unitSize = 60;
 	
 	public MenuComposition(MainFrame MainFrame) {
 		addMouseListener(this);
 		setBackground(new Color(240, 170, 80));
-		load();
-		initializeDisplayList();
 		addCompositionNameLabel();
 		addCompositionLabel();
 		addTypeLabel();
@@ -116,62 +105,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 		setSortButton();
 		setItemScroll();
 		drawComposition(g);
-		countNumber();
+		SaveData.countNumber();
 		requestFocus();
-	}
-	
-	private void load() {
-		try {
-			ObjectInputStream itemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
-			SaveHoldItem = (SaveHoldItem) itemData.readObject();
-			itemData.close();
-			ObjectInputStream compositionData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
-			SaveComposition = (SaveComposition) compositionData.readObject();
-			compositionData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
-		input();
-	}
-	
-	private void input() {
-		coreNumberList = SaveHoldItem.getCoreNumberList();
-		weaponNumberList = SaveHoldItem.getWeaponNumberList();
-		allCompositionList = SaveComposition.getAllCompositionList();
-		compositionNameList = SaveComposition.getCompositionNameList();
-		compositionListModel.clear();
-		compositionNameList.stream().forEach(i -> compositionListModel.addElement(i));
-		selectNumber = SaveComposition.getSelectNumber();
-		compositionJList.setSelectedIndex(selectNumber);
-		new DelaySelect(compositionJList, selectNumber).start();
-	}
-	
-	private void save() {
-		List<List<List<Integer>>> weaponStatusList = new ArrayList<>();
-		List<List<List<Integer>>> unitStatusList = new ArrayList<>();
-		List<Integer> typeList = new ArrayList<>();
-		allCompositionList.get(selectNumber).stream().forEach(i -> {
-			StatusCalculation StatusCalculation = new StatusCalculation(i);
-			weaponStatusList.add(StatusCalculation.getWeaponStatus());
-			unitStatusList.add(StatusCalculation.getUnitStatus());
-			typeList.add(StatusCalculation.getType());
-		});
-		try {
-			ObjectOutputStream compositionData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
-			compositionData.writeObject(new SaveComposition(allCompositionList, compositionNameList, selectNumber, allCompositionList.get(selectNumber), weaponStatusList, unitStatusList, typeList));
-			compositionData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void initializeDisplayList() {
-		coreDisplaySort.core(getDisplayList(coreNumberList));
-		weaponDisplaySort.weapon(getDisplayList(weaponNumberList));
-	}
-	
-	private List<Integer> getDisplayList(List<Integer> list){
-		return IntStream.range(0, list.size()).mapToObj(i -> (list.get(i) == 0)? -1: i).filter(i -> i != -1).collect(Collectors.toList());
 	}
 	
 	private void addCompositionNameLabel() {
@@ -211,8 +146,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void addNewButton(){
 		add(newButton);
 		newButton.addActionListener(e->{
-			SaveComposition.newComposition();
-			input();
+			SaveData.addNewComposition();
+			modelUpdate();
 		});
 	}
 	
@@ -225,21 +160,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void addRemoveButton() {
 		add(removeButton);
 		removeButton.addActionListener(e->{
-			if(1 < allCompositionList.size()) {
-				int select = showConfirmDialog(null, "選択中の編成を全て削除しますか", "編成削除確認", YES_NO_OPTION, QUESTION_MESSAGE);
-				switch(select) {
-				case 0:
-					int[] number = compositionJList.getSelectedIndices();
-					for(int i = number.length - 1; 0 <= i; i--) {
-						SaveComposition.removeComposition(number[i]);
-					}
-					input();
-				default:
-					break;
-				}
-			}else {
-				showMessageDialog(null, "全ての編成を削除できません");
-			}
+			SaveData.removeComposition(compositionJList.getSelectedIndices());
+			modelUpdate();
 		});
 	}
 	
@@ -252,28 +174,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void addSwapButton(){
 		add(swapButton);
 		swapButton.addActionListener(e->{
-			int max = compositionJList.getMaxSelectionIndex();
-			int min = compositionJList.getMinSelectionIndex();
-			if(max == min) {
-				showMessageDialog(null, "入れ替える2つの編成を選択してください");
-			}else {
-				int select = showConfirmDialog(null, "選択中の編成を入れ替えますか", "入替確認", YES_NO_OPTION, QUESTION_MESSAGE);
-				switch(select) {
-				case 0:
-					List<List<Integer>> maxList = allCompositionList.get(max);
-					List<List<Integer>> minList = allCompositionList.get(min);
-					String maxName = compositionNameList.get(max);
-					String minName = compositionNameList.get(min);
-					allCompositionList.set(max, minList);
-					allCompositionList.set(min, maxList);
-					compositionNameList.set(max, minName);
-					compositionNameList.set(min, maxName);
-					compositionListModel.set(max, minName);
-					compositionListModel.set(min, maxName);
-				default:
-					break;
-				}
-			}
+			SaveData.swapComposition(compositionJList.getMaxSelectionIndex(), compositionJList.getMinSelectionIndex());
+			modelUpdate();
 		});
 	}
 	
@@ -286,14 +188,9 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void addNameChangeButton() {
 		add(nameChangeButton);
 		nameChangeButton.addActionListener(e->{
-			String newName = showInputDialog(null, "変更後の編成名を入力してください", "名称変更", INFORMATION_MESSAGE);
-			if(newName != null && !newName.isEmpty()) {
-				if(!newName.startsWith(" ") && !newName.startsWith("　")) {
-					compositionListModel.set(selectNumber, newName);
-					compositionNameList.set(selectNumber, newName);
-				}else {
-					showMessageDialog(null, "スペースで始まる名称は使用できません");
-				}
+			String newName = SaveData.changeCompositionName();
+			if(newName != null) {
+				compositionListModel.set(SaveData.getSelectNumber(), newName);
 			}
 		});
 	}
@@ -307,13 +204,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void addSaveButton() {
 		add(saveButton);
 		saveButton.addActionListener(e->{
-			int select = showConfirmDialog(null, "現在の編成を保存しますか?", "保存確認", YES_NO_OPTION, QUESTION_MESSAGE);
-			switch(select) {
-			case 0:
-				save();
-			default:
-				break;
-			}
+			SaveData.saveProcessing();
 		});
 	}
 	
@@ -326,13 +217,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void addLoadButton() {
 		add(loadButton);
 		loadButton.addActionListener(e->{
-			int select = showConfirmDialog(null, "保存せずに元のデータをロードしますか?", "ロード確認", YES_NO_OPTION, QUESTION_MESSAGE);
-			switch(select) {
-			case 0:
-				load();
-			default:
-				break;
-			}
+			SaveData.loadProcessing();
+			modelUpdate();
 		});
 	}
 	
@@ -345,13 +231,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void addResetButton() {
 		add(resetButton);
 		resetButton.addActionListener(e->{
-			int select = showConfirmDialog(null, "現在の編成をリセットしますか", "リセット確認", YES_NO_OPTION, QUESTION_MESSAGE);
-			switch(select) {
-			case 0:
-				allCompositionList.set(selectNumber, new ArrayList<>(IntStream.range(0, 8).mapToObj(i -> new ArrayList<>(savecomposition.SaveComposition.DEFAULT)).toList()));
-			default:
-				break;
-			}
+			SaveData.resetComposition();
 		});
 	}
 	
@@ -364,17 +244,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void addReturnButton(MainFrame MainFrame) {
 		add(returnButton);
 		returnButton.addActionListener(e->{
-			int select = showConfirmDialog(null, "保存して戻りますか?", "実行確認", YES_NO_CANCEL_OPTION, QUESTION_MESSAGE);
-			switch(select) {
-			case 0:
-				save();
+			if(SaveData.returnProcessing()) {
 				MainFrame.mainMenuDraw();
-				break;
-			case 1:
-				MainFrame.mainMenuDraw();
-				break;
-			default:
-				break;
 			}
 		});
 	}
@@ -402,9 +273,9 @@ public class MenuComposition extends JPanel implements MouseListener{
 		add(sortButton);
 		sortButton.addActionListener(e->{
 			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				CoreImagePanel.updateList(coreDisplaySort.getDisplayList());
+				CoreImagePanel.updateList(DisplayListCreation.getCoreDisplayList());
 			}else {
-				WeaponImagePanel.updateList(weaponDisplaySort.getDisplayList());
+				WeaponImagePanel.updateList(DisplayListCreation.getWeaponDisplayList());
 			}
 		});
 	}
@@ -420,20 +291,28 @@ public class MenuComposition extends JPanel implements MouseListener{
 	}
 	
 	private void addCompositionScroll() {
+		modelUpdate();
 		compositionScroll.getViewport().setView(compositionJList);
     	add(compositionScroll);
+    	new DelaySelect(compositionJList, SaveData.getSelectNumber()).start();
+	}
+	
+	private void modelUpdate() {
+		compositionListModel.clear();
+		SaveData.getCompositionNameList().stream().forEach(i -> compositionListModel.addElement(i));
+		compositionJList.setSelectedIndex(SaveData.getSelectNumber());
 	}
 	
 	private void setCompositionScroll() {
 		compositionJList.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
 		compositionScroll.setPreferredSize(new Dimension(210, 200));
     	compositionScroll.setBounds(10, 40, 210, 200);
-    	selectNumber = compositionJList.getSelectedIndex();
+    	SaveData.selectNumberUpdate(compositionJList.getSelectedIndex());
 	}
 	
 	private void addItemScroll() {
-		CoreImagePanel.setImagePanel(new DataUnit().getCoreImage(2), getDisplayList(coreNumberList), nowCoreNumberList, true);
-		WeaponImagePanel.setImagePanel(new DataUnit().getWeaponImage(2), getDisplayList(weaponNumberList), nowWeaponNumberList, false);
+		CoreImagePanel.setImagePanel(new DataUnit().getCoreImage(2), DisplayListCreation.getDisplayList(SaveData.getCoreNumberList()), SaveData.getNowCoreNumberList(), true);
+		WeaponImagePanel.setImagePanel(new DataUnit().getWeaponImage(2), DisplayListCreation.getDisplayList(SaveData.getWeaponNumberList()), SaveData.getNowWeaponNumberList(), false);
 		itemScroll.getViewport().setView(CoreImagePanel);
     	add(itemScroll);
 	}
@@ -446,15 +325,15 @@ public class MenuComposition extends JPanel implements MouseListener{
 	private void drawComposition(Graphics g) {
 		g.setColor(Color.WHITE);
 		g.fillRect(230, 40, 330, 480);
-		IntStream.range(0, allCompositionList.get(selectNumber).size()).forEach(i -> {
+		IntStream.range(0, SaveData.getActiveCompositionList().size()).forEach(i -> {
 			try {
-				g.drawImage(rightWeaponList.get(allCompositionList.get(selectNumber).get(i).get(0)), getPositionX(i), getPositionY(i), this);
+				g.drawImage(rightWeaponList.get(SaveData.getActiveUnit(i).get(0)), getPositionX(i), getPositionY(i), this);
 			}catch(Exception ignore) {
 				//右武器を装備していないので、無視する
 			}
-			g.drawImage(ceterCoreList.get(allCompositionList.get(selectNumber).get(i).get(1)), getPositionX(i), getPositionY(i), this);
+			g.drawImage(ceterCoreList.get(SaveData.getActiveUnit(i).get(1)), getPositionX(i), getPositionY(i), this);
 			try {
-				g.drawImage(leftWeaponList.get(allCompositionList.get(selectNumber).get(i).get(2)), getPositionX(i), getPositionY(i), this);
+				g.drawImage(leftWeaponList.get(SaveData.getActiveUnit(i).get(2)), getPositionX(i), getPositionY(i), this);
 			}catch(Exception ignore) {
 				//左武器を装備していないので、無視する
 			}
@@ -469,10 +348,132 @@ public class MenuComposition extends JPanel implements MouseListener{
 		return 40 + i / 2 * 100;
 	}
 	
-	private void countNumber() {
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+		IntStream.range(0, SaveData.getActiveCompositionList().size()).forEach(i -> {
+			int x = getPositionX(i) + 60;
+			int y = getPositionY(i) + 60;
+			if(ValueRange.of(x, x + unitSize).isValidIntValue(e.getX())
+					&& ValueRange.of(y, y + unitSize).isValidIntValue(e.getY())){
+				try {
+					if(itemScroll.getViewport().getView() == CoreImagePanel) {
+						int selectCore = CoreImagePanel.getSelectNumber();
+						if(0 < SaveData.getCoreNumberList().get(selectCore)) {
+							SaveData.changeCore(i, selectCore);
+							CoreImagePanel.resetSelectNumber();
+							SaveData.countNumber();
+						}
+					}else {
+						int selectWeapon = WeaponImagePanel.getSelectNumber();
+						if(0 < SaveData.getWeaponNumberList().get(selectWeapon)) {
+							SaveData.changeWeapon(i, selectWeapon);
+							WeaponImagePanel.resetSelectNumber();
+							SaveData.countNumber();
+						}
+					}
+				}catch(Exception notSelect) {
+					unitStstus(i);
+				}
+			}
+		});
+	}
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
+	
+	private void unitStstus(int number) {
+		List<Integer> unitData = SaveData.getActiveUnit(number);
+		StatusCalculation StatusCalculation = new StatusCalculation(unitData);
+		new DisplayStatus().unit(new EditImage().compositeImage(getImageList(unitData)), unitData, StatusCalculation.getWeaponStatus(), StatusCalculation.getUnitStatus());
+	}
+	
+	private List<BufferedImage> getImageList(List<Integer> unitData){
+		List<BufferedImage> originalImage = new ArrayList<>();
+		try {
+			originalImage.add(rightWeaponList.get(unitData.get(0)));
+		}catch(Exception e) {
+			originalImage.add(null);
+		}
+		originalImage.add(ceterCoreList.get(unitData.get(1)));
+		try {
+			originalImage.add(leftWeaponList.get(unitData.get(2)));
+		}catch(Exception e) {
+			originalImage.add(null);
+		}
+		return originalImage;
+	}
+}
+
+//セーブデータ処理
+class SaveData{
+	SaveHoldItem SaveHoldItem;
+	SaveComposition SaveComposition;
+	List<Integer> coreNumberList = new ArrayList<>();
+	List<Integer> weaponNumberList = new ArrayList<>();
+	List<List<List<Integer>>> allCompositionList = new ArrayList<>();
+	List<String> compositionNameList = new ArrayList<>();
+	int selectNumber;
+	List<Integer> nowCoreNumberList = new ArrayList<>();
+	List<Integer> nowWeaponNumberList = new ArrayList<>();
+	
+	protected SaveData() {
+		load();
+	}
+	
+	private void load() {
+		try {
+			ObjectInputStream itemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
+			SaveHoldItem = (SaveHoldItem) itemData.readObject();
+			itemData.close();
+			ObjectInputStream compositionData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
+			SaveComposition = (SaveComposition) compositionData.readObject();
+			compositionData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		input();
+	}
+	
+	private void input() {
+		coreNumberList = SaveHoldItem.getCoreNumberList();
+		weaponNumberList = SaveHoldItem.getWeaponNumberList();
+		allCompositionList = SaveComposition.getAllCompositionList();
+		compositionNameList = SaveComposition.getCompositionNameList();
+		selectNumber = SaveComposition.getSelectNumber();
+	}
+	
+	private void save() {
+		List<List<List<Integer>>> weaponStatusList = new ArrayList<>();
+		List<List<List<Integer>>> unitStatusList = new ArrayList<>();
+		List<Integer> typeList = new ArrayList<>();
+		allCompositionList.get(selectNumber).stream().forEach(i -> {
+			StatusCalculation StatusCalculation = new StatusCalculation(i);
+			weaponStatusList.add(StatusCalculation.getWeaponStatus());
+			unitStatusList.add(StatusCalculation.getUnitStatus());
+			typeList.add(StatusCalculation.getType());
+		});
+		try {
+			ObjectOutputStream compositionData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
+			compositionData.writeObject(new SaveComposition(allCompositionList, compositionNameList, selectNumber, getActiveCompositionList(), weaponStatusList, unitStatusList, typeList));
+			compositionData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected void countNumber() {
 		int[] core = new int[coreNumberList.size()];
     	int[] weapon = new int[weaponNumberList.size()];
-    	allCompositionList.get(selectNumber).stream().forEach(i -> {
+    	getActiveCompositionList().stream().forEach(i -> {
     		core[i.get(1)]++;
     		try {
     			weapon[i.get(0)]++;
@@ -494,72 +495,133 @@ public class MenuComposition extends JPanel implements MouseListener{
     	nowWeaponNumberList.addAll(getNowNumber.apply(weaponNumberList, weapon));
 	}
 	
-	@Override
-	public void mouseClicked(MouseEvent e) {
+	protected void addNewComposition() {
+		SaveComposition.newComposition();
+		input();
 	}
-	@Override
-	public void mousePressed(MouseEvent e) {
-		IntStream.range(0, allCompositionList.get(selectNumber).size()).forEach(i -> {
-			int x = getPositionX(i) + 60;
-			int y = getPositionY(i) + 60;
-			if(ValueRange.of(x, x + unitSize).isValidIntValue(e.getX())
-					&& ValueRange.of(y, y + unitSize).isValidIntValue(e.getY())){
-				try {
-					if(itemScroll.getViewport().getView() == CoreImagePanel) {
-						int selectCore = CoreImagePanel.getSelectNumber();
-						if(0 < nowCoreNumberList.get(selectCore)) {
-							changeCore(i, selectCore);
-							countNumber();
-						}
-					}else {
-						int selectWeapon = WeaponImagePanel.getSelectNumber();
-						if(0 < nowWeaponNumberList.get(selectWeapon)) {
-							changeWeapon(i, selectWeapon);
-							countNumber();
-						}
-					}
-				}catch(Exception notSelect) {
-					unitStstus(i);
+	
+	protected void removeComposition(int[] number) {
+		if(1 < allCompositionList.size()) {
+			int select = showConfirmDialog(null, "選択中の編成を全て削除しますか", "編成削除確認", YES_NO_OPTION, QUESTION_MESSAGE);
+			switch(select) {
+			case 0:
+				for(int i = number.length - 1; 0 <= i; i--) {
+					SaveComposition.removeComposition(number[i]);
 				}
+				input();
+			default:
+				break;
 			}
-		});
-	}
-	@Override
-	public void mouseReleased(MouseEvent e) {
-	}
-	@Override
-	public void mouseEntered(MouseEvent e) {
-	}
-	@Override
-	public void mouseExited(MouseEvent e) {
+		}else {
+			showMessageDialog(null, "全ての編成を削除できません");
+		}
 	}
 	
-	private void changeCore(int number, int selectCore) {
-		allCompositionList.get(selectNumber).get(number).set(1, selectCore);
-		CoreImagePanel.resetSelectNumber();
+	protected void swapComposition(int max, int min) {
+		if(max == min) {
+			showMessageDialog(null, "入れ替える2つの編成を選択してください");
+		}
+		int select = showConfirmDialog(null, "選択中の編成を入れ替えますか", "入替確認", YES_NO_OPTION, QUESTION_MESSAGE);
+		switch(select) {
+		case 0:
+			List<List<Integer>> maxList = allCompositionList.get(max);
+			List<List<Integer>> minList = allCompositionList.get(min);
+			String maxName = compositionNameList.get(max);
+			String minName = compositionNameList.get(min);
+			allCompositionList.set(max, minList);
+			allCompositionList.set(min, maxList);
+			compositionNameList.set(max, minName);
+			compositionNameList.set(min, maxName);
+			break;
+		default:
+			break;
+		}
 	}
 	
-	private void changeWeapon(int number, int selectWeapon) {
+	protected String changeCompositionName() {
+		String newName = showInputDialog(null, "変更後の編成名を入力してください", "名称変更", INFORMATION_MESSAGE);
+		if(newName != null && !newName.isEmpty()) {
+			if(!newName.startsWith(" ") && !newName.startsWith("　")) {
+				compositionNameList.set(selectNumber, newName);
+				return newName;
+			}
+			showMessageDialog(null, "スペースで始まる名称は使用できません");
+		}
+		return null;
+	}
+	
+	protected void saveProcessing() {
+		int select = showConfirmDialog(null, "現在の編成を保存しますか?", "保存確認", YES_NO_OPTION, QUESTION_MESSAGE);
+		switch(select) {
+		case 0:
+			save();
+		default:
+			break;
+		}
+	}
+	
+	protected void loadProcessing() {
+		int select = showConfirmDialog(null, "保存せずに元のデータをロードしますか?", "ロード確認", YES_NO_OPTION, QUESTION_MESSAGE);
+		switch(select) {
+		case 0:
+			load();
+		default:
+			break;
+		}
+	}
+	
+	protected void resetComposition() {
+		int select = showConfirmDialog(null, "現在の編成をリセットしますか", "リセット確認", YES_NO_OPTION, QUESTION_MESSAGE);
+		switch(select) {
+		case 0:
+			allCompositionList.set(selectNumber, new ArrayList<>(IntStream.range(0, 8).mapToObj(i -> new ArrayList<>(savecomposition.SaveComposition.DEFAULT)).toList()));
+		default:
+			break;
+		}
+	}
+	
+	protected boolean returnProcessing() {
+		int select = showConfirmDialog(null, "保存して戻りますか?", "実行確認", YES_NO_CANCEL_OPTION, QUESTION_MESSAGE);
+		switch(select) {
+		case 0:
+			save();
+			return true;
+		case 1:
+			return true;
+		default:
+			break;
+		}
+		return false;
+	}
+	
+	protected void selectNumberUpdate(int indexNumber) {
+		selectNumber = indexNumber;
+	}
+	
+	protected void changeCore(int number, int selectCore) {
+		getActiveUnit(number).set(1, selectCore);
+	}
+	
+	protected void changeWeapon(int number, int selectWeapon) {
 		if(DataUnit.WEAPON_TYPE.get(selectWeapon).get(1) == 1) {
-			allCompositionList.get(selectNumber).get(number).set(2, selectWeapon);
-			allCompositionList.get(selectNumber).get(number).set(0, -1);
-		}else if(allCompositionList.get(selectNumber).get(number).get(2) == -1) {
+			getActiveUnit(number).set(2, selectWeapon);
+			getActiveUnit(number).set(0, -1);
+		}else if(getActiveUnit(number).get(2) == -1) {
 			change(number, selectWeapon);
 		}else {
-			switch(DataUnit.WEAPON_TYPE.get(allCompositionList.get(selectNumber).get(number).get(2)).get(1)) {
+			switch(DataUnit.WEAPON_TYPE.get(getActiveUnit(number).get(2)).get(1)) {
 			case 0:
 				change(number, selectWeapon);
 				break;
 			case 1:
 				if(change(number, selectWeapon) == 1) {
-					allCompositionList.get(selectNumber).get(number).set(2, -1);
+					getActiveUnit(number).set(2, -1);
 				}
 				break;
 			default:
 				break;
 			}
 		}
-		WeaponImagePanel.resetSelectNumber();
 	}
 	
 	private int change(int number, int selectWeapon) {
@@ -567,10 +629,10 @@ public class MenuComposition extends JPanel implements MouseListener{
 		int select = showOptionDialog(null, "左右どちらの武器を変更しますか", "武器変更", OK_CANCEL_OPTION, PLAIN_MESSAGE, null, menu, menu[0]);
 		switch(select) {
 		case 0:
-			allCompositionList.get(selectNumber).get(number).set(2, selectWeapon);
+			getActiveUnit(number).set(2, selectWeapon);
 			break;
 		case 1:
-			allCompositionList.get(selectNumber).get(number).set(0, selectWeapon);
+			getActiveUnit(number).set(0, selectWeapon);
 			break;
 		default:
 			break;
@@ -578,26 +640,59 @@ public class MenuComposition extends JPanel implements MouseListener{
 		return select;
 	}
 	
-	private void unitStstus(int number) {
-		List<Integer> unitData = allCompositionList.get(selectNumber).get(number);
-		StatusCalculation StatusCalculation = new StatusCalculation(unitData);
-		new DisplayStatus().unit(new EditImage().compositeImage(getImageList(unitData)), unitData, StatusCalculation.getWeaponStatus(), StatusCalculation.getUnitStatus());
+	protected List<Integer> getCoreNumberList(){
+		return coreNumberList;
 	}
 	
-	private List<BufferedImage> getImageList(List<Integer> unitData){
-		List<BufferedImage> originalImage = new ArrayList<>();
-		try {
-			originalImage.add(rightWeaponList.get(unitData.get(0)));
-		}catch(Exception e) {
-			originalImage.add(null);
-		}
-		originalImage.add(ceterCoreList.get(unitData.get(1)));
-		try {
-			originalImage.add(leftWeaponList.get(unitData.get(2)));
-		}catch(Exception e) {
-			originalImage.add(null);
-		}
-		return originalImage;
+	protected List<Integer> getWeaponNumberList(){
+		return weaponNumberList;
+	}
+	
+	protected List<String> getCompositionNameList(){
+		return compositionNameList;
+	}
+	
+	protected int getSelectNumber() {
+		return selectNumber;
+	}
+	
+	protected List<List<Integer>> getActiveCompositionList(){
+		return allCompositionList.get(selectNumber);
+	}
+	
+	protected List<Integer> getActiveUnit(int number){
+		return allCompositionList.get(selectNumber).get(number);
+	}
+	
+	protected List<Integer> getNowCoreNumberList(){
+		return nowCoreNumberList;
+	}
+	
+	protected List<Integer> getNowWeaponNumberList(){
+		return nowWeaponNumberList;
+	}
+}
+
+//表示リスト作成
+class DisplayListCreation{
+	DisplaySort coreDisplaySort = new DisplaySort();
+	DisplaySort weaponDisplaySort = new DisplaySort();
+	
+	protected DisplayListCreation(SaveData SaveData) {
+		coreDisplaySort.core(getDisplayList(SaveData.getCoreNumberList()));
+		weaponDisplaySort.weapon(getDisplayList(SaveData.getWeaponNumberList()));
+	}
+	
+	protected List<Integer> getDisplayList(List<Integer> list){
+		return IntStream.range(0, list.size()).mapToObj(i -> (list.get(i) == 0)? -1: i).filter(i -> i != -1).collect(Collectors.toList());
+	}
+	
+	protected List<Integer> getCoreDisplayList() {
+		return coreDisplaySort.getDisplayList();
+	}
+	
+	protected List<Integer> getWeaponDisplayList() {
+		return weaponDisplaySort.getDisplayList();
 	}
 }
 
