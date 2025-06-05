@@ -48,23 +48,13 @@ public class MenuItemDispose extends JPanel{
 	JScrollPane itemScroll = new JScrollPane();
 	ImagePanel CoreImagePanel = new ImagePanel();
 	ImagePanel WeaponImagePanel = new ImagePanel();
-	DisplaySort coreDisplaySort = new DisplaySort();
-	DisplaySort weaponDisplaySort = new DisplaySort();
-	SaveHoldItem SaveHoldItem;
-	SaveComposition SaveComposition;
-	List<Integer> coreNumberList;
-	List<Integer> weaponNumberList;
-	List<List<List<Integer>>> allCompositionList;
-	int[] usedCoreNumber;
-	int[] usedWeaponNumber;
+	HoldItem HoldItem = new HoldItem();
+	DisplayListCreation DisplayListCreation = new DisplayListCreation(HoldItem);
 	List<BufferedImage> coreImageList = new DataUnit().getCoreImage(2);
 	List<BufferedImage> weaponImageList = new DataUnit().getWeaponImage(2);
 	
 	public MenuItemDispose(MainFrame MainFrame) {
 		setBackground(new Color(240, 170, 80));
-		load();
-		itemCount();
-		initializeDisplayList();
 		add(typeLabel);
 		addSwitchButton();
 		addSortButton();
@@ -84,6 +74,137 @@ public class MenuItemDispose extends JPanel{
 		requestFocus();
 	}
 	
+	
+	private void setTypeLabel() {
+		typeLabel.setText((itemScroll.getViewport().getView() == CoreImagePanel)? "コアリスト": "武器リスト");
+		typeLabel.setBounds(20, 10, 400, 30);
+		typeLabel.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 25));
+	}
+	
+	private void addSwitchButton() {
+		add(switchButton);
+		switchButton.addActionListener(e->{
+			itemScroll.getViewport().setView((itemScroll.getViewport().getView() == CoreImagePanel)? WeaponImagePanel: CoreImagePanel);
+		});
+	}
+	
+	private void setSwitchButton() {
+		switchButton.setText("表示切替");
+		switchButton.setBounds(20, 530, 150, 60);
+		setButton(switchButton);
+	}
+	
+	private void addSortButton() {
+		add(sortButton);
+		sortButton.addActionListener(e->{
+			if(itemScroll.getViewport().getView() == CoreImagePanel) {
+				CoreImagePanel.updateList(DisplayListCreation.getCoreDisplayList());
+			}else {
+				WeaponImagePanel.updateList(DisplayListCreation.getWeaponDisplayList());
+			}
+		});
+	}
+	
+	private void setSortButton() {
+		sortButton.setText("ソート");
+		sortButton.setBounds(190, 530, 150, 60);
+		setButton(sortButton);
+	}
+	
+	private void addDisposeButton() {
+		add(disposeButton);
+		disposeButton.addActionListener(e->{
+			if(itemScroll.getViewport().getView() == CoreImagePanel) {
+				recycle(CoreImagePanel, HoldItem.getCoreNumberList(), HoldItem.getUsedCoreNumber(), coreImageList, DataUnit.CORE_RARITY_LIST);
+			}else {
+				recycle(WeaponImagePanel, HoldItem.getWeaponNumberList(), HoldItem.getUsedWeaponNumber(), weaponImageList, DataUnit.WEAPON_RARITY_LIST);
+			}
+		});
+	}
+	
+	private void recycle(ImagePanel ImagePanel, List<Integer> numberList, int[] usedNumber, List<BufferedImage> imageList, List<Integer> rarityList) {
+		Predicate<Integer> selectCheck = (select) -> {
+			if(select < 0) {
+				showMessageDialog(null, "リサイクルする対象が選択されていません");
+				return false;
+			}
+			return true;
+		};
+		Predicate<Integer> numberCheck = (max) -> {
+			if(max <= 0) {
+				showMessageDialog(null, "最大所持数まで編成しているため、リサイクルできません");
+				return false;
+			}
+			return true;
+		};
+		int select = ImagePanel.getSelectNumber();
+		if(selectCheck.test(select)) {
+			int max = numberList.get(select) - usedNumber[select];
+			if(numberCheck.test(max)) {
+				RecyclePanel RecyclePanel = new RecyclePanel(imageList.get(select), max, rarityList.get(select));
+				if(RecyclePanel.getCanDispose()) {
+					numberList.set(select, numberList.get(select) - RecyclePanel.getQuantity());
+					
+					//int medal = RecyclePanel.getMedal();
+					//いずれガチャメダルの保存も記述する
+					
+					HoldItem.save();
+				}
+			}
+		}
+	}
+	
+	private void setDisposeButton() {
+		disposeButton.setText("リサイクル");
+		disposeButton.setBounds(360, 530, 150, 60);
+		setButton(disposeButton);
+	}
+	
+	private void addReturnButton(MainFrame MainFrame) {
+		add(returnButton);
+		returnButton.addActionListener(e->{
+			MainFrame.mainMenuDraw();
+		});
+	}
+	
+	private void setReturnButton() {
+		returnButton.setText("戻る");
+		returnButton.setBounds(530, 530, 150, 60);
+		setButton(returnButton);
+	}
+	
+	private void setButton(JButton button) {
+		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+	}
+	
+	private void addScroll() {
+		CoreImagePanel.setImagePanel(coreImageList, DisplayListCreation.getInitialCoreDisplayList(), HoldItem.getCoreNumberList(), true);
+		WeaponImagePanel.setImagePanel(weaponImageList, DisplayListCreation.getInitialWeaponDisplayList(), HoldItem.getWeaponNumberList(), false);
+		itemScroll.getViewport().setView(CoreImagePanel);
+    	add(itemScroll);
+	}
+	
+	private void setItemScroll() {
+		itemScroll.setBounds(20, 50, 660, 470);
+		itemScroll.setPreferredSize(itemScroll.getSize());
+	}
+}
+
+//所持アイテムと編成の確認
+class HoldItem{
+	SaveHoldItem SaveHoldItem;
+	SaveComposition SaveComposition;
+	List<Integer> coreNumberList;
+	List<Integer> weaponNumberList;
+	List<List<List<Integer>>> allCompositionList;
+	int[] usedCoreNumber;
+	int[] usedWeaponNumber;
+	
+	protected HoldItem() {
+		load();
+		itemCount();
+	}
+	
 	private void load() {
 		try {
 			ObjectInputStream itemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
@@ -98,6 +219,19 @@ public class MenuItemDispose extends JPanel{
 		coreNumberList = SaveHoldItem.getCoreNumberList();
 		weaponNumberList = SaveHoldItem.getWeaponNumberList();
 		allCompositionList = SaveComposition.getAllCompositionList();
+	}
+	
+	protected void save() {
+		try {
+			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
+			saveItemData.writeObject(new SaveHoldItem(coreNumberList, weaponNumberList));
+			saveItemData.close();
+			
+			//いずれガチャメダルの保存も記述する
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void itemCount() {
@@ -131,152 +265,61 @@ public class MenuItemDispose extends JPanel{
 		});
 		usedCoreNumber = coreMax;
 		usedWeaponNumber = weaponMax;
+		//初期武器は2本以外リサイクル禁止
+		usedWeaponNumber[0] += 2;
+		usedWeaponNumber[1] += 2;
 	}
 	
-	private void initializeDisplayList() {
-		coreDisplaySort.core(getCoreDisplayList());
-		weaponDisplaySort.weapon(getWeaponDisplayList());
+	protected List<Integer> getCoreNumberList(){
+		return coreNumberList;
 	}
 	
-	private List<Integer> getCoreDisplayList(){
-		List<Integer> displayList = getDisplayList(coreNumberList);
-		displayList.remove(0);//初期コアはリサイクル禁止
+	protected List<Integer> getWeaponNumberList(){
+		return weaponNumberList;
+	}
+	
+	protected int[] getUsedCoreNumber() {
+		return usedCoreNumber;
+	}
+	
+	protected int[] getUsedWeaponNumber() {
+		return usedWeaponNumber;
+	}
+}
+
+//表示リスト作成
+class DisplayListCreation{
+	DisplaySort coreDisplaySort = new DisplaySort();
+	DisplaySort weaponDisplaySort = new DisplaySort();
+	HoldItem HoldItem;
+	
+	protected DisplayListCreation(HoldItem HoldItem) {
+		this.HoldItem = HoldItem;
+		coreDisplaySort.core(getInitialCoreDisplayList());
+		weaponDisplaySort.weapon(getInitialWeaponDisplayList());
+	}
+	
+	protected List<Integer> getInitialCoreDisplayList(){
+		List<Integer> displayList = getDisplayList(HoldItem.getCoreNumberList());
+		//初期コアはリサイクル禁止
+		displayList.remove(0);
 		return displayList;
 	}
 	
-	private List<Integer> getWeaponDisplayList(){
-		return getDisplayList(weaponNumberList);
+	protected List<Integer> getInitialWeaponDisplayList(){
+		return getDisplayList(HoldItem.getWeaponNumberList());
 	}
 	
 	private List<Integer> getDisplayList(List<Integer> list){
 		return IntStream.range(0, list.size()).mapToObj(i -> (list.get(i) == 0)? -1: i).filter(i -> i != -1).collect(Collectors.toList());
 	}
 	
-	private void setTypeLabel() {
-		typeLabel.setText((itemScroll.getViewport().getView() == CoreImagePanel)? "コアリスト": "武器リスト");
-		typeLabel.setBounds(20, 10, 400, 30);
-		typeLabel.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 25));
+	protected List<Integer> getCoreDisplayList() {
+		return coreDisplaySort.getDisplayList();
 	}
 	
-	private void addSwitchButton() {
-		add(switchButton);
-		switchButton.addActionListener(e->{
-			itemScroll.getViewport().setView((itemScroll.getViewport().getView() == CoreImagePanel)? WeaponImagePanel: CoreImagePanel);
-		});
-	}
-	
-	private void setSwitchButton() {
-		switchButton.setText("表示切替");
-		switchButton.setBounds(20, 530, 150, 60);
-		setButton(switchButton);
-	}
-	
-	private void addSortButton() {
-		add(sortButton);
-		sortButton.addActionListener(e->{
-			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				CoreImagePanel.updateList(coreDisplaySort.getDisplayList());
-			}else {
-				WeaponImagePanel.updateList(weaponDisplaySort.getDisplayList());
-			}
-		});
-	}
-	
-	private void setSortButton() {
-		sortButton.setText("ソート");
-		sortButton.setBounds(190, 530, 150, 60);
-		setButton(sortButton);
-	}
-	
-	private void addDisposeButton() {
-		add(disposeButton);
-		disposeButton.addActionListener(e->{
-			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				recycle(CoreImagePanel, coreNumberList, usedCoreNumber, coreImageList, DataUnit.CORE_RARITY_LIST);
-			}else {
-				recycle(WeaponImagePanel, weaponNumberList, usedWeaponNumber, weaponImageList, DataUnit.WEAPON_RARITY_LIST);
-			}
-		});
-	}
-	
-	private void recycle(ImagePanel ImagePanel, List<Integer> numberList, int[] usedNumber, List<BufferedImage> imageList, List<Integer> rarityList) {
-		Predicate<Integer> selectCheck = (select) -> {
-			if(select < 0) {
-				showMessageDialog(null, "リサイクルする対象が選択されていません");
-				return false;
-			}
-			return true;
-		};
-		Predicate<Integer> numberCheck = (max) -> {
-			if(max == 0) {
-				showMessageDialog(null, "最大所持数まで編成しているため、リサイクルできません");
-				return false;
-			}
-			return true;
-		};
-		int select = ImagePanel.getSelectNumber();
-		if(selectCheck.test(select)) {
-			int max = numberList.get(select) - usedNumber[select];
-			if(numberCheck.test(max)) {
-				RecyclePanel RecyclePanel = new RecyclePanel(imageList.get(select), max, rarityList.get(select));
-				if(RecyclePanel.getCanDispose()) {
-					numberList.set(select, numberList.get(select) - RecyclePanel.getQuantity());
-					
-					//int medal = RecyclePanel.getMedal();
-					//いずれガチャメダルの保存も記述する
-					
-					save();
-				}
-			}
-		}
-	}
-	
-	private void save() {
-		try {
-			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
-			saveItemData.writeObject(new SaveHoldItem(coreNumberList, weaponNumberList));
-			saveItemData.close();
-			
-			//いずれガチャメダルの保存も記述する
-			
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void setDisposeButton() {
-		disposeButton.setText("リサイクル");
-		disposeButton.setBounds(360, 530, 150, 60);
-		setButton(disposeButton);
-	}
-	
-	private void addReturnButton(MainFrame MainFrame) {
-		add(returnButton);
-		returnButton.addActionListener(e->{
-			MainFrame.mainMenuDraw();
-		});
-	}
-	
-	private void setReturnButton() {
-		returnButton.setText("戻る");
-		returnButton.setBounds(530, 530, 150, 60);
-		setButton(returnButton);
-	}
-	
-	private void setButton(JButton button) {
-		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
-	}
-	
-	private void addScroll() {
-		CoreImagePanel.setImagePanel(coreImageList, getCoreDisplayList(), coreNumberList, true);
-		WeaponImagePanel.setImagePanel(weaponImageList, getWeaponDisplayList(), weaponNumberList, false);
-		itemScroll.getViewport().setView(CoreImagePanel);
-    	add(itemScroll);
-	}
-	
-	private void setItemScroll() {
-		itemScroll.setBounds(20, 50, 660, 470);
-		itemScroll.setPreferredSize(itemScroll.getSize());
+	protected List<Integer> getWeaponDisplayList() {
+		return weaponDisplaySort.getDisplayList();
 	}
 }
 
