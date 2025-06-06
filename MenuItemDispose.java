@@ -36,6 +36,7 @@ import displaysort.DisplaySort;
 import displaystatus.DisplayStatus;
 import mainframe.MainFrame;
 import savecomposition.SaveComposition;
+import savegameprogress.SaveGameProgress;
 import saveholditem.SaveHoldItem;
 
 //アイテムのリサイクル
@@ -115,43 +116,11 @@ public class MenuItemDispose extends JPanel{
 		add(disposeButton);
 		disposeButton.addActionListener(e->{
 			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				recycle(CoreImagePanel, HoldItem.getCoreNumberList(), HoldItem.getUsedCoreNumber(), coreImageList, DataUnit.CORE_RARITY_LIST);
+				HoldItem.recycle(CoreImagePanel, HoldItem.getCoreNumberList(), HoldItem.getUsedCoreNumber(), coreImageList, DataUnit.CORE_RARITY_LIST);
 			}else {
-				recycle(WeaponImagePanel, HoldItem.getWeaponNumberList(), HoldItem.getUsedWeaponNumber(), weaponImageList, DataUnit.WEAPON_RARITY_LIST);
+				HoldItem.recycle(WeaponImagePanel, HoldItem.getWeaponNumberList(), HoldItem.getUsedWeaponNumber(), weaponImageList, DataUnit.WEAPON_RARITY_LIST);
 			}
 		});
-	}
-	
-	private void recycle(ImagePanel ImagePanel, List<Integer> numberList, int[] usedNumber, List<BufferedImage> imageList, List<Integer> rarityList) {
-		Predicate<Integer> selectCheck = (select) -> {
-			if(select < 0) {
-				showMessageDialog(null, "リサイクルする対象が選択されていません");
-				return false;
-			}
-			return true;
-		};
-		Predicate<Integer> numberCheck = (max) -> {
-			if(max <= 0) {
-				showMessageDialog(null, "最大所持数まで編成しているため、リサイクルできません");
-				return false;
-			}
-			return true;
-		};
-		int select = ImagePanel.getSelectNumber();
-		if(selectCheck.test(select)) {
-			int max = numberList.get(select) - usedNumber[select];
-			if(numberCheck.test(max)) {
-				RecyclePanel RecyclePanel = new RecyclePanel(imageList.get(select), max, rarityList.get(select));
-				if(RecyclePanel.getCanDispose()) {
-					numberList.set(select, numberList.get(select) - RecyclePanel.getQuantity());
-					
-					//int medal = RecyclePanel.getMedal();
-					//いずれガチャメダルの保存も記述する
-					
-					HoldItem.save();
-				}
-			}
-		}
 	}
 	
 	private void setDisposeButton() {
@@ -194,9 +163,11 @@ public class MenuItemDispose extends JPanel{
 class HoldItem{
 	SaveHoldItem SaveHoldItem;
 	SaveComposition SaveComposition;
+	SaveGameProgress SaveGameProgress;
 	List<Integer> coreNumberList;
 	List<Integer> weaponNumberList;
 	List<List<List<Integer>>> allCompositionList;
+	int medal;
 	int[] usedCoreNumber;
 	int[] usedWeaponNumber;
 	
@@ -213,22 +184,26 @@ class HoldItem{
 			ObjectInputStream compositionData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
 			SaveComposition = (SaveComposition) compositionData.readObject();
 			compositionData.close();
+			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+			SaveGameProgress = (SaveGameProgress) loadProgressData.readObject();
+			loadProgressData.close();
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
 		coreNumberList = SaveHoldItem.getCoreNumberList();
 		weaponNumberList = SaveHoldItem.getWeaponNumberList();
 		allCompositionList = SaveComposition.getAllCompositionList();
+		medal = SaveGameProgress.getMedal();
 	}
 	
-	protected void save() {
+	private void save() {
 		try {
 			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
 			saveItemData.writeObject(new SaveHoldItem(coreNumberList, weaponNumberList));
 			saveItemData.close();
-			
-			//いずれガチャメダルの保存も記述する
-			
+			ObjectOutputStream saveProgressData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+			saveProgressData.writeObject(new SaveGameProgress(SaveGameProgress.getClearStatus(), SaveGameProgress.getMeritStatus(), medal, SaveGameProgress.getSelectStage()));
+			saveProgressData.close();
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -268,6 +243,35 @@ class HoldItem{
 		//初期武器は2本以外リサイクル禁止
 		usedWeaponNumber[0] += 2;
 		usedWeaponNumber[1] += 2;
+	}
+	
+	protected void recycle(ImagePanel ImagePanel, List<Integer> numberList, int[] usedNumber, List<BufferedImage> imageList, List<Integer> rarityList) {
+		Predicate<Integer> selectCheck = (select) -> {
+			if(select < 0) {
+				showMessageDialog(null, "リサイクルする対象が選択されていません");
+				return false;
+			}
+			return true;
+		};
+		Predicate<Integer> numberCheck = (max) -> {
+			if(max <= 0) {
+				showMessageDialog(null, "最大所持数まで編成しているため、リサイクルできません");
+				return false;
+			}
+			return true;
+		};
+		int select = ImagePanel.getSelectNumber();
+		if(selectCheck.test(select)) {
+			int max = numberList.get(select) - usedNumber[select];
+			if(numberCheck.test(max)) {
+				RecyclePanel RecyclePanel = new RecyclePanel(imageList.get(select), max, rarityList.get(select));
+				if(RecyclePanel.getCanDispose()) {
+					numberList.set(select, numberList.get(select) - RecyclePanel.getQuantity());
+					medal += RecyclePanel.getMedal();
+					save();
+				}
+			}
+		}
 	}
 	
 	protected List<Integer> getCoreNumberList(){
@@ -550,6 +554,6 @@ class RecyclePanel extends JPanel{
 	}
 	
 	protected int getMedal() {
-		return quantity * rarity;
+		return quantity * rarity * rarity * 3;
 	}
 }
