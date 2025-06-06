@@ -53,29 +53,19 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	JButton gachaDetailButton = new JButton();
 	JButton repeatButton = new JButton();
 	JButton returnButton = new JButton();
+	DefaultLineup DefaultLineup = new DefaultLineup();
+	HoldMedal HoldMedal = new HoldMedal(DefaultLineup);
+	OpenBallMotion OpenBallMotion = new OpenBallMotion(this, HoldMedal, DefaultLineup);
+	BallMotion BallMotion = new BallMotion(OpenBallMotion);
+	HandleMotion HandleMotion = new HandleMotion(this, HoldMedal, BallMotion);
+	JList<String> selectGachaJList = new JList<>(DefaultLineup.getGachaName());
+	JScrollPane selectGachaScroll = new JScrollPane();
 	BufferedImage ballImage = new DataOther().getBallImage(2);
 	List<BufferedImage> halfBallImage = new ArrayList<>(new DataOther().getHalfBallImage(2));
 	BufferedImage handleImage = new DataOther().getHandleImage(2);
 	List<BufferedImage> machineImage = new ArrayList<>(new DataOther().getMachineImage(2));
 	BufferedImage turnImage = new DataOther().getTurnImage(2);
 	BufferedImage effectImage = new DataOther().getEffectImage(1);
-	int[] gachaMode = {0, 0};//① ガチャ回数コード, ② ガチャ種類コード (詳細はDefaultLineupで定義)でリスト化
-	final static Map<Integer, Integer> modeMap = new HashMap<>();{
-		modeMap.put(0, 1);
-		modeMap.put(1, 5);
-		modeMap.put(2, 10);
-	}
-	String[] selectGachaName = {
-			"通常闇鍋ガチャ",
-			"通常コアガチャ",
-			"通常武器ガチャ"
-	};
-	JList<String> selectGachaJList = new JList<>(selectGachaName);
-	JScrollPane selectGachaScroll = new JScrollPane();
-	HoldMedal HoldMedal = new HoldMedal(gachaMode);
-	OpenBallMotion OpenBallMotion = new OpenBallMotion(this, HoldMedal, gachaMode);
-	BallMotion BallMotion = new BallMotion(OpenBallMotion);
-	HandleMotion HandleMotion = new HandleMotion(this, HoldMedal, BallMotion);
 	Timer timer = new Timer(50, this);
 	double angle;
 	boolean canPlay = true;
@@ -115,7 +105,7 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	private void addGachaDetailButton() {
 		add(gachaDetailButton);
 		gachaDetailButton.addActionListener(e->{
-			new GachaLineup(gachaMode[1]);
+			new GachaLineup(DefaultLineup);
 		});
 	}
 	
@@ -128,12 +118,12 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	private void addRepeatButton() {
 		add(repeatButton);
 		repeatButton.addActionListener(e->{
-			gachaMode[0] = (gachaMode[0] < modeMap.size() - 1)? gachaMode[0] + 1: 0;
+			DefaultLineup.changeRepeatNumber();
 		});
 	}
 	
 	private void setRepeatButton() {
-		repeatButton.setText("<html>&nbsp;" + modeMap.get(gachaMode[0]) + "連<br>" + HoldMedal.useMedal() + "枚");
+		repeatButton.setText("<html>&nbsp;" + DefaultLineup.getRepeatNumber() + "連<br>" + HoldMedal.useMedal() + "枚");
 		repeatButton.setBounds(350, 400, 100, 60);
 		setButton(repeatButton);
 	}
@@ -158,14 +148,14 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	private void addGachaScroll() {
 		selectGachaScroll.getViewport().setView(selectGachaJList);
     	add(selectGachaScroll);
-    	selectGachaJList.setSelectedIndex(gachaMode[1]);
+    	selectGachaJList.setSelectedIndex(0);
 	}
 	
 	private void setGachaScroll() {
 		selectGachaJList.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
 		selectGachaScroll.setBounds(350, 60, 210, 260);
 		selectGachaScroll.setPreferredSize(selectGachaScroll.getSize());
-    	gachaMode[1] = selectGachaJList.getSelectedIndex();
+		DefaultLineup.changeGachaMode(selectGachaJList.getSelectedIndex());
 	}
 
 	protected void activatePanel() {
@@ -219,11 +209,11 @@ public class MenuItemGet extends JPanel implements ActionListener{
 //保有メダル
 class HoldMedal{
 	SaveGameProgress SaveGameProgress;
-	int[] gachaMode;
+	DefaultLineup DefaultLineup;;
 	int medal;
 	final static int USE = 100;
 	
-	protected HoldMedal(int[] gachaMode) {
+	protected HoldMedal(DefaultLineup DefaultLineup) {
 		try {
 			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
 			SaveGameProgress = (SaveGameProgress) loadProgressData.readObject();
@@ -231,7 +221,7 @@ class HoldMedal{
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		this.gachaMode = gachaMode;
+		this.DefaultLineup = DefaultLineup;
 		medal = SaveGameProgress.getMedal();
 	}
 	
@@ -258,7 +248,7 @@ class HoldMedal{
 	}
 	
 	protected int useMedal() {
-		return MenuItemGet.modeMap.get(gachaMode[0]) * USE;
+		return DefaultLineup.getRepeatNumber() * USE;
 	}
 }
 
@@ -441,8 +431,8 @@ class BallMotion implements ActionListener{
 class OpenBallMotion implements ActionListener{
 	MenuItemGet MenuItemGet;
 	HoldMedal HoldMedal;
+	DefaultLineup DefaultLineup;
 	HandleMotion HandleMotion;
-	int[] gachaMode;
 	Timer timer = new Timer(40, this);
 	double bottomAngle;
 	double topAngle;
@@ -451,10 +441,10 @@ class OpenBallMotion implements ActionListener{
 	int color;
 	int expansion;
 	
-	protected OpenBallMotion(MenuItemGet MenuItemGet, HoldMedal HoldMedal, int[] gachaMode) {
+	protected OpenBallMotion(MenuItemGet MenuItemGet, HoldMedal HoldMedal, DefaultLineup DefaultLineup) {
 		this.MenuItemGet = MenuItemGet;
 		this.HoldMedal = HoldMedal;
-		this.gachaMode = gachaMode;
+		this.DefaultLineup = DefaultLineup;
 		reset();
 	}
 	
@@ -468,9 +458,10 @@ class OpenBallMotion implements ActionListener{
 		reset();
 		HandleMotion.addListener();
 		MenuItemGet.activatePanel();
-		if(new DefaultLineup(gachaMode[1]).aptitudeTest()) {
+		DefaultLineup.setLineup();
+		if(DefaultLineup.aptitudeTest()) {
 			HoldMedal.recountMedal();
-			new GachaResult(gachaMode);
+			new GachaResult(DefaultLineup);
 		}
 	}
 	
@@ -521,14 +512,14 @@ class OpenBallMotion implements ActionListener{
 
 //ガチャ結果画面
 class GachaResult extends JDialog{
-	protected GachaResult(int[] gachaMode) {
+	protected GachaResult(DefaultLineup DefaultLineup) {
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setTitle("ガチャ結果");
 		setSize(970, 300);
 		setLocationRelativeTo(null);
-		add(new DrawResult(gachaMode));
+		add(new DrawResult(DefaultLineup));
 		setVisible(true);
 	}
 }
@@ -546,28 +537,24 @@ class DrawResult extends JPanel implements MouseListener{
 	List<BufferedImage> weaponImageList = new DataUnit().getWeaponImage(2);
 	int unitSize = 80;
 	
-	protected DrawResult(int[] gachaMode){
+	protected DrawResult(DefaultLineup DefaultLineup){
 		addMouseListener(this);
 		setBackground(new Color(240, 170, 80));
-		int number = MenuItemGet.modeMap.get(gachaMode[0]);
-		DefaultLineup DefaultLineup = new DefaultLineup(gachaMode[1]);
-		switch(gachaMode[0]) {
-		case 0:
-			position = 435;
-			gacha(DefaultLineup);
-			break;
+		switch(DefaultLineup.getRepeatNumber()) {
 		case 1:
-			position = 255;
-			IntStream.range(0, number).forEach(i -> gacha(DefaultLineup));
+			position = 435;
 			break;
-		case 2:
+		case 5:
+			position = 255;
+			break;
+		case 10:
 			position = 20;
-			IntStream.range(0, number).forEach(i -> gacha(DefaultLineup));
 			break;
 		default:
 			break;
 		}
-		save(gachaMode);
+		IntStream.range(0, DefaultLineup.getRepeatNumber()).forEach(i -> gacha(DefaultLineup));
+		save(DefaultLineup);
 	}
 	
 	private void gacha(DefaultLineup DefaultLineup) {
@@ -597,7 +584,7 @@ class DrawResult extends JPanel implements MouseListener{
 		return false;
 	}
 	
-	private void save(int[] gachaMode) {
+	private void save(DefaultLineup DefaultLineup) {
 		//保有アイテムの更新
 		try {
 			ObjectInputStream loadItemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
@@ -617,7 +604,7 @@ class DrawResult extends JPanel implements MouseListener{
 			e.printStackTrace();
 		}
 		//保有メダルの更新
-		HoldMedal HoldMedal = new HoldMedal(gachaMode);
+		HoldMedal HoldMedal = new HoldMedal(DefaultLineup);
 		HoldMedal.recountMedal();
 		HoldMedal.save();
 	}
@@ -681,18 +668,19 @@ class DrawResult extends JPanel implements MouseListener{
 
 //ガチャ詳細
 class GachaLineup extends JDialog{
-	protected GachaLineup(int mode) {
+	protected GachaLineup(DefaultLineup DefaultLineup) {
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setTitle("ガチャラインナップ");
 		setSize(300, 600);
 		setLocationRelativeTo(null);
-		add(getLineupScrollPane(new DefaultLineup(mode)));
+		add(getLineupScrollPane(DefaultLineup));
 		setVisible(true);
 	}
 	
 	private JScrollPane getLineupScrollPane(DefaultLineup DefaultLineup) {
+		DefaultLineup.setLineup();
 		DefaultLineup.aptitudeTest();
 		Function<Integer, String> getRarity = (count) -> {
 			return "★" + count + " ";
@@ -747,13 +735,45 @@ class DefaultLineup{
 	final List<Integer> weaponLineupSet2 = Arrays.asList();
 	final List<Integer> weaponLineupSet3 = Arrays.asList();
 	
+	int repeatCode = 0;
+	Map<Integer, Integer> repeatMap = new HashMap<>();{
+		repeatMap.put(0, 1);
+		repeatMap.put(1, 5);
+		repeatMap.put(2, 10);
+	}
+	int gachaModeCode = 0;
+	String[] gachaName = {
+			"通常闇鍋ガチャ",
+			"通常コアガチャ",
+			"通常武器ガチャ"
+	};
 	List<Integer> coreLineup = new ArrayList<>();
 	List<Double> coreRatio = new ArrayList<>();
 	List<Integer> weaponLineup = new ArrayList<>();
 	List<Double> weaponRatio = new ArrayList<>();
 	
-	protected DefaultLineup(int mode) {
-		switch(mode) {
+	protected String[] getGachaName() {
+		return gachaName;
+	}
+	
+	protected int getRepeatNumber() {
+		return repeatMap.get(repeatCode);
+	}
+	
+	protected void changeRepeatNumber() {
+		repeatCode = (repeatCode < repeatMap.size() - 1)? repeatCode + 1: 0;
+	}
+	
+	protected void changeGachaMode(int mode) {
+		gachaModeCode = mode;
+	}
+	
+	protected void setLineup() {
+		coreLineup.clear();
+		coreRatio.clear();
+		weaponLineup.clear();
+		weaponRatio.clear();
+		switch(gachaModeCode) {
 		case 0:
 			addCore(coreLineupSet1, 50);
 			addWeapon(weaponLineupSet1, 50);
