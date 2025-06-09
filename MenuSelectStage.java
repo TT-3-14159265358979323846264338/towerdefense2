@@ -9,6 +9,12 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.time.temporal.ValueRange;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -21,6 +27,7 @@ import javax.swing.JScrollPane;
 
 import datastage.DataStage;
 import mainframe.MainFrame;
+import savegameprogress.SaveGameProgress;
 
 //ステージ選択画面
 public class MenuSelectStage extends JPanel{
@@ -32,8 +39,9 @@ public class MenuSelectStage extends JPanel{
 	JScrollPane stageScroll = new JScrollPane();
 	JScrollPane enemyScroll = new JScrollPane();
 	JScrollPane meritScroll = new JScrollPane();
-	StagePanel StagePanel = new StagePanel();
-	MeritPanel MeritPanel = new MeritPanel();
+	ProgressData ProgressData = new ProgressData();
+	StagePanel StagePanel = new StagePanel(ProgressData.getSelectStage());
+	MeritPanel MeritPanel = new MeritPanel(StagePanel, ProgressData.getMeritStatus());
 	EnemyPanel EnemyPanel = new EnemyPanel();
 	List<BufferedImage> stageImage = new DataStage().getStageImage(5);
 	
@@ -103,6 +111,7 @@ public class MenuSelectStage extends JPanel{
 	private void addNormalModeButton() {
 		add(normalModeButton);
 		normalModeButton.addActionListener(e->{
+			ProgressData.save(StagePanel.getSelelct());
 			showMessageDialog(null, "調整中\nnormal mode でゲーム開始");
 		});
 	}
@@ -116,6 +125,7 @@ public class MenuSelectStage extends JPanel{
 	private void addHardModeButton() {
 		add(hardModeButton);
 		hardModeButton.addActionListener(e->{
+			ProgressData.save(StagePanel.getSelelct());
 			showMessageDialog(null, "調整中\nhard mode でゲーム開始");
 		});
 	}
@@ -165,15 +175,49 @@ public class MenuSelectStage extends JPanel{
 	}
 }
 
+//クリアデータ取込み
+class ProgressData{
+	SaveGameProgress SaveGameProgress;
+	
+	protected ProgressData() {
+		try {
+			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+			SaveGameProgress = (SaveGameProgress) loadProgressData.readObject();
+			loadProgressData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected void save(int select) {
+		try {
+			ObjectOutputStream saveProgressData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+			saveProgressData.writeObject(new SaveGameProgress(SaveGameProgress.getClearStatus(), SaveGameProgress.getMeritStatus(), SaveGameProgress.getMedal(), select));
+			saveProgressData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected List<List<Boolean>> getMeritStatus(){
+		return SaveGameProgress.getMeritStatus();
+	}
+	
+	protected int getSelectStage() {
+		return SaveGameProgress.getSelectStage();
+	}
+}
+
 //ステージ切り替え
 class StagePanel extends JPanel implements MouseListener{
 	JLabel[] nameLabel = IntStream.range(0, DataStage.STAGE_NAME_LIST.size()).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
 	List<BufferedImage> stageImage = new DataStage().getStageImage(18);
 	int select = 0;
 	
-	protected StagePanel() {
+	protected StagePanel(int select) {
 		addMouseListener(this);
 		setPreferredSize(new Dimension(100, 85 * stageImage.size()));
+		this.select = select;
 		Stream.of(nameLabel).forEach(i -> addLabel(i));
 	}
 	
@@ -233,17 +277,38 @@ class StagePanel extends JPanel implements MouseListener{
 
 //戦功情報
 class MeritPanel extends JPanel{
+	JLabel[] meritLabel = IntStream.range(0, DataStage.MERIT_INFORMATION.stream().mapToInt(i -> i.size()).max().getAsInt()).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
+	StagePanel StagePanel;
+	List<List<Boolean>> meritStatus;
 	
+	protected MeritPanel(StagePanel StagePanel, List<List<Boolean>> meritStatus) {
+		setPreferredSize(new Dimension(100, 200));
+		this.StagePanel = StagePanel;
+		this.meritStatus = meritStatus;
+		Stream.of(meritLabel).forEach(i -> add(i));
+		
+		
+	}
 	
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		IntStream.range(0, meritLabel.length).forEach(i -> setLabel(i));
+		
+		
+		
+		
+		
+	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
+	private void setLabel(int number) {
+		try{
+			meritLabel[number].setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
+			meritLabel[number].setText(DataStage.MERIT_INFORMATION.get(StagePanel.getSelelct()).get(number));
+			meritLabel[number].setBounds(0, number * 30, 200, 30);
+		}catch (Exception e) {
+			meritLabel[number].setText("");
+		}
+	}
 	
 	
 	
