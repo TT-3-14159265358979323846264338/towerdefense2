@@ -16,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.temporal.ValueRange;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -278,40 +280,68 @@ class StagePanel extends JPanel implements MouseListener{
 //戦功情報
 class MeritPanel extends JPanel{
 	JLabel[] meritLabel = IntStream.range(0, DataStage.MERIT_INFORMATION.stream().mapToInt(i -> i.size()).max().getAsInt()).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
+	JLabel[] clearLabel = IntStream.range(0, meritLabel.length).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
 	StagePanel StagePanel;
 	List<List<Boolean>> meritStatus;
+	List<List<String>> meritInformation;
+	Font meritFont = new Font("ＭＳ ゴシック", Font.BOLD, 15);
+	Font clearFont = new Font("Arail", Font.BOLD, 30);
 	
 	protected MeritPanel(StagePanel StagePanel, List<List<Boolean>> meritStatus) {
-		setPreferredSize(new Dimension(100, 200));
 		this.StagePanel = StagePanel;
 		this.meritStatus = meritStatus;
-		Stream.of(meritLabel).forEach(i -> add(i));
-		
-		
+		meritInformation = DataStage.MERIT_INFORMATION.stream().map(i -> i.stream().map(j -> wrap(j)).toList()).toList();
+		addLabel();
+	}
+	
+	private String wrap(String comment) {
+		int lastPosition = 0;
+		List<Integer> wrapPosition = new ArrayList<>();
+		for(int i = 0; i < comment.length(); i++) {
+			if(comment.substring(i, i + 1).equals("(") || 280 < getFontMetrics(meritFont).stringWidth(comment.substring(lastPosition, i))) {
+				wrapPosition.add(i);
+				lastPosition = i;
+			}
+		}
+		if(wrapPosition.isEmpty()) {
+			return comment;
+		}
+		StringBuilder wrapComment = new StringBuilder(comment);
+		wrapPosition.stream().sorted(Comparator.reverseOrder()).forEach(i -> wrapComment.insert(i, "<br>"));
+		return wrapComment.insert(0, "<html>").toString();
 	}
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		setPreferredSize(new Dimension(200, 70 * meritInformation.get(StagePanel.getSelelct()).size()));
 		IntStream.range(0, meritLabel.length).forEach(i -> setLabel(i));
-		
-		
-		
-		
-		
+		IntStream.range(0, meritLabel.length).forEach(i -> g.drawLine(0, 70 * i, 400, 70 * i));
+	}
+	
+	private void addLabel() {
+		Stream.of(meritLabel).forEach(i -> {
+			add(i);
+			i.setFont(meritFont);
+		});
+		Stream.of(clearLabel).forEach(i -> {
+			add(i);
+			i.setHorizontalAlignment(JLabel.CENTER);
+			i.setForeground(Color.RED);
+			i.setFont(clearFont);
+		});
 	}
 	
 	private void setLabel(int number) {
 		try{
-			meritLabel[number].setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
-			meritLabel[number].setText(DataStage.MERIT_INFORMATION.get(StagePanel.getSelelct()).get(number));
-			meritLabel[number].setBounds(0, number * 30, 200, 30);
+			meritLabel[number].setText(meritInformation.get(StagePanel.getSelelct()).get(number));
+			meritLabel[number].setBounds(5, number * 70, 400, 70);
+			clearLabel[number].setText(meritStatus.get(StagePanel.getSelelct()).get(number)? "clear": "");
+			clearLabel[number].setBounds(290, number * 70, 100, 70);
 		}catch (Exception e) {
 			meritLabel[number].setText("");
+			clearLabel[number].setText("");
 		}
 	}
-	
-	
-	
 }
 
 //敵兵情報

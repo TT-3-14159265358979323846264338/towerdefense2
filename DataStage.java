@@ -33,17 +33,17 @@ public class DataStage {
 					"image/field/stage 2-7.png",
 					"image/field/stage 2-8.png")
 			);
-	//戦功内容
+	//戦功内容　実際の表示では"("で改行が入るため"("の前のスペース禁止
 	public final static List<List<String>> MERIT_INFORMATION = Arrays.asList(
-			Arrays.asList("ステージをクリアする (normal)",
-					"ユニットが一度も倒されずクリアする (normal)",
-					"ステージをクリアする (hard)",
-					"ユニットも城門も破壊されずクリアする (hard)"
+			Arrays.asList("ステージをクリアする(normal)",
+					"ユニットが一度も倒されずクリアする(normal)",
+					"ステージをクリアする(hard)",
+					"ユニットも城門も破壊されずクリアする(hard)"
 					),
-			Arrays.asList("ステージをクリアする (normal)",
-					"ユニットが一度も倒されずクリアする (normal)",
-					"ステージをクリアする (hard)",
-					"ユニットも城門も破壊されずクリアする (hard)"
+			Arrays.asList("ステージをクリアする(normal)",
+					"ユニットが一度も倒されずクリアする(normal)",
+					"ステージをクリアする(hard)",
+					"ユニットも城門も破壊されずクリアする(hard)"
 					)
 			);
 	
