@@ -1,4 +1,4 @@
-package menumain;
+package defendthecastle;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -15,10 +15,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import dataother.DataOther;
-import dataunit.DataUnit;
-import editimage.EditImage;
-import mainframe.MainFrame;
+import defaultdata.DataOther;
+import defaultdata.DataUnit;
+import defaultdata.EditImage;
 
 //トップメニュー画面
 public class MenuMain extends JPanel implements ActionListener{

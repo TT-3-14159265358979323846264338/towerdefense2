@@ -1,4 +1,4 @@
-package dataunit;
+package defaultdata;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
-
-import editimage.EditImage;
 
 //ユニットデータ
 public class DataUnit {

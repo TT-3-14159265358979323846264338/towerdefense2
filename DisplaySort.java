@@ -1,4 +1,4 @@
-package displaysort;
+package screendisplay;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -26,7 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import dataunit.DataUnit;
+import defaultdata.DataUnit;
 
 //ソート画面振り分け
 public class DisplaySort extends SortPanel{

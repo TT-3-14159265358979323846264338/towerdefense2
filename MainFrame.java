@@ -1,12 +1,6 @@
-package mainframe;
+package defendthecastle;
 
 import javax.swing.JFrame;
-
-import menucomposition.MenuComposition;
-import menuitemdispose.MenuItemDispose;
-import menuitemget.MenuItemGet;
-import menumain.MenuMain;
-import menuselectstage.MenuSelectStage;
 
 //メイン画面切り替え
 public class MainFrame extends JFrame{

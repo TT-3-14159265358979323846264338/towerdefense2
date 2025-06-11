@@ -1,4 +1,4 @@
-package dataenemy;
+package defaultdata;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
-
-import dataunit.DataUnit;
-import editimage.EditImage;
 
 //敵兵データ
 public class DataEnemy {

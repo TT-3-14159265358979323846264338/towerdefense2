@@ -1,10 +1,8 @@
-package dataother;
+package defaultdata;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
-
-import editimage.EditImage;
 
 //その他のデータ
 public class DataOther {

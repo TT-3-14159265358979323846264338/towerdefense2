@@ -1,4 +1,4 @@
-package displaystatus;
+package screendisplay;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -18,7 +18,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import dataunit.DataUnit;
+import defaultdata.DataUnit;
 
 //ユニットデータ取込み
 public class DisplayStatus extends StatusPanel{

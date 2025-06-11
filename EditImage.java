@@ -1,4 +1,4 @@
-package editimage;
+package defaultdata;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -110,5 +110,3 @@ public class EditImage{
 		return image;
 	}
 }
-
-

@@ -1,6 +1,9 @@
-package menuitemdispose;
+package defendthecastle;
 
 import static javax.swing.JOptionPane.*;
+import static savedata.SaveComposition.*;
+import static savedata.SaveGameProgress.*;
+import static savedata.SaveHoldItem.*;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -31,13 +34,12 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-import dataunit.DataUnit;
-import displaysort.DisplaySort;
-import displaystatus.DisplayStatus;
-import mainframe.MainFrame;
-import savecomposition.SaveComposition;
-import savegameprogress.SaveGameProgress;
-import saveholditem.SaveHoldItem;
+import defaultdata.DataUnit;
+import savedata.SaveComposition;
+import savedata.SaveGameProgress;
+import savedata.SaveHoldItem;
+import screendisplay.DisplaySort;
+import screendisplay.DisplayStatus;
 
 //アイテムのリサイクル
 public class MenuItemDispose extends JPanel{
@@ -47,10 +49,10 @@ public class MenuItemDispose extends JPanel{
 	JButton disposeButton = new JButton();
 	JButton returnButton = new JButton();
 	JScrollPane itemScroll = new JScrollPane();
-	ImagePanel CoreImagePanel = new ImagePanel();
-	ImagePanel WeaponImagePanel = new ImagePanel();
+	ItemImagePanel CoreImagePanel = new ItemImagePanel();
+	ItemImagePanel WeaponImagePanel = new ItemImagePanel();
 	HoldItem HoldItem = new HoldItem();
-	DisplayListCreation DisplayListCreation = new DisplayListCreation(HoldItem);
+	CreateDisplayList DisplayListCreation = new CreateDisplayList(HoldItem);
 	List<BufferedImage> coreImageList = new DataUnit().getCoreImage(2);
 	List<BufferedImage> weaponImageList = new DataUnit().getWeaponImage(2);
 	
@@ -178,13 +180,13 @@ class HoldItem{
 	
 	private void load() {
 		try {
-			ObjectInputStream itemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
+			ObjectInputStream itemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(HOLD_FILE)));
 			SaveHoldItem = (SaveHoldItem) itemData.readObject();
 			itemData.close();
-			ObjectInputStream compositionData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
+			ObjectInputStream compositionData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(COMPOSITION_FILE)));
 			SaveComposition = (SaveComposition) compositionData.readObject();
 			compositionData.close();
-			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(PROGRESS_FILE)));
 			SaveGameProgress = (SaveGameProgress) loadProgressData.readObject();
 			loadProgressData.close();
 		}catch (Exception e) {
@@ -198,10 +200,10 @@ class HoldItem{
 	
 	private void save() {
 		try {
-			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
+			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(HOLD_FILE)));
 			saveItemData.writeObject(new SaveHoldItem(coreNumberList, weaponNumberList));
 			saveItemData.close();
-			ObjectOutputStream saveProgressData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+			ObjectOutputStream saveProgressData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(PROGRESS_FILE)));
 			saveProgressData.writeObject(new SaveGameProgress(SaveGameProgress.getClearStatus(), SaveGameProgress.getMeritStatus(), medal, SaveGameProgress.getSelectStage()));
 			saveProgressData.close();
 		}catch (Exception e) {
@@ -245,7 +247,7 @@ class HoldItem{
 		usedWeaponNumber[1] += 2;
 	}
 	
-	protected void recycle(ImagePanel ImagePanel, List<Integer> numberList, int[] usedNumber, List<BufferedImage> imageList, List<Integer> rarityList) {
+	protected void recycle(ItemImagePanel ImagePanel, List<Integer> numberList, int[] usedNumber, List<BufferedImage> imageList, List<Integer> rarityList) {
 		Predicate<Integer> selectCheck = (select) -> {
 			if(select < 0) {
 				showMessageDialog(null, "リサイクルする対象が選択されていません");
@@ -292,12 +294,12 @@ class HoldItem{
 }
 
 //表示リスト作成
-class DisplayListCreation{
+class CreateDisplayList{
 	DisplaySort coreDisplaySort = new DisplaySort();
 	DisplaySort weaponDisplaySort = new DisplaySort();
 	HoldItem HoldItem;
 	
-	protected DisplayListCreation(HoldItem HoldItem) {
+	protected CreateDisplayList(HoldItem HoldItem) {
 		this.HoldItem = HoldItem;
 		coreDisplaySort.core(getInitialCoreDisplayList());
 		weaponDisplaySort.weapon(getInitialWeaponDisplayList());
@@ -328,7 +330,7 @@ class DisplayListCreation{
 }
 
 //所持リスト表示
-class ImagePanel extends JPanel implements MouseListener{
+class ItemImagePanel extends JPanel implements MouseListener{
 	List<BufferedImage> imageList;
 	List<Integer> numberList;
 	List<Integer> displayList;
@@ -338,7 +340,7 @@ class ImagePanel extends JPanel implements MouseListener{
 	int drawSize = 120;
 	int columns = 5;
 	
-	protected ImagePanel() {
+	protected ItemImagePanel() {
 		resetSelectNumber();
 		addMouseListener(this);
 	}

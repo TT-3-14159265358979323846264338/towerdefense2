@@ -1,6 +1,7 @@
-package menuselectstage;
+package defendthecastle;
 
 import static javax.swing.JOptionPane.*;
+import static savedata.SaveGameProgress.*;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -27,9 +28,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import datastage.DataStage;
-import mainframe.MainFrame;
-import savegameprogress.SaveGameProgress;
+import defaultdata.DataStage;
+import savedata.SaveGameProgress;
 
 //ステージ選択画面
 public class MenuSelectStage extends JPanel{
@@ -183,7 +183,7 @@ class ProgressData{
 	
 	protected ProgressData() {
 		try {
-			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(PROGRESS_FILE)));
 			SaveGameProgress = (SaveGameProgress) loadProgressData.readObject();
 			loadProgressData.close();
 		}catch (Exception e) {
@@ -193,7 +193,7 @@ class ProgressData{
 	
 	protected void save(int select) {
 		try {
-			ObjectOutputStream saveProgressData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+			ObjectOutputStream saveProgressData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(PROGRESS_FILE)));
 			saveProgressData.writeObject(new SaveGameProgress(SaveGameProgress.getClearStatus(), SaveGameProgress.getMeritStatus(), SaveGameProgress.getMedal(), select));
 			saveProgressData.close();
 		}catch (Exception e) {

@@ -1,6 +1,8 @@
-package menuitemget;
+package defendthecastle;
 
 import static javax.swing.JOptionPane.*;
+import static savedata.SaveGameProgress.*;
+import static savedata.SaveHoldItem.*;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -39,13 +41,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
-import dataother.DataOther;
-import dataunit.DataUnit;
-import displaystatus.DisplayStatus;
-import editimage.EditImage;
-import mainframe.MainFrame;
-import savegameprogress.SaveGameProgress;
-import saveholditem.SaveHoldItem;
+import defaultdata.DataOther;
+import defaultdata.DataUnit;
+import defaultdata.EditImage;
+import savedata.SaveGameProgress;
+import savedata.SaveHoldItem;
+import screendisplay.DisplayStatus;
 
 //ガチャ本体
 public class MenuItemGet extends JPanel implements ActionListener{
@@ -215,7 +216,7 @@ class HoldMedal{
 	
 	protected HoldMedal(DefaultLineup DefaultLineup) {
 		try {
-			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(PROGRESS_FILE)));
 			SaveGameProgress = (SaveGameProgress) loadProgressData.readObject();
 			loadProgressData.close();
 		}catch (Exception e) {
@@ -227,7 +228,7 @@ class HoldMedal{
 	
 	protected void save() {
 		try {
-			ObjectOutputStream saveProgressData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savegameprogress.SaveGameProgress.PROGRESS_FILE)));
+			ObjectOutputStream saveProgressData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(PROGRESS_FILE)));
 			saveProgressData.writeObject(new SaveGameProgress(SaveGameProgress.getClearStatus(), SaveGameProgress.getMeritStatus(), medal, SaveGameProgress.getSelectStage()));
 			saveProgressData.close();
 		}catch (Exception e) {
@@ -587,7 +588,7 @@ class DrawResult extends JPanel implements MouseListener{
 	private void save(DefaultLineup DefaultLineup) {
 		//保有アイテムの更新
 		try {
-			ObjectInputStream loadItemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
+			ObjectInputStream loadItemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(HOLD_FILE)));
 			SaveHoldItem = (SaveHoldItem) loadItemData.readObject();
 			loadItemData.close();
 		}catch (Exception e) {
@@ -597,7 +598,7 @@ class DrawResult extends JPanel implements MouseListener{
 		List<Integer> coreNumberList = getItemList(SaveHoldItem.getCoreNumberList(), getCore);
 		List<Integer> weaponNumberList = getItemList(SaveHoldItem.getWeaponNumberList(), getWeapon);
 		try {
-			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
+			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(HOLD_FILE)));
 			saveItemData.writeObject(new SaveHoldItem(coreNumberList, weaponNumberList));
 			saveItemData.close();
 		}catch (Exception e) {

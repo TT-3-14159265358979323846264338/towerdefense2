@@ -1,6 +1,8 @@
-package menucomposition;
+package defendthecastle;
 
 import static javax.swing.JOptionPane.*;
+import static savedata.SaveComposition.*;
+import static savedata.SaveHoldItem.*;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -31,13 +33,12 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import dataunit.DataUnit;
-import displaysort.DisplaySort;
-import displaystatus.DisplayStatus;
-import editimage.EditImage;
-import mainframe.MainFrame;
-import savecomposition.SaveComposition;
-import saveholditem.SaveHoldItem;
+import defaultdata.DataUnit;
+import defaultdata.EditImage;
+import savedata.SaveComposition;
+import savedata.SaveHoldItem;
+import screendisplay.DisplaySort;
+import screendisplay.DisplayStatus;
 
 //編成
 public class MenuComposition extends JPanel implements MouseListener{
@@ -431,10 +432,10 @@ class SaveData{
 	
 	private void load() {
 		try {
-			ObjectInputStream itemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(saveholditem.SaveHoldItem.HOLD_FILE)));
+			ObjectInputStream itemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(HOLD_FILE)));
 			SaveHoldItem = (SaveHoldItem) itemData.readObject();
 			itemData.close();
-			ObjectInputStream compositionData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
+			ObjectInputStream compositionData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(COMPOSITION_FILE)));
 			SaveComposition = (SaveComposition) compositionData.readObject();
 			compositionData.close();
 		}catch (Exception e) {
@@ -462,7 +463,7 @@ class SaveData{
 			typeList.add(StatusCalculation.getType());
 		});
 		try {
-			ObjectOutputStream compositionData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(savecomposition.SaveComposition.COMPOSITION_FILE)));
+			ObjectOutputStream compositionData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(COMPOSITION_FILE)));
 			compositionData.writeObject(new SaveComposition(allCompositionList, compositionNameList, selectNumber, getActiveCompositionList(), weaponStatusList, unitStatusList, typeList));
 			compositionData.close();
 		}catch (Exception e) {
@@ -574,7 +575,7 @@ class SaveData{
 		int select = showConfirmDialog(null, "現在の編成をリセットしますか", "リセット確認", YES_NO_OPTION, QUESTION_MESSAGE);
 		switch(select) {
 		case 0:
-			allCompositionList.set(selectNumber, new ArrayList<>(IntStream.range(0, 8).mapToObj(i -> new ArrayList<>(savecomposition.SaveComposition.DEFAULT)).toList()));
+			allCompositionList.set(selectNumber, new ArrayList<>(IntStream.range(0, 8).mapToObj(i -> new ArrayList<>(DEFAULT)).toList()));
 		default:
 			break;
 		}

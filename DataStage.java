@@ -1,10 +1,8 @@
-package datastage;
+package defaultdata;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
-
-import editimage.EditImage;
 
 //ステージデータ
 public class DataStage {
