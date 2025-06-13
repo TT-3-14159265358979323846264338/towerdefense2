@@ -47,7 +47,7 @@ public class MenuSelectStage extends JPanel{
 	EnemyPanel EnemyPanel = new EnemyPanel();
 	List<BufferedImage> stageImage = new DataStage().getStageImage(5);
 	
-	public MenuSelectStage(MainFrame MainFrame) {
+	protected MenuSelectStage(MainFrame MainFrame) {
 		setBackground(new Color(240, 170, 80));
 		addStageLabel();
 		addInformationLabel();

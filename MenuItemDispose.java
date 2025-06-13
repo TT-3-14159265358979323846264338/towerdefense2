@@ -56,7 +56,7 @@ public class MenuItemDispose extends JPanel{
 	List<BufferedImage> coreImageList = new DataUnit().getCoreImage(2);
 	List<BufferedImage> weaponImageList = new DataUnit().getWeaponImage(2);
 	
-	public MenuItemDispose(MainFrame MainFrame) {
+	protected MenuItemDispose(MainFrame MainFrame) {
 		setBackground(new Color(240, 170, 80));
 		add(typeLabel);
 		addSwitchButton();

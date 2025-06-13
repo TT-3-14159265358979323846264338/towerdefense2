@@ -71,7 +71,7 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	double angle;
 	boolean canPlay = true;
 	
-	public MenuItemGet(MainFrame MainFrame) {
+	protected MenuItemGet(MainFrame MainFrame) {
 		addMedalLabel();
 		addGachaDetailButton();
 		addRepeatButton();

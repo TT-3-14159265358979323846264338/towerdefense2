@@ -35,7 +35,7 @@ public class MenuMain extends JPanel implements ActionListener{
 	List<Integer> randamList = IntStream.range(0, NUMBER).mapToObj(i -> new Random().nextInt(coreImage.size())).toList();
 	int count;
 	
-	public MenuMain(MainFrame MainFrame) {
+	protected MenuMain(MainFrame MainFrame) {
 		this.MainFrame = MainFrame;
 		setBackground(new Color(240, 170, 80));
 		addItemGetButton();

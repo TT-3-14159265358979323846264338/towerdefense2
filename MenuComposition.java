@@ -68,7 +68,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 	List<BufferedImage> leftWeaponList = new ArrayList<>(new DataUnit().getLeftWeaponImage(2));
 	static int unitSize = 60;
 	
-	public MenuComposition(MainFrame MainFrame) {
+	protected MenuComposition(MainFrame MainFrame) {
 		addMouseListener(this);
 		setBackground(new Color(240, 170, 80));
 		addCompositionNameLabel();

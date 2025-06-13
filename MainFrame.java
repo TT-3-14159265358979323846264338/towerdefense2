@@ -4,13 +4,13 @@ import javax.swing.JFrame;
 
 //メイン画面切り替え
 public class MainFrame extends JFrame{
-	public MainFrame() {
+	protected MainFrame() {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
 		mainMenuDraw();
 	}
 	
-	public void mainMenuDraw() {
+	protected void mainMenuDraw() {
 		getContentPane().removeAll();
 		setTitle("メインメニュー");
 		setSize(585, 510);
@@ -19,7 +19,7 @@ public class MainFrame extends JFrame{
 		setVisible(true);
 	}
 	
-	public void itemGetMenuDraw() {
+	protected void itemGetMenuDraw() {
 		getContentPane().removeAll();
 		setTitle("ガチャ");
 		setSize(585, 510);
@@ -27,7 +27,7 @@ public class MainFrame extends JFrame{
 		setLocationRelativeTo(null);
 	}
 	
-	public void itemDisposeMenuDraw() {
+	protected void itemDisposeMenuDraw() {
 		getContentPane().removeAll();
 		setTitle("リサイクル");
 		setSize(715, 640);
@@ -35,7 +35,7 @@ public class MainFrame extends JFrame{
 		setLocationRelativeTo(null);
 	}
 	
-	public void compositionDraw() {
+	protected void compositionDraw() {
 		getContentPane().removeAll();
 		setTitle("ユニット編成");
 		setSize(975, 570);
@@ -43,7 +43,7 @@ public class MainFrame extends JFrame{
 		setLocationRelativeTo(null);
 	}
 	
-	public void selectStageDraw() {
+	protected void selectStageDraw() {
 		getContentPane().removeAll();
 		setTitle("ステージ選択");
 		setSize(925, 570);
