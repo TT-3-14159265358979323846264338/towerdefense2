@@ -65,12 +65,12 @@ public class FileCheck{
 		}
 		//データ数を確認し、足りなければ追加
 		List<Integer> coreNumberList = SaveHoldItem.getCoreNumberList();
-		if(checkSize(DataUnit.CORE_NAME_LIST.size(), coreNumberList.size())) {
-			addList.accept(DataUnit.CORE_NAME_LIST.size() - coreNumberList.size(), coreNumberList);
+		if(checkSize(DataUnit.CORE_SPECIES, coreNumberList.size())) {
+			addList.accept(DataUnit.CORE_SPECIES - coreNumberList.size(), coreNumberList);
 		}
 		List<Integer> weaponNumberList = SaveHoldItem.getWeaponNumberList();
-		if(checkSize(DataUnit.WEAPON_NAME_LIST.size(), weaponNumberList.size())) {
-			addList.accept(DataUnit.WEAPON_NAME_LIST.size() - weaponNumberList.size(), weaponNumberList);
+		if(checkSize(DataUnit.WEAPON_SPECIES, weaponNumberList.size())) {
+			addList.accept(DataUnit.WEAPON_SPECIES - weaponNumberList.size(), weaponNumberList);
 		}
 		//データの保存
 		try {

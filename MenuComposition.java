@@ -35,6 +35,8 @@ import javax.swing.JScrollPane;
 
 import defaultdata.DataUnit;
 import defaultdata.EditImage;
+import defaultdata.core.CoreData;
+import defaultdata.weapon.WeaponData;
 import savedata.SaveComposition;
 import savedata.SaveHoldItem;
 import screendisplay.DisplaySort;
@@ -604,13 +606,14 @@ class SaveData{
 	}
 	
 	protected void changeWeapon(int number, int selectWeapon) {
-		if(DataUnit.WEAPON_TYPE.get(selectWeapon).get(1) == 1) {
+		DataUnit DataUnit = new DataUnit();
+		if(DataUnit.getWeaponData(selectWeapon).getType().get(1) == 1) {
 			getActiveUnit(number).set(2, selectWeapon);
 			getActiveUnit(number).set(0, -1);
 		}else if(getActiveUnit(number).get(2) == -1) {
 			change(number, selectWeapon);
 		}else {
-			switch(DataUnit.WEAPON_TYPE.get(getActiveUnit(number).get(2)).get(1)) {
+			switch(DataUnit.getWeaponData(getActiveUnit(number).get(2)).getType().get(1)) {
 			case 0:
 				change(number, selectWeapon);
 				break;
@@ -823,12 +826,14 @@ class StatusCalculation{
 	List<Integer> coreCutList;
 	
 	protected StatusCalculation(List<Integer> unitData) {
+		DataUnit DataUnit = new DataUnit();
 		try {
-			rightType = DataUnit.WEAPON_TYPE.get(unitData.get(0)).get(0);
-			rightElement = DataUnit.WEAPON_ELEMENT.get(unitData.get(0));
-			rightWeaponStatus = DataUnit.WEAPON_WEAPON_STATUS_LIST.get(unitData.get(0));
-			rightUnitStatus = DataUnit.WEAPON_UNIT_STATUS_LIST.get(unitData.get(0));
-			rightWeaponCutList = DataUnit.WEAPON_CUT_STATUS_LIST.get(unitData.get(0));
+			WeaponData WeaponData = DataUnit.getWeaponData(unitData.get(0));
+			rightType = WeaponData.getType().get(0);
+			rightElement = WeaponData.getElement();
+			rightWeaponStatus = WeaponData.getWeaponStatus();
+			rightUnitStatus = WeaponData.getUnitStatus();
+			rightWeaponCutList = WeaponData.getCutStatus();
 		}catch(Exception noWeapon) {
 			rightType = defaultType();
 			rightElement = defaultElement();
@@ -837,11 +842,12 @@ class StatusCalculation{
 			rightWeaponCutList = defaultCutList();
 		}
 		try {
-			leftType = DataUnit.WEAPON_TYPE.get(unitData.get(2)).get(0);
-			leftElement = DataUnit.WEAPON_ELEMENT.get(unitData.get(2));
-			leftWeaponStatus = DataUnit.WEAPON_WEAPON_STATUS_LIST.get(unitData.get(2));
-			leftUnitStatus = DataUnit.WEAPON_UNIT_STATUS_LIST.get(unitData.get(2));
-			leftWeaponCutList = DataUnit.WEAPON_CUT_STATUS_LIST.get(unitData.get(2));
+			WeaponData WeaponData = DataUnit.getWeaponData(unitData.get(2));
+			leftType = WeaponData.getType().get(0);
+			leftElement = WeaponData.getElement();
+			leftWeaponStatus = WeaponData.getWeaponStatus();
+			leftUnitStatus = WeaponData.getUnitStatus();
+			leftWeaponCutList = WeaponData.getCutStatus();
 		}catch(Exception noWeapon) {
 			leftType = defaultType();
 			leftElement = defaultElement();
@@ -849,9 +855,10 @@ class StatusCalculation{
 			leftUnitStatus = defaultUnitStatus();
 			leftWeaponCutList = defaultCutList();
 		}
-		coreWeaponStatus = DataUnit.CORE_WEAPON_STATUS_LIST.get(unitData.get(1));
-		coreUnitStatus = DataUnit.CORE_UNIT_STATUS_LIST.get(unitData.get(1));
-		coreCutList = DataUnit.CORE_CUT_STATUS_LIST.get(unitData.get(1));
+		CoreData CoreData = DataUnit.getCoreData(unitData.get(1));
+		coreWeaponStatus = CoreData.getWeaponStatus();
+		coreUnitStatus = CoreData.getUnitStatus();
+		coreCutList = CoreData.getCutStatus();
 	}
 	
 	private int defaultType() {

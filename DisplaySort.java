@@ -27,24 +27,28 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import defaultdata.DataUnit;
+import defaultdata.core.CoreData;
+import defaultdata.weapon.WeaponData;
 
 //ソート画面振り分け
 public class DisplaySort extends SortPanel{
 	public void core(List<Integer> defaultList) {
-		rarityList = DataUnit.CORE_RARITY_LIST;
-		weaponStatusList = DataUnit.CORE_WEAPON_STATUS_LIST;
-		unitStatusList = DataUnit.CORE_UNIT_STATUS_LIST;
-		cutList = DataUnit.CORE_CUT_STATUS_LIST;
+		CoreData[] CoreData = IntStream.range(0, DataUnit.CORE_SPECIES).mapToObj(i -> new DataUnit().getCoreData(i)).toArray(CoreData[]::new);
+		rarityList = Stream.of(CoreData).map(i -> i.getRarity()).toList();
+		weaponStatusList = Stream.of(CoreData).map(i -> i.getWeaponStatus()).toList();
+		unitStatusList = Stream.of(CoreData).map(i -> i.getUnitStatus()).toList();
+		cutList = Stream.of(CoreData).map(i -> i.getCutStatus()).toList();
 		super.setSortPanel(defaultList);
 	}
 	
 	public void weapon(List<Integer> defaultList) {
-		rarityList = DataUnit.WEAPON_RARITY_LIST;
-		weaponStatusList = DataUnit.WEAPON_WEAPON_STATUS_LIST.stream().map(i -> i.stream().map(j -> (double) j).toList()).toList();
-		unitStatusList = DataUnit.WEAPON_UNIT_STATUS_LIST.stream().map(i -> i.stream().map(j -> (double) j).toList()).toList();
-		cutList = DataUnit.WEAPON_CUT_STATUS_LIST;
-		typeList = DataUnit.WEAPON_TYPE;
-		elementList = DataUnit.WEAPON_ELEMENT;
+		WeaponData[] WeaponData = IntStream.range(0, DataUnit.WEAPON_SPECIES).mapToObj(i -> new DataUnit().getWeaponData(i)).toArray(WeaponData[]::new);
+		rarityList = Stream.of(WeaponData).map(i -> i.getRarity()).toList();
+		weaponStatusList = Stream.of(WeaponData).map(i -> i.getWeaponStatus().stream().map(j -> (double) j).toList()).toList();
+		unitStatusList = Stream.of(WeaponData).map(i -> i.getUnitStatus().stream().map(j -> (double) j).toList()).toList();
+		cutList = Stream.of(WeaponData).map(i -> i.getCutStatus()).toList();
+		typeList = Stream.of(WeaponData).map(i -> i.getType()).toList();
+		elementList = Stream.of(WeaponData).map(i -> i.getElement()).toList();
 		super.setSortPanel(defaultList);
 	}
 }

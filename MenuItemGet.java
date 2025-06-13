@@ -44,6 +44,8 @@ import javax.swing.Timer;
 import defaultdata.DataOther;
 import defaultdata.DataUnit;
 import defaultdata.EditImage;
+import defaultdata.core.CoreData;
+import defaultdata.weapon.WeaponData;
 import savedata.SaveGameProgress;
 import savedata.SaveHoldItem;
 import screendisplay.DisplayStatus;
@@ -681,10 +683,11 @@ class GachaLineup extends JDialog{
 	}
 	
 	private JScrollPane getLineupScrollPane(DefaultLineup DefaultLineup) {
+		DataUnit DataUnit = new DataUnit();
 		DefaultLineup.setLineup();
 		DefaultLineup.aptitudeTest();
-		Function<Integer, String> getRarity = (count) -> {
-			return "★" + count + " ";
+		Function<Integer, String> getRarity = (rarity) -> {
+			return "★" + rarity + " ";
 		};
 		Function<String, String> getName = (name) -> {
 			return String.format("%-" + (60 - name.getBytes().length) + "s", name);
@@ -700,7 +703,8 @@ class GachaLineup extends JDialog{
 		lineup.addElement("【コア確率】 " + getRatio.apply(getTotal(coreRatio)));
 		lineup.addElement(" ");
 		IntStream.range(0, coreLineup.size()).forEach(i -> {
-			String coreName = getRarity.apply(DataUnit.CORE_RARITY_LIST.get(coreLineup.get(i))) + DataUnit.CORE_NAME_LIST.get(coreLineup.get(i));
+			CoreData CoreData = DataUnit.getCoreData(coreLineup.get(i));
+			String coreName = getRarity.apply(CoreData.getRarity()) + CoreData.getCoreName();
 			lineup.addElement(getName.apply(coreName) + getRatio.apply(coreRatio.get(i)));
 		});
 		if(getTotal(coreRatio) != 0) {
@@ -709,7 +713,8 @@ class GachaLineup extends JDialog{
 		lineup.addElement("【武器確率】 " + getRatio.apply(getTotal(weaponRatio)));
 		lineup.addElement(" ");
 		IntStream.range(0, weaponLineup.size()).forEach(i -> {
-			String weaponName = getRarity.apply(DataUnit.WEAPON_RARITY_LIST.get(weaponLineup.get(i))) + DataUnit.WEAPON_NAME_LIST.get(weaponLineup.get(i));
+			WeaponData WeaponData = DataUnit.getWeaponData(weaponLineup.get(i));
+			String weaponName = getRarity.apply(WeaponData.getRarity()) + WeaponData.getWeaponName();
 			lineup.addElement(getName.apply(weaponName) + getRatio.apply(weaponRatio.get(i)));
 		});
 		JList<String> lineupJList = new JList<String>(lineup);

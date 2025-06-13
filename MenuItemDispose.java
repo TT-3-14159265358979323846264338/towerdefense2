@@ -117,10 +117,11 @@ public class MenuItemDispose extends JPanel{
 	private void addDisposeButton() {
 		add(disposeButton);
 		disposeButton.addActionListener(e->{
+			DataUnit DataUnit = new DataUnit();
 			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				HoldItem.recycle(CoreImagePanel, HoldItem.getCoreNumberList(), HoldItem.getUsedCoreNumber(), coreImageList, DataUnit.CORE_RARITY_LIST);
+				HoldItem.recycle(CoreImagePanel, HoldItem.getCoreNumberList(), HoldItem.getUsedCoreNumber(), coreImageList, IntStream.range(0, defaultdata.DataUnit.CORE_SPECIES).mapToObj(i -> DataUnit.getCoreData(i).getRarity()).toList());
 			}else {
-				HoldItem.recycle(WeaponImagePanel, HoldItem.getWeaponNumberList(), HoldItem.getUsedWeaponNumber(), weaponImageList, DataUnit.WEAPON_RARITY_LIST);
+				HoldItem.recycle(WeaponImagePanel, HoldItem.getWeaponNumberList(), HoldItem.getUsedWeaponNumber(), weaponImageList, IntStream.range(0, defaultdata.DataUnit.WEAPON_SPECIES).mapToObj(i -> DataUnit.getWeaponData(i).getRarity()).toList());
 			}
 		});
 	}
