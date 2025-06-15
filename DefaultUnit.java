@@ -10,7 +10,7 @@ import defaultdata.core.*;
 import defaultdata.weapon.*;
 
 //ユニットデータ
-public class DataUnit {
+public class DefaultUnit {
 	//データコード変換
 	public final static Map<Integer, String> CORE_WEAPON_MAP = new HashMap<>();{
 		CORE_WEAPON_MAP.put(0, "攻撃倍率");

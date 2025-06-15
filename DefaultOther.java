@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 //その他のデータ
-public class DataOther {
+public class DefaultOther {
 	//タイトル画像ファイル
 	final static String TITLE = "image/gacha/title.png";
 

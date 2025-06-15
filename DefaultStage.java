@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 //ステージデータ
-public class DataStage {
+public class DefaultStage {
 	//配置マス画像ファイル
 	public final static List<String> PLACEMENT_NAME_LIST = Arrays.asList(
 			"image/field/near placement.png",

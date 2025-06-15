@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 //敵兵データ
-public class DataEnemy {
+public class DefaultEnemy {
 	//データコード変換
 	public final static Map<Integer, String> WEAPON_MAP = new HashMap<>();{
 		WEAPON_MAP.put(0, "攻撃");
@@ -33,7 +33,7 @@ public class DataEnemy {
 		TYPE_MAP.put(0, "一般");
 		TYPE_MAP.put(1, "ボス");
 	}
-	public final static Map<Integer, String> ELEMENT_MAP = DataUnit.ELEMENT_MAP;
+	public final static Map<Integer, String> ELEMENT_MAP = DefaultUnit.ELEMENT_MAP;
 	/*
 	実際のMapの中身
 		ELEMENT_MAP.put(0,"斬撃");
