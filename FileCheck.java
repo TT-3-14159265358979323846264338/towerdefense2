@@ -17,8 +17,8 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import defaultdata.DataStage;
-import defaultdata.DataUnit;
+import defaultdata.DefaultStage;
+import defaultdata.DefaultUnit;
 
 //データ保存用ファイルの確認
 public class FileCheck{
@@ -65,12 +65,12 @@ public class FileCheck{
 		}
 		//データ数を確認し、足りなければ追加
 		List<Integer> coreNumberList = SaveHoldItem.getCoreNumberList();
-		if(checkSize(DataUnit.CORE_SPECIES, coreNumberList.size())) {
-			addList.accept(DataUnit.CORE_SPECIES - coreNumberList.size(), coreNumberList);
+		if(checkSize(DefaultUnit.CORE_SPECIES, coreNumberList.size())) {
+			addList.accept(DefaultUnit.CORE_SPECIES - coreNumberList.size(), coreNumberList);
 		}
 		List<Integer> weaponNumberList = SaveHoldItem.getWeaponNumberList();
-		if(checkSize(DataUnit.WEAPON_SPECIES, weaponNumberList.size())) {
-			addList.accept(DataUnit.WEAPON_SPECIES - weaponNumberList.size(), weaponNumberList);
+		if(checkSize(DefaultUnit.WEAPON_SPECIES, weaponNumberList.size())) {
+			addList.accept(DefaultUnit.WEAPON_SPECIES - weaponNumberList.size(), weaponNumberList);
 		}
 		//データの保存
 		try {
@@ -94,20 +94,20 @@ public class FileCheck{
 		}
 		//データ数を確認し、足りなければ追加
 		List<Boolean> clearStatus = SaveGameProgress.getClearStatus();
-		if(checkSize(DataStage.STAGE_NAME_LIST.size(), clearStatus.size())) {
-			IntStream.range(0, DataStage.STAGE_NAME_LIST.size() - clearStatus.size()).forEach(i -> clearStatus.add(false));
+		if(checkSize(DefaultStage.STAGE_NAME_LIST.size(), clearStatus.size())) {
+			IntStream.range(0, DefaultStage.STAGE_NAME_LIST.size() - clearStatus.size()).forEach(i -> clearStatus.add(false));
 		}
 		List<List<Boolean>> meritStatus = SaveGameProgress.getMeritStatus();
-		IntStream.range(0, DataStage.MERIT_INFORMATION.size()).forEach(i -> {
+		IntStream.range(0, DefaultStage.MERIT_INFORMATION.size()).forEach(i -> {
 			try {
 				//meritStatusの内側のListのデータ数を確認し、足りなければ追加
-				if(checkSize(DataStage.MERIT_INFORMATION.get(i).size(), meritStatus.get(i).size())) {
-					IntStream.range(0, DataStage.MERIT_INFORMATION.get(i).size() - meritStatus.get(i).size()).forEach(j -> meritStatus.get(i).add(false));
+				if(checkSize(DefaultStage.MERIT_INFORMATION.get(i).size(), meritStatus.get(i).size())) {
+					IntStream.range(0, DefaultStage.MERIT_INFORMATION.get(i).size() - meritStatus.get(i).size()).forEach(j -> meritStatus.get(i).add(false));
 				}
 			}catch(Exception e) {
 				//エラーが起こる時はList<Boolean>の数が足りない時である
 				//その時はList<Boolean>を追加
-				meritStatus.add(DataStage.MERIT_INFORMATION.get(i).stream().map(j -> false).collect(Collectors.toList()));
+				meritStatus.add(DefaultStage.MERIT_INFORMATION.get(i).stream().map(j -> false).collect(Collectors.toList()));
 			}
 			});
 		//データの保存

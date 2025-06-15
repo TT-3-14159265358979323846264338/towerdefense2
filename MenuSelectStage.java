@@ -28,7 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import defaultdata.DataStage;
+import defaultdata.DefaultStage;
 import savedata.SaveGameProgress;
 
 //ステージ選択画面
@@ -45,7 +45,7 @@ public class MenuSelectStage extends JPanel{
 	StagePanel StagePanel = new StagePanel(ProgressData.getSelectStage());
 	MeritPanel MeritPanel = new MeritPanel(StagePanel, ProgressData.getMeritStatus());
 	EnemyPanel EnemyPanel = new EnemyPanel();
-	List<BufferedImage> stageImage = new DataStage().getStageImage(5);
+	List<BufferedImage> stageImage = new DefaultStage().getStageImage(5);
 	
 	protected MenuSelectStage(MainFrame MainFrame) {
 		setBackground(new Color(240, 170, 80));
@@ -212,8 +212,8 @@ class ProgressData{
 
 //ステージ切り替え
 class StagePanel extends JPanel implements MouseListener{
-	JLabel[] nameLabel = IntStream.range(0, DataStage.STAGE_NAME_LIST.size()).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
-	List<BufferedImage> stageImage = new DataStage().getStageImage(18);
+	JLabel[] nameLabel = IntStream.range(0, DefaultStage.STAGE_NAME_LIST.size()).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
+	List<BufferedImage> stageImage = new DefaultStage().getStageImage(18);
 	int select = 0;
 	
 	protected StagePanel(int select) {
@@ -236,7 +236,7 @@ class StagePanel extends JPanel implements MouseListener{
 	}
 	
 	private void setLabel(int number) {
-		nameLabel[number].setText(DataStage.STAGE_NAME_LIST.get(number));
+		nameLabel[number].setText(DefaultStage.STAGE_NAME_LIST.get(number));
 		nameLabel[number].setBounds(0, 25 + 85 * number, 130, 30);
 		nameLabel[number].setFont(new Font("Arial", Font.BOLD, 20));
 	}
@@ -279,7 +279,7 @@ class StagePanel extends JPanel implements MouseListener{
 
 //戦功情報
 class MeritPanel extends JPanel{
-	JLabel[] meritLabel = IntStream.range(0, DataStage.MERIT_INFORMATION.stream().mapToInt(i -> i.size()).max().getAsInt()).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
+	JLabel[] meritLabel = IntStream.range(0, DefaultStage.MERIT_INFORMATION.stream().mapToInt(i -> i.size()).max().getAsInt()).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
 	JLabel[] clearLabel = IntStream.range(0, meritLabel.length).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
 	StagePanel StagePanel;
 	List<List<Boolean>> meritStatus;
@@ -290,7 +290,7 @@ class MeritPanel extends JPanel{
 	protected MeritPanel(StagePanel StagePanel, List<List<Boolean>> meritStatus) {
 		this.StagePanel = StagePanel;
 		this.meritStatus = meritStatus;
-		meritInformation = DataStage.MERIT_INFORMATION.stream().map(i -> i.stream().map(j -> wrap(j)).toList()).toList();
+		meritInformation = DefaultStage.MERIT_INFORMATION.stream().map(i -> i.stream().map(j -> wrap(j)).toList()).toList();
 		addLabel();
 	}
 	

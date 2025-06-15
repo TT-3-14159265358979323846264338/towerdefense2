@@ -18,14 +18,14 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import defaultdata.DataUnit;
+import defaultdata.DefaultUnit;
 import defaultdata.core.CoreData;
 import defaultdata.weapon.WeaponData;
 
 //ユニットデータ取込み
 public class DisplayStatus extends StatusPanel{
 	public void core(BufferedImage image, int number) {
-		CoreData CoreData = new DataUnit().getCoreData(number);
+		CoreData CoreData = new DefaultUnit().getCoreData(number);
 		setLabelName(getRarity(CoreData.getRarity()) + CoreData.getCoreName());
 		setWeapon(CoreData.getWeaponStatus());
 		setUnit(CoreData.getUnitStatus(), "倍");
@@ -34,7 +34,7 @@ public class DisplayStatus extends StatusPanel{
 	}
 	
 	public void weapon(BufferedImage image, int number) {
-		WeaponData WeaponData = new DataUnit().getWeaponData(number);
+		WeaponData WeaponData = new DefaultUnit().getWeaponData(number);
 		setLabelName(getRarity(WeaponData.getRarity()) + WeaponData.getWeaponName());
 		setWeapon(WeaponData.getWeaponStatus(), WeaponData.getElement(), number);
 		setUnit(WeaponData.getUnitStatus());
@@ -63,17 +63,17 @@ public class DisplayStatus extends StatusPanel{
 	
 	private String getUnitName(List<Integer> compositionList) {
 		String name = "";
-		DataUnit DataUnit = new DataUnit();
+		DefaultUnit DefaultUnit = new DefaultUnit();
 		try {
-			WeaponData WeaponData = DataUnit.getWeaponData(compositionList.get(2));
+			WeaponData WeaponData = DefaultUnit.getWeaponData(compositionList.get(2));
 			name += getRarity(WeaponData.getRarity()) + WeaponData.getWeaponName() + " - ";
 		}catch(Exception ignore) {
 			//左武器を装備していないので、無視する
 		}
-		CoreData CoreData = DataUnit.getCoreData(compositionList.get(1));
+		CoreData CoreData = DefaultUnit.getCoreData(compositionList.get(1));
 		name += getRarity(CoreData.getRarity()) + CoreData.getCoreName() + " - ";
 		try {
-			WeaponData WeaponData = DataUnit.getWeaponData(compositionList.get(0));
+			WeaponData WeaponData = DefaultUnit.getWeaponData(compositionList.get(0));
 			name += getRarity(WeaponData.getRarity()) + WeaponData.getWeaponName() + " - ";
 		}catch(Exception ignore) {
 			//右武器を装備していないので、無視する
@@ -83,7 +83,7 @@ public class DisplayStatus extends StatusPanel{
 	
 	private void setWeapon(List<Double> statusList) {
 		IntStream.range(0, statusList.size()).forEach(i -> {
-			weapon[i + 1].setText(DataUnit.CORE_WEAPON_MAP.get(i));
+			weapon[i + 1].setText(DefaultUnit.CORE_WEAPON_MAP.get(i));
 			weapon[i + 9].setText(statusList.get(i) + "倍");
 		});
 		weapon[8].setText("武器性能");
@@ -91,35 +91,35 @@ public class DisplayStatus extends StatusPanel{
 	
 	private void setWeapon(List<Integer> statusList, List<Integer> elementList, int number) {
 		IntStream.range(0, statusList.size()).forEach(i -> {
-			weapon[i + 1].setText(DataUnit.WEAPON_WEAPON_MAP.get(i));
+			weapon[i + 1].setText(DefaultUnit.WEAPON_WEAPON_MAP.get(i));
 			weapon[i + 9].setText("" + statusList.get(i));
 		});
 		weapon[5].setText("距離タイプ");
 		weapon[6].setText("装備タイプ");
 		weapon[7].setText("属性");
 		weapon[8].setText("武器性能");
-		weapon[13].setText("" + DataUnit.DISTANCE_MAP.get(number));
-		weapon[14].setText("" + DataUnit.HANDLE_MAP.get(number));
+		weapon[13].setText("" + DefaultUnit.DISTANCE_MAP.get(number));
+		weapon[14].setText("" + DefaultUnit.HANDLE_MAP.get(number));
 		weapon[15].setText("" + getElement(elementList));
 	}
 	
 	private void setWeapon(List<List<Integer>> weaponStatusList, List<Integer> compositionList) {
-		IntStream.range(0, DataUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 1].setText(DataUnit.WEAPON_WEAPON_MAP.get(i)));
+		IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 1].setText(DefaultUnit.WEAPON_WEAPON_MAP.get(i)));
 		weapon[5].setText("距離タイプ");
 		weapon[6].setText("装備タイプ");
 		weapon[7].setText("属性");
 		weapon[8].setText("左武器");
 		if(0 <= compositionList.get(2)) {
 			IntStream.range(0, weaponStatusList.get(3).size()).forEach(i -> weapon[i + 9].setText("" + weaponStatusList.get(3).get(i)));
-			weapon[13].setText("" + DataUnit.DISTANCE_MAP.get(compositionList.get(2)));
-			weapon[14].setText("" + DataUnit.HANDLE_MAP.get(compositionList.get(2)));
+			weapon[13].setText("" + DefaultUnit.DISTANCE_MAP.get(compositionList.get(2)));
+			weapon[14].setText("" + DefaultUnit.HANDLE_MAP.get(compositionList.get(2)));
 			weapon[15].setText("" + getElement(weaponStatusList.get(2)));
 		}
 		weapon[16].setText("右武器");
 		if(0 <= compositionList.get(0)) {
 			IntStream.range(0, weaponStatusList.get(1).size()).forEach(i -> weapon[i + 17].setText("" + weaponStatusList.get(1).get(i)));
-			weapon[21].setText("" + DataUnit.DISTANCE_MAP.get(compositionList.get(0)));
-			weapon[22].setText("" + DataUnit.HANDLE_MAP.get(compositionList.get(0)));
+			weapon[21].setText("" + DefaultUnit.DISTANCE_MAP.get(compositionList.get(0)));
+			weapon[22].setText("" + DefaultUnit.HANDLE_MAP.get(compositionList.get(0)));
 			weapon[23].setText("" + getElement(weaponStatusList.get(0)));
 		}
 	}
@@ -127,27 +127,27 @@ public class DisplayStatus extends StatusPanel{
 	private String getElement(List<Integer> elementList) {
 		String element = "";
 		for(int i: elementList) {
-			element += DataUnit.ELEMENT_MAP.get(i) + ", ";
+			element += DefaultUnit.ELEMENT_MAP.get(i) + ", ";
 		}
 		return element.substring(0, element.length() - 2);
 	}
 	
 	private void setUnit(List<Double> statusList, String comment) {
 		IntStream.range(0, statusList.size()).forEach(i -> {
-			unit[i].setText(DataUnit.CORE_UNIT_MAP.get(i));
+			unit[i].setText(DefaultUnit.CORE_UNIT_MAP.get(i));
 			unit[i + 6].setText(statusList.get(i) + comment);
 		});
 	}
 	
 	private void setUnit(List<Integer> statusList) {
 		IntStream.range(0, statusList.size()).forEach(i -> {
-			unit[i].setText(DataUnit.WEAPON_UNIT_MAP.get(i));
+			unit[i].setText(DefaultUnit.WEAPON_UNIT_MAP.get(i));
 			unit[i + 6].setText(statusList.get(i) + "");
 		});
 	}
 	
 	private void setCut(List<Integer> cutList) {
-		IntStream.range(0, cutList.size()).forEach(i -> cut[i].setText(DataUnit.ELEMENT_MAP.get(i) + "耐性"));
+		IntStream.range(0, cutList.size()).forEach(i -> cut[i].setText(DefaultUnit.ELEMENT_MAP.get(i) + "耐性"));
 		IntStream.range(0, cutList.size()).forEach(i -> cut[i + 11].setText(cutList.get(i) + "%"));
 	}
 }

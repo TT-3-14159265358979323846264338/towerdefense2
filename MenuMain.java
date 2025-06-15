@@ -15,8 +15,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import defaultdata.DataOther;
-import defaultdata.DataUnit;
+import defaultdata.DefaultOther;
+import defaultdata.DefaultUnit;
 import defaultdata.EditImage;
 
 //トップメニュー画面
@@ -30,8 +30,8 @@ public class MenuMain extends JPanel implements ActionListener{
 	JButton itemDisposeButton = new JButton();
 	JButton compositionButton = new JButton();
 	JButton selectStageButton = new JButton();
-	BufferedImage titleImage = new DataOther().getTitleImage(2);
-	List<BufferedImage> coreImage = new DataUnit().getCoreImage(1);
+	BufferedImage titleImage = new DefaultOther().getTitleImage(2);
+	List<BufferedImage> coreImage = new DefaultUnit().getCoreImage(1);
 	List<Integer> randamList = IntStream.range(0, NUMBER).mapToObj(i -> new Random().nextInt(coreImage.size())).toList();
 	int count;
 	

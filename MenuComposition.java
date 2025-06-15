@@ -33,7 +33,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import defaultdata.DataUnit;
+import defaultdata.DefaultUnit;
 import defaultdata.EditImage;
 import defaultdata.core.CoreData;
 import defaultdata.weapon.WeaponData;
@@ -65,9 +65,9 @@ public class MenuComposition extends JPanel implements MouseListener{
 	ImagePanel WeaponImagePanel = new ImagePanel();
 	SaveData SaveData = new SaveData();
 	DisplayListCreation DisplayListCreation = new DisplayListCreation(SaveData);
-	List<BufferedImage> rightWeaponList = new ArrayList<>(new DataUnit().getRightWeaponImage(2));
-	List<BufferedImage> ceterCoreList = new ArrayList<>(new DataUnit().getCenterCoreImage(2));
-	List<BufferedImage> leftWeaponList = new ArrayList<>(new DataUnit().getLeftWeaponImage(2));
+	List<BufferedImage> rightWeaponList = new ArrayList<>(new DefaultUnit().getRightWeaponImage(2));
+	List<BufferedImage> ceterCoreList = new ArrayList<>(new DefaultUnit().getCenterCoreImage(2));
+	List<BufferedImage> leftWeaponList = new ArrayList<>(new DefaultUnit().getLeftWeaponImage(2));
 	static int unitSize = 60;
 	
 	protected MenuComposition(MainFrame MainFrame) {
@@ -314,8 +314,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 	}
 	
 	private void addItemScroll() {
-		CoreImagePanel.setImagePanel(new DataUnit().getCoreImage(2), DisplayListCreation.getDisplayList(SaveData.getCoreNumberList()), SaveData.getNowCoreNumberList(), true);
-		WeaponImagePanel.setImagePanel(new DataUnit().getWeaponImage(2), DisplayListCreation.getDisplayList(SaveData.getWeaponNumberList()), SaveData.getNowWeaponNumberList(), false);
+		CoreImagePanel.setImagePanel(new DefaultUnit().getCoreImage(2), DisplayListCreation.getDisplayList(SaveData.getCoreNumberList()), SaveData.getNowCoreNumberList(), true);
+		WeaponImagePanel.setImagePanel(new DefaultUnit().getWeaponImage(2), DisplayListCreation.getDisplayList(SaveData.getWeaponNumberList()), SaveData.getNowWeaponNumberList(), false);
 		itemScroll.getViewport().setView(CoreImagePanel);
     	add(itemScroll);
 	}
@@ -606,14 +606,14 @@ class SaveData{
 	}
 	
 	protected void changeWeapon(int number, int selectWeapon) {
-		DataUnit DataUnit = new DataUnit();
-		if(DataUnit.getWeaponData(selectWeapon).getType().get(1) == 1) {
+		DefaultUnit DefaultUnit = new DefaultUnit();
+		if(DefaultUnit.getWeaponData(selectWeapon).getType().get(1) == 1) {
 			getActiveUnit(number).set(2, selectWeapon);
 			getActiveUnit(number).set(0, -1);
 		}else if(getActiveUnit(number).get(2) == -1) {
 			change(number, selectWeapon);
 		}else {
-			switch(DataUnit.getWeaponData(getActiveUnit(number).get(2)).getType().get(1)) {
+			switch(DefaultUnit.getWeaponData(getActiveUnit(number).get(2)).getType().get(1)) {
 			case 0:
 				change(number, selectWeapon);
 				break;
@@ -826,9 +826,9 @@ class StatusCalculation{
 	List<Integer> coreCutList;
 	
 	protected StatusCalculation(List<Integer> unitData) {
-		DataUnit DataUnit = new DataUnit();
+		DefaultUnit DefaultUnit = new DefaultUnit();
 		try {
-			WeaponData WeaponData = DataUnit.getWeaponData(unitData.get(0));
+			WeaponData WeaponData = DefaultUnit.getWeaponData(unitData.get(0));
 			rightType = WeaponData.getType().get(0);
 			rightElement = WeaponData.getElement();
 			rightWeaponStatus = WeaponData.getWeaponStatus();
@@ -842,7 +842,7 @@ class StatusCalculation{
 			rightWeaponCutList = defaultCutList();
 		}
 		try {
-			WeaponData WeaponData = DataUnit.getWeaponData(unitData.get(2));
+			WeaponData WeaponData = DefaultUnit.getWeaponData(unitData.get(2));
 			leftType = WeaponData.getType().get(0);
 			leftElement = WeaponData.getElement();
 			leftWeaponStatus = WeaponData.getWeaponStatus();
@@ -855,7 +855,7 @@ class StatusCalculation{
 			leftUnitStatus = defaultUnitStatus();
 			leftWeaponCutList = defaultCutList();
 		}
-		CoreData CoreData = DataUnit.getCoreData(unitData.get(1));
+		CoreData CoreData = DefaultUnit.getCoreData(unitData.get(1));
 		coreWeaponStatus = CoreData.getWeaponStatus();
 		coreUnitStatus = CoreData.getUnitStatus();
 		coreCutList = CoreData.getCutStatus();

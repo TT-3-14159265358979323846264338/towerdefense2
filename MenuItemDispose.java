@@ -34,7 +34,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-import defaultdata.DataUnit;
+import defaultdata.DefaultUnit;
 import savedata.SaveComposition;
 import savedata.SaveGameProgress;
 import savedata.SaveHoldItem;
@@ -53,8 +53,8 @@ public class MenuItemDispose extends JPanel{
 	ItemImagePanel WeaponImagePanel = new ItemImagePanel();
 	HoldItem HoldItem = new HoldItem();
 	CreateDisplayList DisplayListCreation = new CreateDisplayList(HoldItem);
-	List<BufferedImage> coreImageList = new DataUnit().getCoreImage(2);
-	List<BufferedImage> weaponImageList = new DataUnit().getWeaponImage(2);
+	List<BufferedImage> coreImageList = new DefaultUnit().getCoreImage(2);
+	List<BufferedImage> weaponImageList = new DefaultUnit().getWeaponImage(2);
 	
 	protected MenuItemDispose(MainFrame MainFrame) {
 		setBackground(new Color(240, 170, 80));
@@ -117,11 +117,11 @@ public class MenuItemDispose extends JPanel{
 	private void addDisposeButton() {
 		add(disposeButton);
 		disposeButton.addActionListener(e->{
-			DataUnit DataUnit = new DataUnit();
+			DefaultUnit DefaultUnit = new DefaultUnit();
 			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				HoldItem.recycle(CoreImagePanel, HoldItem.getCoreNumberList(), HoldItem.getUsedCoreNumber(), coreImageList, IntStream.range(0, defaultdata.DataUnit.CORE_SPECIES).mapToObj(i -> DataUnit.getCoreData(i).getRarity()).toList());
+				HoldItem.recycle(CoreImagePanel, HoldItem.getCoreNumberList(), HoldItem.getUsedCoreNumber(), coreImageList, IntStream.range(0, defaultdata.DefaultUnit.CORE_SPECIES).mapToObj(i -> DefaultUnit.getCoreData(i).getRarity()).toList());
 			}else {
-				HoldItem.recycle(WeaponImagePanel, HoldItem.getWeaponNumberList(), HoldItem.getUsedWeaponNumber(), weaponImageList, IntStream.range(0, defaultdata.DataUnit.WEAPON_SPECIES).mapToObj(i -> DataUnit.getWeaponData(i).getRarity()).toList());
+				HoldItem.recycle(WeaponImagePanel, HoldItem.getWeaponNumberList(), HoldItem.getUsedWeaponNumber(), weaponImageList, IntStream.range(0, defaultdata.DefaultUnit.WEAPON_SPECIES).mapToObj(i -> DefaultUnit.getWeaponData(i).getRarity()).toList());
 			}
 		});
 	}

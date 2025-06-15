@@ -41,8 +41,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
-import defaultdata.DataOther;
-import defaultdata.DataUnit;
+import defaultdata.DefaultOther;
+import defaultdata.DefaultUnit;
 import defaultdata.EditImage;
 import defaultdata.core.CoreData;
 import defaultdata.weapon.WeaponData;
@@ -63,12 +63,12 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	HandleMotion HandleMotion = new HandleMotion(this, HoldMedal, BallMotion);
 	JList<String> selectGachaJList = new JList<>(DefaultLineup.getGachaName());
 	JScrollPane selectGachaScroll = new JScrollPane();
-	BufferedImage ballImage = new DataOther().getBallImage(2);
-	List<BufferedImage> halfBallImage = new ArrayList<>(new DataOther().getHalfBallImage(2));
-	BufferedImage handleImage = new DataOther().getHandleImage(2);
-	List<BufferedImage> machineImage = new ArrayList<>(new DataOther().getMachineImage(2));
-	BufferedImage turnImage = new DataOther().getTurnImage(2);
-	BufferedImage effectImage = new DataOther().getEffectImage(1);
+	BufferedImage ballImage = new DefaultOther().getBallImage(2);
+	List<BufferedImage> halfBallImage = new ArrayList<>(new DefaultOther().getHalfBallImage(2));
+	BufferedImage handleImage = new DefaultOther().getHandleImage(2);
+	List<BufferedImage> machineImage = new ArrayList<>(new DefaultOther().getMachineImage(2));
+	BufferedImage turnImage = new DefaultOther().getTurnImage(2);
+	BufferedImage effectImage = new DefaultOther().getEffectImage(1);
 	Timer timer = new Timer(50, this);
 	double angle;
 	boolean canPlay = true;
@@ -536,8 +536,8 @@ class DrawResult extends JPanel implements MouseListener{
 	List<Point> weaponPosition = new ArrayList<>();
 	double total;
 	int position;
-	List<BufferedImage> coreImageList = new DataUnit().getCoreImage(2);
-	List<BufferedImage> weaponImageList = new DataUnit().getWeaponImage(2);
+	List<BufferedImage> coreImageList = new DefaultUnit().getCoreImage(2);
+	List<BufferedImage> weaponImageList = new DefaultUnit().getWeaponImage(2);
 	int unitSize = 80;
 	
 	protected DrawResult(DefaultLineup DefaultLineup){
@@ -683,7 +683,7 @@ class GachaLineup extends JDialog{
 	}
 	
 	private JScrollPane getLineupScrollPane(DefaultLineup DefaultLineup) {
-		DataUnit DataUnit = new DataUnit();
+		DefaultUnit DefaultUnit = new DefaultUnit();
 		DefaultLineup.setLineup();
 		DefaultLineup.aptitudeTest();
 		Function<Integer, String> getRarity = (rarity) -> {
@@ -703,7 +703,7 @@ class GachaLineup extends JDialog{
 		lineup.addElement("【コア確率】 " + getRatio.apply(getTotal(coreRatio)));
 		lineup.addElement(" ");
 		IntStream.range(0, coreLineup.size()).forEach(i -> {
-			CoreData CoreData = DataUnit.getCoreData(coreLineup.get(i));
+			CoreData CoreData = DefaultUnit.getCoreData(coreLineup.get(i));
 			String coreName = getRarity.apply(CoreData.getRarity()) + CoreData.getCoreName();
 			lineup.addElement(getName.apply(coreName) + getRatio.apply(coreRatio.get(i)));
 		});
@@ -713,7 +713,7 @@ class GachaLineup extends JDialog{
 		lineup.addElement("【武器確率】 " + getRatio.apply(getTotal(weaponRatio)));
 		lineup.addElement(" ");
 		IntStream.range(0, weaponLineup.size()).forEach(i -> {
-			WeaponData WeaponData = DataUnit.getWeaponData(weaponLineup.get(i));
+			WeaponData WeaponData = DefaultUnit.getWeaponData(weaponLineup.get(i));
 			String weaponName = getRarity.apply(WeaponData.getRarity()) + WeaponData.getWeaponName();
 			lineup.addElement(getName.apply(weaponName) + getRatio.apply(weaponRatio.get(i)));
 		});
