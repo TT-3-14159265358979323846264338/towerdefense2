@@ -29,6 +29,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import defaultdata.DefaultStage;
+import defaultdata.EditImage;
+import defaultdata.stage.StageData;
 import savedata.SaveGameProgress;
 
 //ステージ選択画面
@@ -42,10 +44,11 @@ public class MenuSelectStage extends JPanel{
 	JScrollPane enemyScroll = new JScrollPane();
 	JScrollPane meritScroll = new JScrollPane();
 	ProgressData ProgressData = new ProgressData();
-	StagePanel StagePanel = new StagePanel(ProgressData.getSelectStage());
-	MeritPanel MeritPanel = new MeritPanel(StagePanel, ProgressData.getMeritStatus());
+	StageData[] StageData = IntStream.range(0, DefaultStage.STAGE_SPECIES).mapToObj(i -> new DefaultStage().getStageData(i)).toArray(StageData[]::new);
+	StagePanel StagePanel = new StagePanel(ProgressData.getSelectStage(), StageData);
+	MeritPanel MeritPanel = new MeritPanel(StagePanel, ProgressData.getMeritStatus(), StageData);
 	EnemyPanel EnemyPanel = new EnemyPanel();
-	List<BufferedImage> stageImage = new DefaultStage().getStageImage(5);
+	List<BufferedImage> stageImage = Stream.of(StageData).map(i -> new EditImage().input(i.getImageName().get(0), 5)).toList();
 	
 	protected MenuSelectStage(MainFrame MainFrame) {
 		setBackground(new Color(240, 170, 80));
@@ -212,15 +215,18 @@ class ProgressData{
 
 //ステージ切り替え
 class StagePanel extends JPanel implements MouseListener{
-	JLabel[] nameLabel = IntStream.range(0, DefaultStage.STAGE_NAME_LIST.size()).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
-	List<BufferedImage> stageImage = new DefaultStage().getStageImage(18);
+	JLabel[] nameLabel = IntStream.range(0, DefaultStage.STAGE_SPECIES).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
+	List<BufferedImage> stageImage;
+	List<String> stageNameList;
 	int select = 0;
 	
-	protected StagePanel(int select) {
+	protected StagePanel(int select, StageData[] StageData) {
+		Stream.of(nameLabel).forEach(i -> addLabel(i));
+		stageImage = Stream.of(StageData).map(i -> new EditImage().input(i.getImageName().get(0), 18)).toList();
+		stageNameList = Stream.of(StageData).map(i -> i.getName()).toList();
+		this.select = select;
 		addMouseListener(this);
 		setPreferredSize(new Dimension(100, 85 * stageImage.size()));
-		this.select = select;
-		Stream.of(nameLabel).forEach(i -> addLabel(i));
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -236,7 +242,7 @@ class StagePanel extends JPanel implements MouseListener{
 	}
 	
 	private void setLabel(int number) {
-		nameLabel[number].setText(DefaultStage.STAGE_NAME_LIST.get(number));
+		nameLabel[number].setText(stageNameList.get(number));
 		nameLabel[number].setBounds(0, 25 + 85 * number, 130, 30);
 		nameLabel[number].setFont(new Font("Arial", Font.BOLD, 20));
 	}
@@ -279,18 +285,20 @@ class StagePanel extends JPanel implements MouseListener{
 
 //戦功情報
 class MeritPanel extends JPanel{
-	JLabel[] meritLabel = IntStream.range(0, DefaultStage.MERIT_INFORMATION.stream().mapToInt(i -> i.size()).max().getAsInt()).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
-	JLabel[] clearLabel = IntStream.range(0, meritLabel.length).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
+	JLabel[] meritLabel;
+	JLabel[] clearLabel;
 	StagePanel StagePanel;
 	List<List<Boolean>> meritStatus;
 	List<List<String>> meritInformation;
 	Font meritFont = new Font("ＭＳ ゴシック", Font.BOLD, 15);
 	Font clearFont = new Font("Arail", Font.BOLD, 30);
 	
-	protected MeritPanel(StagePanel StagePanel, List<List<Boolean>> meritStatus) {
+	protected MeritPanel(StagePanel StagePanel, List<List<Boolean>> meritStatus, StageData[] StageData) {
 		this.StagePanel = StagePanel;
 		this.meritStatus = meritStatus;
-		meritInformation = DefaultStage.MERIT_INFORMATION.stream().map(i -> i.stream().map(j -> wrap(j)).toList()).toList();
+		meritLabel = IntStream.range(0, Stream.of(StageData).mapToInt(i -> i.getMerit().size()).max().getAsInt()).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
+		clearLabel = IntStream.range(0, meritLabel.length).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
+		meritInformation = Stream.of(StageData).map(i -> i.getMerit().stream().map(j -> wrap(j)).toList()).toList();
 		addLabel();
 	}
 	

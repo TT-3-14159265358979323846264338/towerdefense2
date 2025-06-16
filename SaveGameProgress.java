@@ -18,7 +18,7 @@ public class SaveGameProgress implements Serializable{
 	セーブデータの構造
 	clearStatus: 各ステージのクリア状況
 	meritStatus: 各ステージの戦功取得状況
-	これらのListのsize()は、DataStageに新規追加されると、TowerDefense2で自動的に追加される
+	これらのListのsize()は、DefaultStageに新規追加されると、FileCheckで自動的に追加される
 	medal: 現在保有しているガチャメダル数
 	selectStage: 最後に出撃したステージ番号
 	*/

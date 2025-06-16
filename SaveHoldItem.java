@@ -18,7 +18,7 @@ public class SaveHoldItem implements Serializable{
 	セーブデータの構造
 	coreNumberList: 各コアの所持数
 	weaponNumberList: 各武器の所持数
-	これらのListのsize()は、DataUnitに新規追加されると、TowerDefense2で自動的に追加される
+	これらのListのsize()は、DefaultUnitに新規追加されると、FileCheckで自動的に追加される
 	*/
 	
 	public SaveHoldItem() {

@@ -64,7 +64,7 @@ public class DefaultEnemy {
 			return null;
 		}
 		/*
-		新たなデータを追加したらCORE_SPECIESにも加算すること
+		新たなデータを追加したらENEMY_SPECIESにも加算すること
 		 */
 	}
 	

@@ -19,6 +19,7 @@ import java.util.stream.IntStream;
 
 import defaultdata.DefaultStage;
 import defaultdata.DefaultUnit;
+import defaultdata.stage.StageData;
 
 //データ保存用ファイルの確認
 public class FileCheck{
@@ -94,20 +95,21 @@ public class FileCheck{
 		}
 		//データ数を確認し、足りなければ追加
 		List<Boolean> clearStatus = SaveGameProgress.getClearStatus();
-		if(checkSize(DefaultStage.STAGE_NAME_LIST.size(), clearStatus.size())) {
-			IntStream.range(0, DefaultStage.STAGE_NAME_LIST.size() - clearStatus.size()).forEach(i -> clearStatus.add(false));
+		if(checkSize(DefaultStage.STAGE_SPECIES, clearStatus.size())) {
+			IntStream.range(0, DefaultStage.STAGE_SPECIES - clearStatus.size()).forEach(i -> clearStatus.add(false));
 		}
 		List<List<Boolean>> meritStatus = SaveGameProgress.getMeritStatus();
-		IntStream.range(0, DefaultStage.MERIT_INFORMATION.size()).forEach(i -> {
+		IntStream.range(0, DefaultStage.STAGE_SPECIES).forEach(i -> {
+			StageData StageData = new DefaultStage().getStageData(i);
 			try {
 				//meritStatusの内側のListのデータ数を確認し、足りなければ追加
-				if(checkSize(DefaultStage.MERIT_INFORMATION.get(i).size(), meritStatus.get(i).size())) {
-					IntStream.range(0, DefaultStage.MERIT_INFORMATION.get(i).size() - meritStatus.get(i).size()).forEach(j -> meritStatus.get(i).add(false));
+				if(checkSize(StageData.getMerit().size(), meritStatus.get(i).size())) {
+					IntStream.range(0, StageData.getMerit().size() - meritStatus.get(i).size()).forEach(j -> meritStatus.get(i).add(false));
 				}
 			}catch(Exception e) {
 				//エラーが起こる時はList<Boolean>の数が足りない時である
 				//その時はList<Boolean>を追加
-				meritStatus.add(DefaultStage.MERIT_INFORMATION.get(i).stream().map(j -> false).collect(Collectors.toList()));
+				meritStatus.add(StageData.getMerit().stream().map(j -> false).collect(Collectors.toList()));
 			}
 			});
 		//データの保存
