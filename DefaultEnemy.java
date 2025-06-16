@@ -1,11 +1,12 @@
 package defaultdata;
 
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
+
+import defaultdata.enemy.*;
 
 //敵兵データ
 public class DefaultEnemy {
@@ -49,66 +50,26 @@ public class DefaultEnemy {
 		ELEMENT_MAP.put(10,"闇");
 	*/
 	
+	//敵の種類
+	public final static int ENEMY_SPECIES = 2;
 	
-	
-	//敵画像ファイル
-	public final static List<String> ENEMY_NAME_LIST = Arrays.asList(
-			"ブルースライム",
-			"レッドスライム"
-			);
-	final static List<String> ENEMY_IMAGE_NAME_LIST = Arrays.asList(
-			"image/enemy/blue slime.png",
-			"image/enemy/red slime.png"
-			);
-	public final static List<List<String>> ENEMY_MOTION_NAME_LIST = Arrays.asList(
-			Arrays.asList("image/enemy/blue slime 0.png",
-					"image/enemy/blue slime 1.png",
-					"image/enemy/blue slime 2.png",
-					"image/enemy/blue slime 3.png",
-					"image/enemy/blue slime 4.png",
-					"image/enemy/blue slime 5.png"),
-			Arrays.asList("image/enemy/red slime 0.png",
-					"image/enemy/red slime 1.png",
-					"image/enemy/red slime 2.png",
-					"image/enemy/red slime 3.png",
-					"image/enemy/red slime 4.png",
-					"image/enemy/red slime 5.png")
-			);
-	//タイプは ① 移動経路(MOVE_MAP) ② 種別(TYPE_MAP)で登録
-	public final static List<List<Integer>> TYPE = Arrays.asList(
-			Arrays.asList(0, 0),
-			Arrays.asList(0, 0)
-			);
-	//全ての武器属性(ELEMENT_MAP)を登録
-	public final static List<List<Integer>> ELEMENT = Arrays.asList(
-			Arrays.asList(2),
-			Arrays.asList(2)
-			);
-	//武器ステータスはWEAPON_MAPの順でリスト化
-	public final static List<List<Integer>> WEAPON_STATUS_LIST = Arrays.asList(
-			Arrays.asList(20, 30, 1000, 1),
-			Arrays.asList(30, 30, 1000, 1)
-			);
-	//ユニットステータスはUNIT_MAPの順でリスト化
-	public final static List<List<Integer>> UNIT_STATUS_LIST = Arrays.asList(
-			Arrays.asList(1000, 1000, 10, 0, 100, 1),
-			Arrays.asList(1000, 1000, 10, 0, 100, 1)
-			);
-	//属性カット率はELEMENT_MAPの順でリスト化
-	public final static List<List<Integer>> CUT_STATUS_LIST = Arrays.asList(
-			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-			Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-			);
-	
-	
+	//デフォルトデータ収集
+	public EnemyData getEnemyData(int number) {
+		switch(number) {
+		case 0:
+			return new No0000BlueSlime();
+		case 1:
+			return new No0001RedSlime();
+		default:
+			return null;
+		}
+		/*
+		新たなデータを追加したらCORE_SPECIESにも加算すること
+		 */
+	}
 	
 	//画像取込み
 	public List<BufferedImage> getEnemyImage(int ratio){
-		return new EditImage().inputList(ENEMY_IMAGE_NAME_LIST, ratio);
-	}
-	
-	public List<List<BufferedImage>> getEnemyImage(List<List<Integer>> enemyList, int ratio){
-		List<List<String>> extractionList = IntStream.range(0, ENEMY_MOTION_NAME_LIST.size()).mapToObj(i -> (enemyList.stream().anyMatch(j -> i == j.get(0)))? ENEMY_MOTION_NAME_LIST.get(i): null).toList();
-		return new EditImage().inputList2(extractionList, ratio);
+		return new EditImage().inputList(IntStream.range(0, ENEMY_SPECIES).mapToObj(i -> getEnemyData(i).getImageName()).toList(), ratio);
 	}
 }

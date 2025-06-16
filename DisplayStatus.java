@@ -26,7 +26,7 @@ import defaultdata.weapon.WeaponData;
 public class DisplayStatus extends StatusPanel{
 	public void core(BufferedImage image, int number) {
 		CoreData CoreData = new DefaultUnit().getCoreData(number);
-		setLabelName(getRarity(CoreData.getRarity()) + CoreData.getCoreName());
+		setLabelName(getRarity(CoreData.getRarity()) + CoreData.getName());
 		setWeapon(CoreData.getWeaponStatus());
 		setUnit(CoreData.getUnitStatus(), "倍");
 		setCut(CoreData.getCutStatus());
@@ -35,7 +35,7 @@ public class DisplayStatus extends StatusPanel{
 	
 	public void weapon(BufferedImage image, int number) {
 		WeaponData WeaponData = new DefaultUnit().getWeaponData(number);
-		setLabelName(getRarity(WeaponData.getRarity()) + WeaponData.getWeaponName());
+		setLabelName(getRarity(WeaponData.getRarity()) + WeaponData.getName());
 		setWeapon(WeaponData);
 		setUnit(WeaponData.getUnitStatus());
 		setCut(WeaponData.getCutStatus());
@@ -67,15 +67,15 @@ public class DisplayStatus extends StatusPanel{
 		DefaultUnit DefaultUnit = new DefaultUnit();
 		try {
 			WeaponData WeaponData = DefaultUnit.getWeaponData(compositionList.get(2));
-			name += getRarity(WeaponData.getRarity()) + WeaponData.getWeaponName() + " - ";
+			name += getRarity(WeaponData.getRarity()) + WeaponData.getName() + " - ";
 		}catch(Exception ignore) {
 			//左武器を装備していないので、無視する
 		}
 		CoreData CoreData = DefaultUnit.getCoreData(compositionList.get(1));
-		name += getRarity(CoreData.getRarity()) + CoreData.getCoreName() + " - ";
+		name += getRarity(CoreData.getRarity()) + CoreData.getName() + " - ";
 		try {
 			WeaponData WeaponData = DefaultUnit.getWeaponData(compositionList.get(0));
-			name += getRarity(WeaponData.getRarity()) + WeaponData.getWeaponName() + " - ";
+			name += getRarity(WeaponData.getRarity()) + WeaponData.getName() + " - ";
 		}catch(Exception ignore) {
 			//右武器を装備していないので、無視する
 		}

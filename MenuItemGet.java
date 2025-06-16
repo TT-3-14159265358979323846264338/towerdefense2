@@ -704,7 +704,7 @@ class GachaLineup extends JDialog{
 		lineup.addElement(" ");
 		IntStream.range(0, coreLineup.size()).forEach(i -> {
 			CoreData CoreData = DefaultUnit.getCoreData(coreLineup.get(i));
-			String coreName = getRarity.apply(CoreData.getRarity()) + CoreData.getCoreName();
+			String coreName = getRarity.apply(CoreData.getRarity()) + CoreData.getName();
 			lineup.addElement(getName.apply(coreName) + getRatio.apply(coreRatio.get(i)));
 		});
 		if(getTotal(coreRatio) != 0) {
@@ -714,7 +714,7 @@ class GachaLineup extends JDialog{
 		lineup.addElement(" ");
 		IntStream.range(0, weaponLineup.size()).forEach(i -> {
 			WeaponData WeaponData = DefaultUnit.getWeaponData(weaponLineup.get(i));
-			String weaponName = getRarity.apply(WeaponData.getRarity()) + WeaponData.getWeaponName();
+			String weaponName = getRarity.apply(WeaponData.getRarity()) + WeaponData.getName();
 			lineup.addElement(getName.apply(weaponName) + getRatio.apply(weaponRatio.get(i)));
 		});
 		JList<String> lineupJList = new JList<String>(lineup);
