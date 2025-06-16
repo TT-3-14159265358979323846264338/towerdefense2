@@ -17,18 +17,21 @@ public abstract class WeaponData {
 	//レアリティ
 	public abstract int getRarity();
 	
-	//武器タイプは ① 距離(DataUnit.DISTANCE_MAP) ② 装備位置(DataUnit.HANDLE_MAP)で登録
-	public abstract List<Integer> getType();
+	//距離(DefaultUnit.DISTANCE_MAP)で登録
+	public abstract int getDistance();
 	
-	//武器属性はその武器の全ての属性(DataUnit.ELEMENT_MAP)を登録
+	//装備位置(DefaultUnit.HANDLE_MAP)で登録
+	public abstract int getHandle();
+	
+	//武器属性はその武器の全ての属性(DefaultUnit.ELEMENT_MAP)を登録
 	public abstract List<Integer> getElement();
 	
-	//DataUnit.WEAPON_WEAPON_MAPの順にステータスをリスト化
+	//DefaultUnit.WEAPON_WEAPON_MAPの順にステータスをリスト化
 	public abstract List<Integer> getWeaponStatus();
 	
-	//DataUnit.WEAPON_UNIT_MAPの順にステータスをリスト化
+	//DefaultUnit.WEAPON_UNIT_MAPの順にステータスをリスト化
 	public abstract List<Integer> getUnitStatus();
 	
-	//DataUnit.ELEMENT_MAPの順にステータスをリスト化
+	//DefaultUnit.ELEMENT_MAPの順にステータスをリスト化
 	public abstract List<Integer> getCutStatus();
 }

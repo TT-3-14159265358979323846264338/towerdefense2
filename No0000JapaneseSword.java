@@ -40,8 +40,13 @@ public class No0000JapaneseSword extends WeaponData{
 	}
 
 	@Override
-	public List<Integer> getType() {
-		return Arrays.asList(0, 0);
+	public int getDistance() {
+		return 0;
+	}
+
+	@Override
+	public int getHandle() {
+		return 0;
 	}
 
 	@Override

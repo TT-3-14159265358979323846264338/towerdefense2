@@ -35,8 +35,13 @@ public class No0001Bow extends WeaponData{
 	}
 
 	@Override
-	public List<Integer> getType() {
-		return Arrays.asList(1, 1);
+	public int getDistance() {
+		return 1;
+	}
+
+	@Override
+	public int getHandle() {
+		return 1;
 	}
 
 	@Override
