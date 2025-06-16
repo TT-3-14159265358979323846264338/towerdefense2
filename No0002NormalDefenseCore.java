@@ -5,17 +5,17 @@ import java.util.List;
 
 public class No0002NormalDefenseCore extends CoreData{
 	@Override
-	public String getCoreName() {
+	public String getName() {
 		return "ノーマルブラックコア";
 	}
 	
 	@Override
-	public String getCoreImageName() {
+	public String getImageName() {
 		return "image/soldier/normal defense core.png";
 	}
 	
 	@Override
-	public String getCoreActionImageName() {
+	public String getActionImageName() {
 		return "image/soldier/normal defense core center.png";
 	}
 	

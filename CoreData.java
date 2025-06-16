@@ -4,23 +4,23 @@ import java.util.List;
 
 public abstract class CoreData {
 	//コアの名前
-	public abstract String getCoreName();
+	public abstract String getName();
 	
 	//通常時のコア画像ファイル名
-	public abstract String getCoreImageName();
+	public abstract String getImageName();
 	
 	//攻撃時のコア画像ファイル名
-	public abstract String getCoreActionImageName();
+	public abstract String getActionImageName();
 	
 	//レアリティ
 	public abstract int getRarity();
 	
-	//DataUnit.CORE_WEAPON_MAPの順にステータスをリスト化
+	//DefaultUnit.CORE_WEAPON_MAPの順にステータスをリスト化
 	public abstract List<Double> getWeaponStatus();
 	
-	//DataUnit.CORE_UNIT_MAPの順にステータスをリスト化
+	//DefaultUnit.CORE_UNIT_MAPの順にステータスをリスト化
 	public abstract List<Double> getUnitStatus();
 	
-	//DataUnit.ELEMENT_MAPの順にステータスをリスト化
+	//DefaultUnit.ELEMENT_MAPの順にステータスをリスト化
 	public abstract List<Integer> getCutStatus();
 }
