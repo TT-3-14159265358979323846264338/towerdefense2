@@ -13,10 +13,6 @@ public class SaveComposition implements Serializable{
 	List<List<List<Integer>>> allCompositionList = new ArrayList<>();
 	List<String> compositionNameList = new ArrayList<>();
 	int selectNumber;
-	List<List<Integer>> compositionList = new ArrayList<>();
-	List<List<List<Integer>>> weaponStatusList = new ArrayList<>();
-	List<List<List<Integer>>> unitStatusList = new ArrayList<>();
-	List<Integer> typeList = new ArrayList<>();
 	
 	/*
 	非セーブデータの構造
@@ -27,24 +23,16 @@ public class SaveComposition implements Serializable{
 	allCompositionList: ①List 編成番号 ②List パーティ8体のデータ ③List 右武器番号, コア番号, 左武器番号 の順でリスト化
 	compositionNameList: 各編成番号の名称
 	selectNumber: 現在使用可能な編成番号
-	compositionList: 現在使用可能なパーティデータ (allCompositionListの②③を抜き出してある)
-	weaponStatusList: 現在使用可能な武器ステータス (① 各ユニット順 ② 各ユニットデータ (list.get(i).get(0): 右武器属性リスト, list.get(i).get(1): 右武器ステータスリスト, list.get(i).get(2): 左武器属性リスト, list.get(i).get(3): 左武器ステータスリスト) の順でリスト化)
-	unitStatusList: 現在使用可能なユニットステータス (① 各ユニット順 ② 各ユニットデータ (list.get(i).get(0): 属性カットリスト, list.get(i).get(1): ユニットステータスリスト) の順でリスト化)
-	typeList: 現在使用可能なユニットの配置できるマスの種類
 	*/
 	
 	public SaveComposition() {
 		newComposition();
 	}
 	
-	public SaveComposition(List<List<List<Integer>>> allCompositionList, List<String> compositionNameList, int selectNumber,  List<List<Integer>> compositionList, List<List<List<Integer>>> weaponStatusList, List<List<List<Integer>>> unitStatusList, List<Integer> typeList) {
+	public SaveComposition(List<List<List<Integer>>> allCompositionList, List<String> compositionNameList, int selectNumber) {
 		this.allCompositionList = allCompositionList;
 		this.compositionNameList = compositionNameList;
 		this.selectNumber = selectNumber;
-		this.compositionList = compositionList;
-		this.weaponStatusList = weaponStatusList;
-		this.unitStatusList = unitStatusList;
-		this.typeList = typeList;
 	}
 	
 	public void newComposition() {
@@ -69,21 +57,5 @@ public class SaveComposition implements Serializable{
 	
 	public int getSelectNumber() {
 		return selectNumber;
-	}
-	
-	public List<List<Integer>> getcompositionList(){
-		return compositionList;
-	}
-	
-	public List<List<List<Integer>>> getWeaponStatusList(){
-		return weaponStatusList;
-	}
-	
-	public List<List<List<Integer>>> getUnitStatusList(){
-		return unitStatusList;
-	}
-	
-	public List<Integer> setTypeList(){
-		return typeList;
 	}
 }

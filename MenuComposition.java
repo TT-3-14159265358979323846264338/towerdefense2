@@ -19,10 +19,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.temporal.ValueRange;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -35,8 +33,6 @@ import javax.swing.JScrollPane;
 
 import defaultdata.DefaultUnit;
 import defaultdata.EditImage;
-import defaultdata.core.CoreData;
-import defaultdata.weapon.WeaponData;
 import savedata.SaveComposition;
 import savedata.SaveHoldItem;
 import screendisplay.DisplaySort;
@@ -378,7 +374,7 @@ public class MenuComposition extends JPanel implements MouseListener{
 						}
 					}
 				}catch(Exception notSelect) {
-					unitStstus(i);
+					new DisplayStatus().unit(new EditImage().compositeImage(getImageList(SaveData.getActiveUnit(i))), SaveData.getActiveUnit(i));
 				}
 			}
 		});
@@ -391,12 +387,6 @@ public class MenuComposition extends JPanel implements MouseListener{
 	}
 	@Override
 	public void mouseExited(MouseEvent e) {
-	}
-	
-	private void unitStstus(int number) {
-		List<Integer> unitData = SaveData.getActiveUnit(number);
-		StatusCalculation StatusCalculation = new StatusCalculation(unitData);
-		new DisplayStatus().unit(new EditImage().compositeImage(getImageList(unitData)), unitData, StatusCalculation.getWeaponStatus(), StatusCalculation.getUnitStatus());
 	}
 	
 	private List<BufferedImage> getImageList(List<Integer> unitData){
@@ -455,18 +445,9 @@ class SaveData{
 	}
 	
 	private void save() {
-		List<List<List<Integer>>> weaponStatusList = new ArrayList<>();
-		List<List<List<Integer>>> unitStatusList = new ArrayList<>();
-		List<Integer> typeList = new ArrayList<>();
-		allCompositionList.get(selectNumber).stream().forEach(i -> {
-			StatusCalculation StatusCalculation = new StatusCalculation(i);
-			weaponStatusList.add(StatusCalculation.getWeaponStatus());
-			unitStatusList.add(StatusCalculation.getUnitStatus());
-			typeList.add(StatusCalculation.getType());
-		});
 		try {
 			ObjectOutputStream compositionData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(COMPOSITION_FILE)));
-			compositionData.writeObject(new SaveComposition(allCompositionList, compositionNameList, selectNumber, getActiveCompositionList(), weaponStatusList, unitStatusList, typeList));
+			compositionData.writeObject(new SaveComposition(allCompositionList, compositionNameList, selectNumber));
 			compositionData.close();
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -607,13 +588,13 @@ class SaveData{
 	
 	protected void changeWeapon(int number, int selectWeapon) {
 		DefaultUnit DefaultUnit = new DefaultUnit();
-		if(DefaultUnit.getWeaponData(selectWeapon).getType().get(1) == 1) {
+		if(DefaultUnit.getWeaponData(selectWeapon).getHandle() == 1) {
 			getActiveUnit(number).set(2, selectWeapon);
 			getActiveUnit(number).set(0, -1);
 		}else if(getActiveUnit(number).get(2) == -1) {
 			change(number, selectWeapon);
 		}else {
-			switch(DefaultUnit.getWeaponData(getActiveUnit(number).get(2)).getType().get(1)) {
+			switch(DefaultUnit.getWeaponData(getActiveUnit(number).get(2)).getHandle()) {
 			case 0:
 				change(number, selectWeapon);
 				break;
@@ -805,110 +786,5 @@ class DelaySelect extends Thread{
 			e.printStackTrace();
 		}
 		compositionJList.ensureIndexIsVisible(selectNumber);
-	}
-}
-
-//ステータス計算
-class StatusCalculation{
-	int rightType;
-	List<Integer> rightElement;
-	List<Integer> rightWeaponStatus;
-	List<Integer> rightUnitStatus;
-	int leftType;
-	List<Integer> leftElement;
-	List<Integer> leftWeaponStatus;
-	List<Integer> leftUnitStatus;
-	List<Double> coreWeaponStatus;
-	List<Double> coreUnitStatus;
-	
-	List<Integer> rightWeaponCutList;
-	List<Integer> leftWeaponCutList;
-	List<Integer> coreCutList;
-	
-	protected StatusCalculation(List<Integer> unitData) {
-		DefaultUnit DefaultUnit = new DefaultUnit();
-		try {
-			WeaponData WeaponData = DefaultUnit.getWeaponData(unitData.get(0));
-			rightType = WeaponData.getType().get(0);
-			rightElement = WeaponData.getElement();
-			rightWeaponStatus = WeaponData.getWeaponStatus();
-			rightUnitStatus = WeaponData.getUnitStatus();
-			rightWeaponCutList = WeaponData.getCutStatus();
-		}catch(Exception noWeapon) {
-			rightType = defaultType();
-			rightElement = defaultElement();
-			rightWeaponStatus = defaultWeaponStatus();
-			rightUnitStatus = defaultUnitStatus();
-			rightWeaponCutList = defaultCutList();
-		}
-		try {
-			WeaponData WeaponData = DefaultUnit.getWeaponData(unitData.get(2));
-			leftType = WeaponData.getType().get(0);
-			leftElement = WeaponData.getElement();
-			leftWeaponStatus = WeaponData.getWeaponStatus();
-			leftUnitStatus = WeaponData.getUnitStatus();
-			leftWeaponCutList = WeaponData.getCutStatus();
-		}catch(Exception noWeapon) {
-			leftType = defaultType();
-			leftElement = defaultElement();
-			leftWeaponStatus = defaultWeaponStatus();
-			leftUnitStatus = defaultUnitStatus();
-			leftWeaponCutList = defaultCutList();
-		}
-		CoreData CoreData = DefaultUnit.getCoreData(unitData.get(1));
-		coreWeaponStatus = CoreData.getWeaponStatus();
-		coreUnitStatus = CoreData.getUnitStatus();
-		coreCutList = CoreData.getCutStatus();
-	}
-	
-	private int defaultType() {
-		return -1;
-	}
-	
-	private List<Integer> defaultElement(){
-		return Arrays.asList(-1);
-	}
-	
-	private List<Integer> defaultWeaponStatus(){
-		return Arrays.asList(0, 0, 0, 0);
-	}
-	
-	private List<Integer> defaultUnitStatus(){
-		return Arrays.asList(1000, 1000, 0, 0, 0, 0);
-	}
-	
-	private List<Integer> defaultCutList(){
-		return Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	}
-	
-	protected int getType() {
-		if(rightType == -1 && leftType == -1) {
-			return 2;
-		}else if(rightType == leftType) {
-			return leftType;
-		}else if(0 <= rightType && 0 <= leftType){
-			return 2;
-		}else {
-			return (rightType <= leftType)? leftType: rightType;
-		}
-	}
-	
-	protected List<List<Integer>> getWeaponStatus(){
-		Function<List<Integer>, List<Integer>> getStatus = (list) -> {
-			return IntStream.range(0, list.size()).mapToObj(i -> (int) (list.get(i) * coreWeaponStatus.get(i))).toList();
-		};
-		List<List<Integer>> weaponStatus = new ArrayList<>();
-		weaponStatus.add(rightElement);
-		weaponStatus.add(getStatus.apply(rightWeaponStatus));
-		weaponStatus.add(leftElement);
-		weaponStatus.add(getStatus.apply(leftWeaponStatus));
-		return weaponStatus;
-	}
-	
-	protected List<List<Integer>> getUnitStatus(){
-		List<List<Integer>> statusList = new ArrayList<>();
-		statusList.add(IntStream.range(0, coreCutList.size()).mapToObj(i -> leftWeaponCutList.get(i) + coreCutList.get(i) + rightWeaponCutList.get(i)).toList());
-		statusList.add(IntStream.range(0, coreUnitStatus.size()).mapToObj(i -> (int) ((rightUnitStatus.get(i) + leftUnitStatus.get(i)) * coreUnitStatus.get(i))).toList());
-		return statusList;
 	}
 }

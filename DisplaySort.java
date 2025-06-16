@@ -47,7 +47,8 @@ public class DisplaySort extends SortPanel{
 		weaponStatusList = Stream.of(WeaponData).map(i -> i.getWeaponStatus().stream().map(j -> (double) j).toList()).toList();
 		unitStatusList = Stream.of(WeaponData).map(i -> i.getUnitStatus().stream().map(j -> (double) j).toList()).toList();
 		cutList = Stream.of(WeaponData).map(i -> i.getCutStatus()).toList();
-		typeList = Stream.of(WeaponData).map(i -> i.getType()).toList();
+		distanceList = Stream.of(WeaponData).map(i -> i.getDistance()).toList();
+		handleList = Stream.of(WeaponData).map(i -> i.getHandle()).toList();
 		elementList = Stream.of(WeaponData).map(i -> i.getElement()).toList();
 		super.setSortPanel(defaultList);
 	}
@@ -95,7 +96,8 @@ class SortPanel extends JPanel {
 	List<List<Double>> weaponStatusList;
 	List<List<Double>> unitStatusList;
 	List<List<Integer>> cutList;
-	List<List<Integer>> typeList;
+	List<Integer> distanceList;
+	List<Integer> handleList;
 	List<List<Integer>> elementList;
 	List<Integer> defaultDisplayList;
 	boolean canSort;
@@ -137,7 +139,7 @@ class SortPanel extends JPanel {
 		commentLabel[2].setText("ユニットステータス");
 		commentLabel[3].setText("属性耐性");
 		commentLabel[4].setText("レアリティ");
-		if(Objects.nonNull(typeList)) {
+		if(Objects.nonNull(distanceList)) {
 			commentLabel[5].setText("距離タイプ");
 			commentLabel[6].setText("装備タイプ");
 			commentLabel[7].setText("属性");
@@ -173,7 +175,7 @@ class SortPanel extends JPanel {
 			mode[0].setSelected(true);
 			raritySort[0].setSelected(true);
 			initialize.accept(rarity);
-			if(Objects.nonNull(typeList)) {
+			if(Objects.nonNull(distanceList)) {
 				initialize.accept(distance);
 				initialize.accept(handle);
 				initialize.accept(element);
@@ -223,7 +225,7 @@ class SortPanel extends JPanel {
 		grouping.accept(itemGroup, cut);
 		
 		rarity = initialize.apply(Collections.max(rarityList));
-		if(Objects.nonNull(typeList)) {
+		if(Objects.nonNull(distanceList)) {
 			distance = initialize.apply(DefaultUnit.DISTANCE_MAP.size());
 			handle = initialize.apply(DefaultUnit.HANDLE_MAP.size());
 			element = initialize.apply(DefaultUnit.ELEMENT_MAP.size());
@@ -243,7 +245,7 @@ class SortPanel extends JPanel {
 		setAction.accept(cut, DefaultUnit.ELEMENT_MAP);
 		
 		IntStream.range(0, rarity.length).forEach(i -> rarity[i].setActionCommand("" + (i + 1)));
-		if(Objects.nonNull(typeList)) {
+		if(Objects.nonNull(distanceList)) {
 			setAction.accept(distance, DefaultUnit.DISTANCE_MAP);
 			setAction.accept(handle, DefaultUnit.HANDLE_MAP);
 			setAction.accept(element, DefaultUnit.ELEMENT_MAP);
@@ -261,7 +263,7 @@ class SortPanel extends JPanel {
 		getName.accept(unit, DefaultUnit.WEAPON_UNIT_MAP);
 		getName.accept(cut, DefaultUnit.ELEMENT_MAP);
 		IntStream.range(0, rarity.length).forEach(i -> rarity[i].setText("★" + (i + 1)));
-		if(Objects.nonNull(typeList)) {
+		if(Objects.nonNull(distanceList)) {
 			getName.accept(distance, DefaultUnit.DISTANCE_MAP);
 			getName.accept(handle, DefaultUnit.HANDLE_MAP);
 			getName.accept(element, DefaultUnit.ELEMENT_MAP);
@@ -294,7 +296,7 @@ class SortPanel extends JPanel {
 		IntStream.range(0, cut.length).forEach(i -> cut[i].setBounds(150 + i % 6 * sizeX, 90 + sizeY * (3 + i / 6), sizeX, sizeY));
 		
 		IntStream.range(0, rarity.length).forEach(i -> rarity[i].setBounds(150 + i * sizeX, 280, sizeX, sizeY));
-		if(Objects.nonNull(typeList)) {
+		if(Objects.nonNull(distanceList)) {
 			IntStream.range(0, distance.length).forEach(i -> distance[i].setBounds(150 + i * sizeX, 280 + sizeY, sizeX, sizeY));
 			IntStream.range(0, handle.length).forEach(i -> handle[i].setBounds(150 + i * sizeX, 280 + sizeY * 2, sizeX, sizeY));
 			IntStream.range(0, element.length).forEach(i -> element[i].setBounds(150 + i % 6 * sizeX, 280 + sizeY * (3 + i / 6), sizeX, sizeY));
@@ -372,12 +374,12 @@ class SortPanel extends JPanel {
 	}
 	
 	private List<Integer> getFilterList(List<Integer> displayList){
-		if(Objects.isNull(typeList)) {
+		if(Objects.isNull(distanceList)) {
 			return getRarityList(displayList);
 		}
 		displayList = getRarityList(displayList);
-		displayList = getTypeList(displayList, distance, DefaultUnit.DISTANCE_MAP, 0);
-		displayList = getTypeList(displayList, handle, DefaultUnit.HANDLE_MAP, 1);
+		displayList = getTypeList(displayList, distance, DefaultUnit.DISTANCE_MAP, distanceList);
+		displayList = getTypeList(displayList, handle, DefaultUnit.HANDLE_MAP, handleList);
 		return getElementList(displayList);
 	}
 	
@@ -391,11 +393,11 @@ class SortPanel extends JPanel {
 		return displayList.stream().filter(i -> getActiveButtonStream.apply(rarity).anyMatch(j -> rarityList.get(i) == j)).collect(Collectors.toList());
 	}
 	
-	private List<Integer> getTypeList(List<Integer> displayList, JRadioButton[] radio, Map<Integer, String> map, int index){
+	private List<Integer> getTypeList(List<Integer> displayList, JRadioButton[] radio, Map<Integer, String> map, List<Integer> type){
 		if(selectCheck(radio)) {
 			return displayList;
 		}
-		return displayList.stream().filter(i -> getActiveButtonStream(radio).anyMatch(j -> map.get(typeList.get(i).get(index)).equals(j))).collect(Collectors.toList());
+		return displayList.stream().filter(i -> getActiveButtonStream(radio).anyMatch(j -> map.get(type.get(i)).equals(j))).collect(Collectors.toList());
 	}
 	
 	private List<Integer> getElementList(List<Integer> displayList){
