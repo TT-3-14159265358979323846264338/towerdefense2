@@ -4,15 +4,15 @@ import java.util.List;
 
 public abstract class WeaponData {
 	//武器の名前
-	public abstract String getWeaponName();
+	public abstract String getName();
 	
 	//通常時の武器画像ファイル名
-	public abstract String getWeaponImageName();
+	public abstract String getImageName();
 	
 	//攻撃時の武器画像ファイル名
 	//片手武器の時は右武器のlistにEmptyのlistを入れる
-	public abstract List<String> getRightWeaponActionImageName();
-	public abstract List<String> getLeftWeaponActionImageName();
+	public abstract List<String> getRightActionImageName();
+	public abstract List<String> getLeftActionImageName();
 	
 	//レアリティ
 	public abstract int getRarity();

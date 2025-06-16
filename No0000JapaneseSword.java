@@ -5,17 +5,17 @@ import java.util.List;
 
 public class No0000JapaneseSword extends WeaponData{
 	@Override
-	public String getWeaponName() {
+	public String getName() {
 		return "日本刀";
 	}
 
 	@Override
-	public String getWeaponImageName() {
+	public String getImageName() {
 		return "image/soldier/Japanese sword.png";
 	}
 
 	@Override
-	public List<String> getRightWeaponActionImageName() {
+	public List<String> getRightActionImageName() {
 		return Arrays.asList("image/soldier/Japanese sword right 0.png",
 				"image/soldier/Japanese sword right 1.png",
 				"image/soldier/Japanese sword right 2.png",
@@ -25,7 +25,7 @@ public class No0000JapaneseSword extends WeaponData{
 	}
 
 	@Override
-	public List<String> getLeftWeaponActionImageName() {
+	public List<String> getLeftActionImageName() {
 		return Arrays.asList("image/soldier/Japanese sword left 0.png",
 				"image/soldier/Japanese sword left 1.png",
 				"image/soldier/Japanese sword left 2.png",
