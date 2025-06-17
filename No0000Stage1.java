@@ -11,32 +11,23 @@ public class No0000Stage1 extends StageData{
 	}
 
 	@Override
-	public List<String> getImageName() {
-		return Arrays.asList("image/field/stage 1-1.png",
-				"image/field/stage 1-2.png",
-				"image/field/stage 1-3.png",
-				"image/field/stage 1-4.png");
-	}
-
-	@Override
-	public List<List<Boolean>> getGateMode(){
-		return Arrays.asList(
-				Arrays.asList(true, true, true),
-				Arrays.asList(false, true, true),
-				Arrays.asList(false, false, true),
-				Arrays.asList(false, false, false));
+	public String getImageName() {
+		return "image/field/stage 1.png";
 	}
 
 	@Override
 	public List<Integer> getFacility() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		return Arrays.asList(0, 1, 1, 1);
+	}
+
+	@Override
+	public List<Boolean> getFacilityDirection() {
+		return Arrays.asList(true, false, false, true);
 	}
 
 	@Override
 	public List<Point> getFacilityPoint() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		return Arrays.asList(new Point(530, 10), new Point(310, 320), new Point(660, 430), new Point(910, 160));
 	}
 
 	@Override
@@ -77,7 +68,7 @@ public class No0000Stage1 extends StageData{
 
 	@Override
 	public List<Integer> getDisplayOrder() {
-		return Arrays.asList(0, 1, 0, 0, 0, 0, 0);
+		return Arrays.asList(0, 1);
 	}
 
 	@Override

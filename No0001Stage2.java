@@ -11,40 +11,23 @@ public class No0001Stage2 extends StageData {
 	}
 
 	@Override
-	public List<String> getImageName() {
-		return Arrays.asList("image/field/stage 2-1.png",
-				"image/field/stage 2-2.png",
-				"image/field/stage 2-3.png",
-				"image/field/stage 2-4.png",
-				"image/field/stage 2-5.png",
-				"image/field/stage 2-6.png",
-				"image/field/stage 2-7.png",
-				"image/field/stage 2-8.png");
-	}
-
-	@Override
-	public List<List<Boolean>> getGateMode() {
-		return Arrays.asList(
-				Arrays.asList(true, true, true),
-				Arrays.asList(false, true, true),
-				Arrays.asList(true, false, true),
-				Arrays.asList(true, true, false),
-				Arrays.asList(false, false, true),
-				Arrays.asList(false, true, false),
-				Arrays.asList(true, false, false),
-				Arrays.asList(false, false, false));
+	public String getImageName() {
+		return "image/field/stage 2.png";
 	}
 
 	@Override
 	public List<Integer> getFacility() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		return Arrays.asList(0, 1, 1, 1);
+	}
+
+	@Override
+	public List<Boolean> getFacilityDirection() {
+		return Arrays.asList(true, true, false, false);
 	}
 
 	@Override
 	public List<Point> getFacilityPoint() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		return Arrays.asList(new Point(430, 20), new Point(450, 260), new Point(190, 80), new Point(715, 80));
 	}
 
 	@Override
@@ -81,13 +64,12 @@ public class No0001Stage2 extends StageData {
 				Arrays.asList(1, 0, 200),
 				Arrays.asList(1, 1, 200),
 				Arrays.asList(0, 3, 400),
-				Arrays.asList(0, 4, 400)
-				);
+				Arrays.asList(0, 4, 400));
 	}
 
 	@Override
 	public List<Integer> getDisplayOrder() {
-		return Arrays.asList(1, 0);
+		return Arrays.asList(0, 1);
 	}
 
 	@Override

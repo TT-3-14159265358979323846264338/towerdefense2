@@ -8,13 +8,13 @@ public abstract class StageData {
 	public abstract String getName();
 	
 	//ステージ画像ファイル名
-	public abstract List<String> getImageName();
-	
-	//ステージ画像における門の状態
-	public abstract List<List<Boolean>> getGateMode();
+	public abstract String getImageName();
 	
 	//設備の種類番号
 	public abstract List<Integer> getFacility();
+	
+	//設備の向き　前向きをtrue, 横向きをfalse
+	public abstract List<Boolean> getFacilityDirection();
 	
 	//設備の位置
 	public abstract List<Point> getFacilityPoint();
