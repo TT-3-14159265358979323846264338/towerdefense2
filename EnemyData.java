@@ -18,15 +18,15 @@ public abstract class EnemyData {
 	//種別(DefaultEnemy.TYPE_MAP)で登録
 	public abstract int getType();
 	
-	//武器属性はその武器の全ての属性(DefaultEnemy.ELEMENT_MAP)を登録
+	//武器属性はその武器の全ての属性(DefaultStage.ELEMENT_MAP)を登録
 	public abstract List<Integer> getElement();
 	
-	//DefaultEnemy.WEAPON_MAPの順にステータスをリスト化
+	//DefaultStage.WEAPON_MAPの順にステータスをリスト化
 	public abstract List<Integer> getWeaponStatus();
 	
-	//DefaultEnemy.UNIT_MAPの順にステータスをリスト化
+	//DefaultStage.UNIT_MAPの順にステータスをリスト化
 	public abstract List<Integer> getUnitStatus();
 	
-	//DefaultEnemy.ELEMENT_MAPの順にステータスをリスト化
+	//DefaultStage.ELEMENT_MAPの順にステータスをリスト化
 	public abstract List<Integer> getCutStatus();
 }
