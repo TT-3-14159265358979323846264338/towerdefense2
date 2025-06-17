@@ -20,31 +20,31 @@ public class DefaultOther {
 	
 	
 	//画像取込み
-	public BufferedImage getTitleImage(int ratio) {
+	public BufferedImage getTitleImage(double ratio) {
 		return new EditImage().input(TITLE, ratio);
 	}
 
-	public BufferedImage getBallImage(int ratio) {
+	public BufferedImage getBallImage(double ratio) {
 		return new EditImage().input(BALL, ratio);
 	}
 
-	public List<BufferedImage> getHalfBallImage(int ratio) {
+	public List<BufferedImage> getHalfBallImage(double ratio) {
 		return new EditImage().inputList(HALF_BALL, ratio);
 	}
 
-	public BufferedImage getHandleImage(int ratio) {
+	public BufferedImage getHandleImage(double ratio) {
 		return new EditImage().input(HANDLE, ratio);
 	}
 
-	public List<BufferedImage> getMachineImage(int ratio) {
+	public List<BufferedImage> getMachineImage(double ratio) {
 		return new EditImage().inputList(MACHINE, ratio);
 	}
 
-	public BufferedImage getTurnImage(int ratio) {
+	public BufferedImage getTurnImage(double ratio) {
 		return new EditImage().input(TURN, ratio);
 	}
 
-	public BufferedImage getEffectImage(int ratio) {
+	public BufferedImage getEffectImage(double ratio) {
 		return new EditImage().input(EFFECT, ratio);
 	}
 }

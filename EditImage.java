@@ -11,12 +11,16 @@ import java.awt.image.Kernel;
 import java.io.File;
 import java.util.List;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 
+import defaultdata.facility.FacilityData;
+import defaultdata.stage.StageData;
+
 //画像処理
 public class EditImage{
-	public BufferedImage input(String imageName, int ratio) {
+	public BufferedImage input(String imageName, double ratio) {
 		if(imageName == null) {
 			return null;
 		}
@@ -29,15 +33,11 @@ public class EditImage{
 		return image;
 	}
 	
-	public List<BufferedImage> inputList(List<String> imageNameList, int ratio){
+	protected List<BufferedImage> inputList(List<String> imageNameList, double ratio){
 		return imageNameList.stream().map(i -> (i == null)? null: input(i, ratio)).toList();
 	}
 	
-	public List<List<BufferedImage>> inputList2(List<List<String>> imageNameList, int ratio){
-		return imageNameList.stream().map(i -> (i == null)? null: inputList(i, ratio)).toList();
-	}
-	
-	private BufferedImage getImage(BufferedImage originalImage, int ratio) {
+	private BufferedImage getImage(BufferedImage originalImage, double ratio) {
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
 		BufferedImage image = getBlankImage(width, height);
@@ -49,9 +49,9 @@ public class EditImage{
 		return scalingImage(image, ratio);
 	}
 	
-	public BufferedImage scalingImage(BufferedImage originalImage, int ratio) {
-		int resizeWidth = originalImage.getWidth() / ratio;
-		int resizeHeight = originalImage.getHeight() / ratio;
+	public BufferedImage scalingImage(BufferedImage originalImage, double ratio) {
+		int resizeWidth = (int) (originalImage.getWidth() / ratio);
+		int resizeHeight = (int) (originalImage.getHeight() / ratio);
 		BufferedImage resizeImage = getBlankImage(resizeWidth, resizeHeight);
 		resizeImage.createGraphics().drawImage(
 				originalImage.getScaledInstance(resizeWidth, resizeHeight, Image.SCALE_AREA_AVERAGING),
@@ -102,6 +102,24 @@ public class EditImage{
 		IntStream.range(0, matrix.length).forEach(i -> matrix[i] = 1.5f / (pixel * pixel));//透過度あるため、色濃いめの1.5f
 		ConvolveOp blur = new ConvolveOp(new Kernel(pixel, pixel, matrix), ConvolveOp.EDGE_NO_OP, null);
 		return blur.filter(resizeImage, null);
+	}
+	
+	public BufferedImage stageImage(StageData StageData) {
+		BufferedImage image = input(StageData.getImageName(), 2);
+		Graphics g = image.getGraphics();
+		
+		
+		
+		
+		
+		FacilityData[] FacilityData = IntStream.range(0, DefaultStage.FACILITY_SPECIES).mapToObj(i -> new DefaultStage().getFacilityData(i)).toArray(FacilityData[]::new);
+		List<BufferedImage> frontFacilityImage = Stream.of(FacilityData).map(i -> input(i.getFrontImageName(), 4)).toList();
+		List<BufferedImage> sideFacilityImage = Stream.of(FacilityData).map(i -> input(i.getSideImageName(), 4)).toList();
+		IntStream.range(0, StageData.getFacility().size()).forEach(i -> {
+			g.drawImage(StageData.getFacilityDirection().get(i)? frontFacilityImage.get(StageData.getFacility().get(i)): sideFacilityImage.get(StageData.getFacility().get(i)), StageData.getFacilityPoint().get(i).x, StageData.getFacilityPoint().get(i).y, null);
+		});
+		g.dispose();
+		return scalingImage(image, 2.5);
 	}
 	
 	private BufferedImage getBlankImage(int width, int height) {

@@ -48,10 +48,10 @@ public class MenuSelectStage extends JPanel{
 	JScrollPane meritScroll = new JScrollPane();
 	ProgressData ProgressData = new ProgressData();
 	StageData[] StageData = IntStream.range(0, DefaultStage.STAGE_SPECIES).mapToObj(i -> new DefaultStage().getStageData(i)).toArray(StageData[]::new);
-	StagePanel StagePanel = new StagePanel(ProgressData.getSelectStage(), StageData);
-	MeritPanel MeritPanel = new MeritPanel(StagePanel, ProgressData.getMeritStatus(), StageData);
-	EnemyPanel EnemyPanel = new EnemyPanel(StagePanel, StageData);
-	List<BufferedImage> stageImage = Stream.of(StageData).map(i -> new EditImage().input(i.getImageName().get(0), 5)).toList();
+	SelectPanel SelectPanel = new SelectPanel(ProgressData.getSelectStage(), StageData);
+	MeritPanel MeritPanel = new MeritPanel(SelectPanel, ProgressData.getMeritStatus(), StageData);
+	EnemyPanel EnemyPanel = new EnemyPanel(SelectPanel, StageData);
+	List<BufferedImage> stageImage = Stream.of(StageData).map(i -> new EditImage().stageImage(i)).toList();
 	
 	protected MenuSelectStage(MainFrame MainFrame) {
 		setBackground(new Color(240, 170, 80));
@@ -119,7 +119,7 @@ public class MenuSelectStage extends JPanel{
 	private void addNormalModeButton() {
 		add(normalModeButton);
 		normalModeButton.addActionListener(e->{
-			ProgressData.save(StagePanel.getSelelct());
+			ProgressData.save(SelectPanel.getSelelct());
 			showMessageDialog(null, "調整中\nnormal mode でゲーム開始");
 		});
 	}
@@ -133,7 +133,7 @@ public class MenuSelectStage extends JPanel{
 	private void addHardModeButton() {
 		add(hardModeButton);
 		hardModeButton.addActionListener(e->{
-			ProgressData.save(StagePanel.getSelelct());
+			ProgressData.save(SelectPanel.getSelelct());
 			showMessageDialog(null, "調整中\nhard mode でゲーム開始");
 		});
 	}
@@ -149,7 +149,7 @@ public class MenuSelectStage extends JPanel{
 	}
 	
 	private void addStageScroll() {
-		stageScroll.getViewport().setView(StagePanel);
+		stageScroll.getViewport().setView(SelectPanel);
     	add(stageScroll);
 	}
 	
@@ -179,7 +179,7 @@ public class MenuSelectStage extends JPanel{
 	}
 	
 	private void drawField(Graphics g){
-		g.drawImage(stageImage.get(StagePanel.getSelelct()), 170, 40, this);
+		g.drawImage(stageImage.get(SelectPanel.getSelelct()), 170, 40, this);
 	}
 }
 
@@ -217,15 +217,15 @@ class ProgressData{
 }
 
 //ステージ切り替え
-class StagePanel extends JPanel implements MouseListener{
+class SelectPanel extends JPanel implements MouseListener{
 	JLabel[] nameLabel = IntStream.range(0, DefaultStage.STAGE_SPECIES).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
 	List<BufferedImage> stageImage;
 	List<String> stageNameList;
 	int select = 0;
 	
-	protected StagePanel(int select, StageData[] StageData) {
+	protected SelectPanel(int select, StageData[] StageData) {
 		Stream.of(nameLabel).forEach(i -> addLabel(i));
-		stageImage = Stream.of(StageData).map(i -> new EditImage().input(i.getImageName().get(0), 18)).toList();
+		stageImage = Stream.of(StageData).map(i -> new EditImage().input(i.getImageName(), 18)).toList();
 		stageNameList = Stream.of(StageData).map(i -> i.getName()).toList();
 		this.select = select;
 		addMouseListener(this);
@@ -290,14 +290,14 @@ class StagePanel extends JPanel implements MouseListener{
 class MeritPanel extends JPanel{
 	JLabel[] meritLabel;
 	JLabel[] clearLabel;
-	StagePanel StagePanel;
+	SelectPanel SelectPanel;
 	List<List<Boolean>> meritStatus;
 	List<List<String>> meritInformation;
 	Font meritFont = new Font("ＭＳ ゴシック", Font.BOLD, 15);
 	Font clearFont = new Font("Arail", Font.BOLD, 30);
 	
-	protected MeritPanel(StagePanel StagePanel, List<List<Boolean>> meritStatus, StageData[] StageData) {
-		this.StagePanel = StagePanel;
+	protected MeritPanel(SelectPanel SelectPanel, List<List<Boolean>> meritStatus, StageData[] StageData) {
+		this.SelectPanel = SelectPanel;
 		this.meritStatus = meritStatus;
 		meritLabel = IntStream.range(0, Stream.of(StageData).mapToInt(i -> i.getMerit().size()).max().getAsInt()).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
 		clearLabel = IntStream.range(0, meritLabel.length).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
@@ -324,7 +324,7 @@ class MeritPanel extends JPanel{
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		setPreferredSize(new Dimension(200, 70 * meritInformation.get(StagePanel.getSelelct()).size()));
+		setPreferredSize(new Dimension(200, 70 * meritInformation.get(SelectPanel.getSelelct()).size()));
 		IntStream.range(0, meritLabel.length).forEach(i -> setLabel(i));
 		IntStream.range(0, meritLabel.length).forEach(i -> g.drawLine(0, 70 * i, 400, 70 * i));
 	}
@@ -344,9 +344,9 @@ class MeritPanel extends JPanel{
 	
 	private void setLabel(int number) {
 		try{
-			meritLabel[number].setText(meritInformation.get(StagePanel.getSelelct()).get(number));
+			meritLabel[number].setText(meritInformation.get(SelectPanel.getSelelct()).get(number));
 			meritLabel[number].setBounds(5, number * 70, 400, 70);
-			clearLabel[number].setText(meritStatus.get(StagePanel.getSelelct()).get(number)? "clear": "");
+			clearLabel[number].setText(meritStatus.get(SelectPanel.getSelelct()).get(number)? "clear": "");
 			clearLabel[number].setBounds(290, number * 70, 100, 70);
 		}catch (Exception e) {
 			meritLabel[number].setText("");
@@ -357,18 +357,18 @@ class MeritPanel extends JPanel{
 
 //敵兵情報
 class EnemyPanel extends JPanel implements MouseListener{
-	StagePanel StagePanel;
+	SelectPanel SelectPanel;
 	StageData[] StageData;
 	List<BufferedImage> enemyImage = new DefaultEnemy().getEnemyImage(2);
 	List<List<Integer>> enemyCount;
 	int drawSize = 100;
 	int column = 3;
 	
-	protected EnemyPanel(StagePanel StagePanel, StageData[] StageData) {
+	protected EnemyPanel(SelectPanel SelectPanel, StageData[] StageData) {
 		BiFunction<Integer, List<List<Integer>>, Integer> count = (number, enemyList) -> {
 			return (int) enemyList.stream().filter(i -> i.get(0) == number).count();
 		};
-		this.StagePanel = StagePanel;
+		this.SelectPanel = SelectPanel;
 		this.StageData = StageData;
 		enemyCount = Stream.of(StageData).map(i -> i.getDisplayOrder().stream().map(j -> count.apply(j, i.getEnemy())).toList()).toList();
 		addMouseListener(this);
@@ -376,14 +376,14 @@ class EnemyPanel extends JPanel implements MouseListener{
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		List<Integer> displayList = StageData[StagePanel.getSelelct()].getDisplayOrder();
+		List<Integer> displayList = StageData[SelectPanel.getSelelct()].getDisplayOrder();
 		setPreferredSize(new Dimension(100, (displayList.size() / column + 1) * drawSize));
 		IntStream.range(0, displayList.size()).forEach(i -> {
 			int x = i % column * drawSize;
 			int y = i / column * drawSize;
 			g.drawImage(enemyImage.get(displayList.get(i)), x, y, this);
 			g.setFont(new Font("Arial", Font.BOLD, 30));
-			g.drawString("" + enemyCount.get(StagePanel.getSelelct()).get(i), 80 + x, 80 + y);
+			g.drawString("" + enemyCount.get(SelectPanel.getSelelct()).get(i), 80 + x, 80 + y);
 		});
 	}
 	
@@ -392,7 +392,7 @@ class EnemyPanel extends JPanel implements MouseListener{
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
-		List<Integer> displayList = StageData[StagePanel.getSelelct()].getDisplayOrder();
+		List<Integer> displayList = StageData[SelectPanel.getSelelct()].getDisplayOrder();
 		for(int i = 0; i < displayList.size(); i++) {
 			int x = i % column * drawSize + 10;
 			int y = i / column * drawSize + 10;

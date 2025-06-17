@@ -107,23 +107,23 @@ public class DefaultUnit {
 	}
 	
 	//画像取込み
-	public List<BufferedImage> getCoreImage(int ratio){
+	public List<BufferedImage> getCoreImage(double ratio){
 		return new EditImage().inputList(IntStream.range(0, CORE_SPECIES).mapToObj(i -> getCoreData(i).getImageName()).toList(), ratio);
 	}
 	
-	public List<BufferedImage> getCenterCoreImage(int ratio){
+	public List<BufferedImage> getCenterCoreImage(double ratio){
 		return new EditImage().inputList(IntStream.range(0, CORE_SPECIES).mapToObj(i -> getCoreData(i).getActionImageName()).toList(), ratio);
 	}
 	
-	public List<BufferedImage> getWeaponImage(int ratio){
+	public List<BufferedImage> getWeaponImage(double ratio){
 		return new EditImage().inputList(IntStream.range(0, WEAPON_SPECIES).mapToObj(i -> getWeaponData(i).getImageName()).toList(), ratio);
 	}
 	
-	public List<BufferedImage> getRightWeaponImage(int ratio){
+	public List<BufferedImage> getRightWeaponImage(double ratio){
 		return new EditImage().inputList(IntStream.range(0, WEAPON_SPECIES).mapToObj(i -> getWeaponData(i).getRightActionImageName()).map(i -> (i.isEmpty())? null: i.get(0)).toList(), ratio);
 	}
 	
-	public List<BufferedImage> getLeftWeaponImage(int ratio){
+	public List<BufferedImage> getLeftWeaponImage(double ratio){
 		return new EditImage().inputList(IntStream.range(0, WEAPON_SPECIES).mapToObj(i -> getWeaponData(i).getLeftActionImageName().get(0)).toList(), ratio);
 	}
 }

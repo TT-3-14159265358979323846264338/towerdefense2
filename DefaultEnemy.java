@@ -69,7 +69,7 @@ public class DefaultEnemy {
 	}
 	
 	//画像取込み
-	public List<BufferedImage> getEnemyImage(int ratio){
+	public List<BufferedImage> getEnemyImage(double ratio){
 		return new EditImage().inputList(IntStream.range(0, ENEMY_SPECIES).mapToObj(i -> getEnemyData(i).getImageName()).toList(), ratio);
 	}
 }
