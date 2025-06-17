@@ -20,6 +20,7 @@ import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -28,10 +29,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import defaultdata.DefaultEnemy;
 import defaultdata.DefaultStage;
 import defaultdata.EditImage;
 import defaultdata.stage.StageData;
 import savedata.SaveGameProgress;
+import screendisplay.DisplayStatus;
 
 //ステージ選択画面
 public class MenuSelectStage extends JPanel{
@@ -47,7 +50,7 @@ public class MenuSelectStage extends JPanel{
 	StageData[] StageData = IntStream.range(0, DefaultStage.STAGE_SPECIES).mapToObj(i -> new DefaultStage().getStageData(i)).toArray(StageData[]::new);
 	StagePanel StagePanel = new StagePanel(ProgressData.getSelectStage(), StageData);
 	MeritPanel MeritPanel = new MeritPanel(StagePanel, ProgressData.getMeritStatus(), StageData);
-	EnemyPanel EnemyPanel = new EnemyPanel();
+	EnemyPanel EnemyPanel = new EnemyPanel(StagePanel, StageData);
 	List<BufferedImage> stageImage = Stream.of(StageData).map(i -> new EditImage().input(i.getImageName().get(0), 5)).toList();
 	
 	protected MenuSelectStage(MainFrame MainFrame) {
@@ -353,19 +356,60 @@ class MeritPanel extends JPanel{
 }
 
 //敵兵情報
-class EnemyPanel extends JPanel{
+class EnemyPanel extends JPanel implements MouseListener{
+	StagePanel StagePanel;
+	StageData[] StageData;
+	List<BufferedImage> enemyImage = new DefaultEnemy().getEnemyImage(2);
+	List<List<Integer>> enemyCount;
+	int drawSize = 100;
+	int column = 3;
 	
+	protected EnemyPanel(StagePanel StagePanel, StageData[] StageData) {
+		BiFunction<Integer, List<List<Integer>>, Integer> count = (number, enemyList) -> {
+			return (int) enemyList.stream().filter(i -> i.get(0) == number).count();
+		};
+		this.StagePanel = StagePanel;
+		this.StageData = StageData;
+		enemyCount = Stream.of(StageData).map(i -> i.getDisplayOrder().stream().map(j -> count.apply(j, i.getEnemy())).toList()).toList();
+		addMouseListener(this);
+	}
 	
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		List<Integer> displayList = StageData[StagePanel.getSelelct()].getDisplayOrder();
+		setPreferredSize(new Dimension(100, (displayList.size() / column + 1) * drawSize));
+		IntStream.range(0, displayList.size()).forEach(i -> {
+			int x = i % column * drawSize;
+			int y = i / column * drawSize;
+			g.drawImage(enemyImage.get(displayList.get(i)), x, y, this);
+			g.setFont(new Font("Arial", Font.BOLD, 30));
+			g.drawString("" + enemyCount.get(StagePanel.getSelelct()).get(i), 80 + x, 80 + y);
+		});
+	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+		List<Integer> displayList = StageData[StagePanel.getSelelct()].getDisplayOrder();
+		for(int i = 0; i < displayList.size(); i++) {
+			int x = i % column * drawSize + 10;
+			int y = i / column * drawSize + 10;
+			if(ValueRange.of(x, x + drawSize - 30).isValidIntValue(e.getX())
+					&& ValueRange.of(y, y + drawSize - 30).isValidIntValue(e.getY())){
+				new DisplayStatus().enemy(enemyImage.get(displayList.get(i)), displayList.get(i));
+				break;
+			}
+		}
+	}
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
 }
