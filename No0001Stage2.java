@@ -75,14 +75,19 @@ public class No0001Stage2 extends StageData {
 
 	@Override
 	public List<List<Integer>> getEnemy() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		return Arrays.asList(
+				Arrays.asList(0, 0, 100),
+				Arrays.asList(0, 1, 100),
+				Arrays.asList(1, 0, 200),
+				Arrays.asList(1, 1, 200),
+				Arrays.asList(0, 3, 400),
+				Arrays.asList(0, 4, 400)
+				);
 	}
 
 	@Override
 	public List<Integer> getDisplayOrder() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		return Arrays.asList(1, 0);
 	}
 
 	@Override
