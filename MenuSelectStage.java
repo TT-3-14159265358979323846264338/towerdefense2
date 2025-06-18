@@ -48,10 +48,10 @@ public class MenuSelectStage extends JPanel{
 	JScrollPane meritScroll = new JScrollPane();
 	ProgressData ProgressData = new ProgressData();
 	StageData[] StageData = IntStream.range(0, DefaultStage.STAGE_SPECIES).mapToObj(i -> new DefaultStage().getStageData(i)).toArray(StageData[]::new);
-	SelectPanel SelectPanel = new SelectPanel(ProgressData.getSelectStage(), StageData);
+	List<BufferedImage> stageImage = Stream.of(StageData).map(i -> new EditImage().stageImage(i, 5)).toList();
+	SelectPanel SelectPanel = new SelectPanel(stageImage, ProgressData.getSelectStage(), StageData);
 	MeritPanel MeritPanel = new MeritPanel(SelectPanel, ProgressData.getMeritStatus(), StageData);
 	EnemyPanel EnemyPanel = new EnemyPanel(SelectPanel, StageData);
-	List<BufferedImage> stageImage = Stream.of(StageData).map(i -> new EditImage().stageImage(i)).toList();
 	
 	protected MenuSelectStage(MainFrame MainFrame) {
 		setBackground(new Color(240, 170, 80));
@@ -223,9 +223,9 @@ class SelectPanel extends JPanel implements MouseListener{
 	List<String> stageNameList;
 	int select = 0;
 	
-	protected SelectPanel(int select, StageData[] StageData) {
+	protected SelectPanel(List<BufferedImage> stageImage, int select, StageData[] StageData) {
 		Stream.of(nameLabel).forEach(i -> addLabel(i));
-		stageImage = Stream.of(StageData).map(i -> new EditImage().input(i.getImageName(), 18)).toList();
+		this.stageImage = stageImage.stream().map(i -> new EditImage().scalingImage(i, 3.5)).toList();
 		stageNameList = Stream.of(StageData).map(i -> i.getName()).toList();
 		this.select = select;
 		addMouseListener(this);

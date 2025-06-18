@@ -4,12 +4,14 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
 import java.io.File;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -104,22 +106,24 @@ public class EditImage{
 		return blur.filter(resizeImage, null);
 	}
 	
-	public BufferedImage stageImage(StageData StageData) {
+	public BufferedImage stageImage(StageData StageData, double ratio) {
 		BufferedImage image = input(StageData.getImageName(), 2);
 		Graphics g = image.getGraphics();
-		
-		
-		
-		
-		
+		BiConsumer<BufferedImage, Point> drawImage = (displayImage, point) -> {
+			g.drawImage(displayImage, point.x, point.y, null);
+		};
+		//配置マスの表示
+		List<BufferedImage> placementImage = new DefaultStage().getPlacementImage(4);
+		IntStream.range(0, placementImage.size()).forEach(i -> StageData.getPlacementPoint().get(i).stream().forEach(j -> drawImage.accept(placementImage.get(i), j)));
+		//設備の表示
 		FacilityData[] FacilityData = IntStream.range(0, DefaultStage.FACILITY_SPECIES).mapToObj(i -> new DefaultStage().getFacilityData(i)).toArray(FacilityData[]::new);
 		List<BufferedImage> frontFacilityImage = Stream.of(FacilityData).map(i -> input(i.getFrontImageName(), 4)).toList();
 		List<BufferedImage> sideFacilityImage = Stream.of(FacilityData).map(i -> input(i.getSideImageName(), 4)).toList();
 		IntStream.range(0, StageData.getFacility().size()).forEach(i -> {
-			g.drawImage(StageData.getFacilityDirection().get(i)? frontFacilityImage.get(StageData.getFacility().get(i)): sideFacilityImage.get(StageData.getFacility().get(i)), StageData.getFacilityPoint().get(i).x, StageData.getFacilityPoint().get(i).y, null);
+			drawImage.accept(StageData.getFacilityDirection().get(i)? frontFacilityImage.get(StageData.getFacility().get(i)): sideFacilityImage.get(StageData.getFacility().get(i)), StageData.getFacilityPoint().get(i));
 		});
 		g.dispose();
-		return scalingImage(image, 2.5);
+		return scalingImage(image, ratio / 2);
 	}
 	
 	private BufferedImage getBlankImage(int width, int height) {
