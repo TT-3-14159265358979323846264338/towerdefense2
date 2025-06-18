@@ -19,15 +19,13 @@ public abstract class StageData {
 	//設備の位置
 	public abstract List<Point> getFacilityPoint();
 	
-	//配置位置
-	public abstract List<Point> getNearPoint();
-	public abstract List<Point> getFarPoint();
-	public abstract List<Point> getAllPoint();
+	//配置位置　near, far, allの順にList<Point>を追加
+	public abstract List<List<Point>> getPlacementPoint();
 	
 	//戦功内容　実際の表示では"("で改行が入るため"("の前のスペース禁止
 	public abstract List<String> getMerit();
 	
-	//敵情報　敵番号, 移動番号, 出撃タイミング の順にリスト化
+	//敵情報　各敵番号, 移動番号, 出撃タイミング の順にリスト化
 	public abstract List<List<Integer>> getEnemy();
 	
 	//敵情報表示順

@@ -31,21 +31,47 @@ public class No0001Stage2 extends StageData {
 	}
 
 	@Override
-	public List<Point> getNearPoint() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
-
-	@Override
-	public List<Point> getFarPoint() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
-
-	@Override
-	public List<Point> getAllPoint() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	public List<List<Point>> getPlacementPoint() {
+		double size = 29.5;
+		Point center = new Point(483, 265);
+		return Arrays.asList(
+				Arrays.asList(new Point((int) (center.x - size * 7), (int) (center.y - size * 5)),
+						new Point((int) (center.x - size * 5), (int) (center.y - size * 5)),
+						new Point((int) (center.x + size * 5), (int) (center.y - size * 5)),
+						new Point((int) (center.x + size * 7), (int) (center.y - size * 5)),
+						
+						new Point((int) (center.x - size), (int) (center.y - size)),
+						new Point((int) (center.x + size), (int) (center.y - size))),
+				Arrays.asList(new Point((int) (center.x - size * 9), (int) (center.y - size * 8)),
+						new Point((int) (center.x + size * 9), (int) (center.y - size * 8)),
+						
+						new Point((int) (center.x - size * 6), (int) (center.y - size * 7)),
+						new Point((int) (center.x - size * 4), (int) (center.y - size * 7)),
+						new Point((int) (center.x + size * 6), (int) (center.y - size * 7)),
+						new Point((int) (center.x + size * 4), (int) (center.y - size * 7)),
+						
+						new Point((int) (center.x - size * 9), (int) (center.y - size * 3)),
+						new Point((int) (center.x - size * 5), (int) (center.y - size * 3)),
+						new Point((int) (center.x - size * 3), (int) (center.y - size * 3)),
+						new Point((int) (center.x + size * 9), (int) (center.y - size * 3)),
+						new Point((int) (center.x + size * 5), (int) (center.y - size * 3)),
+						new Point((int) (center.x + size * 3), (int) (center.y - size * 3)),
+						
+						new Point((int) (center.x - size * 9), (int) (center.y - size)),
+						new Point((int) (center.x + size * 9), (int) (center.y - size)),
+						
+						new Point((int) (center.x - size * 7), (int) (center.y + size)),
+						new Point((int) (center.x - size * 5), (int) (center.y + size)),
+						new Point((int) (center.x - size * 3), (int) (center.y + size)),
+						new Point((int) (center.x + size * 7), (int) (center.y + size)),
+						new Point((int) (center.x + size * 5), (int) (center.y + size)),
+						new Point((int) (center.x + size * 3), (int) (center.y + size))),
+				Arrays.asList(new Point((int) (center.x - size * 3), (int) (center.y - size * 5)),
+						new Point((int) (center.x + size * 3), (int) (center.y - size * 5)),
+						
+						new Point((int) (center.x - size), (int) (center.y - size * 3)),
+						new Point((int) (center.x + size), (int) (center.y - size * 3))
+						));
 	}
 
 	@Override
