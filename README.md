@@ -1,3 +1,5 @@
+♦現在作成中♦  
+  
 mainと各defaultdata.のbranchに必要なソースファイルを格納している。  
 defaultのdataはソースファイル数が多くなる予定のため、各branchへ退避させた。  
   
