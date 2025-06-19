@@ -31,8 +31,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 
 import defaultdata.DefaultUnit;
 import savedata.SaveComposition;
@@ -501,7 +501,7 @@ class RecyclePanel extends JPanel{
 		importQuantity();
 		JSpinner.NumberEditor editor = new JSpinner.NumberEditor(countSpinner);
 		editor.getTextField().setEditable(false);
-		editor.getTextField().setHorizontalAlignment(SwingConstants.CENTER);
+		editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
 		countSpinner.setEditor(editor);
 	}
 	

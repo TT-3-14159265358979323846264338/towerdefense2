@@ -35,6 +35,9 @@ public class MenuMain extends JPanel implements ActionListener{
 	List<Integer> randamList = IntStream.range(0, NUMBER).mapToObj(i -> new Random().nextInt(coreImage.size())).toList();
 	int count;
 	
+	//テスト用
+	JButton testButton = new JButton();
+	
 	protected MenuMain(MainFrame MainFrame) {
 		this.MainFrame = MainFrame;
 		setBackground(new Color(240, 170, 80));
@@ -42,6 +45,7 @@ public class MenuMain extends JPanel implements ActionListener{
 		addItemDisposeButton();
 		addCompositionButton();
 		addBattleButton();
+		addTestButton();
 		timer.start();
 	}
 	
@@ -51,6 +55,7 @@ public class MenuMain extends JPanel implements ActionListener{
 		setItemDisposeButton();
 		setCompositionButton();
 		setBattleButton();
+		setTestButton();
 		drawImage(g);
 	}
 	
@@ -115,6 +120,20 @@ public class MenuMain extends JPanel implements ActionListener{
 		Stream.of(FinalMotion).forEach(i -> i.timerStop());
 		timer.stop();
 	}
+	
+	//テスト用
+	private void addTestButton() {
+		add(testButton);
+		testButton.addActionListener(e->{
+			new TestDataEdit();
+		});
+	}
+	private void setTestButton() {
+		testButton.setText("セーブデータ編集");
+		testButton.setBounds(410, 0, 160, 40);
+		setButton(testButton);
+	}
+	//ここまで
 	
 	private void setButton(JButton button) {
 		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
