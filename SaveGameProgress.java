@@ -1,5 +1,9 @@
 package savedata;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +32,42 @@ public class SaveGameProgress implements Serializable{
 		selectStage = 0;
 	}
 	
-	public SaveGameProgress(List<Boolean> clearStatus, List<List<Boolean>> meritStatus, int medal, int selectStage) {
+	public void load() {
+		try {
+			ObjectInputStream loadProgressData = new ObjectInputStream(new FileInputStream(PROGRESS_FILE));
+			SaveGameProgress SaveGameProgress = (SaveGameProgress) loadProgressData.readObject();
+			loadProgressData.close();
+			clearStatus = SaveGameProgress.getClearStatus();
+			meritStatus = SaveGameProgress.getMeritStatus();
+			medal = SaveGameProgress.getMedal();
+			selectStage = SaveGameProgress.getSelectStage();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void save() {
+		try {
+			ObjectOutputStream saveProgressData = new ObjectOutputStream(new FileOutputStream(PROGRESS_FILE));
+			saveProgressData.writeObject(this);
+			saveProgressData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void save(List<Boolean> clearStatus, List<List<Boolean>> meritStatus, int medal, int selectStage) {
 		this.clearStatus = clearStatus;
 		this.meritStatus = meritStatus;
 		this.medal = medal;
 		this.selectStage = selectStage;
+		try {
+			ObjectOutputStream saveProgressData = new ObjectOutputStream(new FileOutputStream(PROGRESS_FILE));
+			saveProgressData.writeObject(this);
+			saveProgressData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public List<Boolean> getClearStatus(){

@@ -1,5 +1,9 @@
 package savedata;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,12 +33,6 @@ public class SaveComposition implements Serializable{
 		newComposition();
 	}
 	
-	public SaveComposition(List<List<List<Integer>>> allCompositionList, List<String> compositionNameList, int selectNumber) {
-		this.allCompositionList = allCompositionList;
-		this.compositionNameList = compositionNameList;
-		this.selectNumber = selectNumber;
-	}
-	
 	public void newComposition() {
 		allCompositionList.add(new ArrayList<>(IntStream.range(0, 8).mapToObj(i -> new ArrayList<>(DEFAULT)).toList()));
 		compositionNameList.add("編成 " + allCompositionList.size());
@@ -45,6 +43,42 @@ public class SaveComposition implements Serializable{
 		allCompositionList.remove(number);
 		compositionNameList.remove(number);
 		selectNumber = (number == 0)? 0: number - 1;
+	}
+	
+	public void load() {
+		try {
+			ObjectInputStream compositionData = new ObjectInputStream(new FileInputStream(COMPOSITION_FILE));
+			SaveComposition SaveComposition = (SaveComposition) compositionData.readObject();
+			compositionData.close();
+			allCompositionList = SaveComposition.getAllCompositionList();
+			compositionNameList = SaveComposition.getCompositionNameList();
+			selectNumber = SaveComposition.getSelectNumber();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void save() {
+		try {
+			ObjectOutputStream saveItemData = new ObjectOutputStream(new FileOutputStream(COMPOSITION_FILE));
+			saveItemData.writeObject(this);
+			saveItemData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void save(List<List<List<Integer>>> allCompositionList, List<String> compositionNameList, int selectNumber) {
+		this.allCompositionList = allCompositionList;
+		this.compositionNameList = compositionNameList;
+		this.selectNumber = selectNumber;
+		try {
+			ObjectOutputStream saveItemData = new ObjectOutputStream(new FileOutputStream(COMPOSITION_FILE));
+			saveItemData.writeObject(this);
+			saveItemData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public List<List<List<Integer>>> getAllCompositionList(){

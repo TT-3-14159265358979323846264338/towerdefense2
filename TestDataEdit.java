@@ -1,19 +1,12 @@
 package defendthecastle;
 
-import static savedata.SaveGameProgress.*;
-import static savedata.SaveHoldItem.*;
+import static javax.swing.JOptionPane.*;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -115,6 +108,7 @@ class TestPanel extends JPanel{
 			}else {
 				EditProgress.save();
 			}
+			showMessageDialog(null, "セーブしました");
 		});
 	}
 	
@@ -160,7 +154,7 @@ class EditItem extends JPanel{
 	JSpinner[] weaponSpinner;
 	List<BufferedImage> coreImage = new DefaultUnit().getCoreImage(4);
 	List<BufferedImage> weaponImage = new DefaultUnit().getWeaponImage(4);
-	SaveHoldItem SaveHoldItem;
+	SaveHoldItem SaveHoldItem = new SaveHoldItem();
 	List<Integer> coreNumberList;
 	List<Integer> weaponNumberList;
 	int size = 50;
@@ -180,13 +174,7 @@ class EditItem extends JPanel{
 	}
 	
 	private void load() {
-		try {
-			ObjectInputStream itemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(HOLD_FILE)));
-			SaveHoldItem = (SaveHoldItem) itemData.readObject();
-			itemData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+		SaveHoldItem.load();
 		coreNumberList = SaveHoldItem.getCoreNumberList();
 		weaponNumberList = SaveHoldItem.getWeaponNumberList();
 	}
@@ -197,13 +185,7 @@ class EditItem extends JPanel{
 		};
 		coreNumberList = input.apply(coreSpinner);
 		weaponNumberList = input.apply(weaponSpinner);
-		try {
-			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(HOLD_FILE)));
-			saveItemData.writeObject(new SaveHoldItem(coreNumberList, weaponNumberList));
-			saveItemData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+		SaveHoldItem.save(coreNumberList, weaponNumberList);
 	}
 	
 	private void addLabel() {
@@ -282,11 +264,10 @@ class EditProgress extends JPanel{
 	List<JRadioButton[]> merit;
 	StageData[] StageData = IntStream.range(0, DefaultStage.STAGE_SPECIES).mapToObj(i -> new DefaultStage().getStageData(i)).toArray(StageData[]::new);
 	List<BufferedImage> stageImage = Stream.of(StageData).map(i -> new EditImage().stageImage(i, 20)).toList();
-	SaveGameProgress SaveGameProgress;
+	SaveGameProgress SaveGameProgress = new SaveGameProgress();
 	List<Boolean> clearStatus;
 	List<List<Boolean>> meritStatus;
 	int medal;
-	int selectStage;
 	int sizeX = 110;
 	int sizeY = 70;
 	
@@ -307,30 +288,17 @@ class EditProgress extends JPanel{
 	}
 	
 	private void load() {
-		try {
-			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(PROGRESS_FILE)));
-			SaveGameProgress = (SaveGameProgress) loadProgressData.readObject();
-			loadProgressData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+		SaveGameProgress.load();
 		clearStatus = SaveGameProgress.getClearStatus();
 		meritStatus = SaveGameProgress.getMeritStatus();
 		medal = SaveGameProgress.getMedal();
-		selectStage = SaveGameProgress.getSelectStage();
 	}
 	
 	protected void save() {
 		clearStatus = Stream.of(stage).map(i -> i.isSelected()).collect(Collectors.toList());
 		meritStatus = merit.stream().map(i -> Stream.of(i).map(j -> j.isSelected()).collect(Collectors.toList())).collect(Collectors.toList());
 		medal = (int) medalSpinner.getValue();
-		try {
-			ObjectOutputStream saveProgressData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(PROGRESS_FILE)));
-			saveProgressData.writeObject(new SaveGameProgress(clearStatus, meritStatus, medal, selectStage));
-			saveProgressData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+		SaveGameProgress.save(clearStatus, meritStatus, medal, SaveGameProgress.getSelectStage());
 	}
 	
 	private void addLabel() {

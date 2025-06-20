@@ -1,5 +1,9 @@
 package savedata;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,9 +30,38 @@ public class SaveHoldItem implements Serializable{
 		weaponNumberList = new ArrayList<>(Arrays.asList(2, 2));
 	}
 	
-	public SaveHoldItem(List<Integer> coreNumberList, List<Integer> weaponNumberList) {
+	public void load() {
+		try {
+			ObjectInputStream itemData = new ObjectInputStream(new FileInputStream(HOLD_FILE));
+			SaveHoldItem SaveHoldItem = (SaveHoldItem) itemData.readObject();
+			itemData.close();
+			coreNumberList = SaveHoldItem.getCoreNumberList();
+			weaponNumberList = SaveHoldItem.getWeaponNumberList();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void save() {
+		try {
+			ObjectOutputStream saveItemData = new ObjectOutputStream(new FileOutputStream(HOLD_FILE));
+			saveItemData.writeObject(this);
+			saveItemData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void save(List<Integer> coreNumberList, List<Integer> weaponNumberList) {
 		this.coreNumberList = coreNumberList;
 		this.weaponNumberList = weaponNumberList;
+		try {
+			ObjectOutputStream saveItemData = new ObjectOutputStream(new FileOutputStream(HOLD_FILE));
+			saveItemData.writeObject(this);
+			saveItemData.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public List<Integer> getCoreNumberList(){

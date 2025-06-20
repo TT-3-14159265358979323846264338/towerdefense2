@@ -1,7 +1,6 @@
 package defendthecastle;
 
 import static javax.swing.JOptionPane.*;
-import static savedata.SaveGameProgress.*;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -10,12 +9,6 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -185,26 +178,14 @@ public class MenuSelectStage extends JPanel{
 
 //クリアデータ取込み
 class ProgressData{
-	SaveGameProgress SaveGameProgress;
+	SaveGameProgress SaveGameProgress = new SaveGameProgress();
 	
 	protected ProgressData() {
-		try {
-			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(PROGRESS_FILE)));
-			SaveGameProgress = (SaveGameProgress) loadProgressData.readObject();
-			loadProgressData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+		SaveGameProgress.load();
 	}
 	
 	protected void save(int select) {
-		try {
-			ObjectOutputStream saveProgressData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(PROGRESS_FILE)));
-			saveProgressData.writeObject(new SaveGameProgress(SaveGameProgress.getClearStatus(), SaveGameProgress.getMeritStatus(), SaveGameProgress.getMedal(), select));
-			saveProgressData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+		SaveGameProgress.save(SaveGameProgress.getClearStatus(), SaveGameProgress.getMeritStatus(), SaveGameProgress.getMedal(), select);
 	}
 	
 	protected List<List<Boolean>> getMeritStatus(){

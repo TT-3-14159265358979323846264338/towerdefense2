@@ -1,9 +1,6 @@
 package defendthecastle;
 
 import static javax.swing.JOptionPane.*;
-import static savedata.SaveComposition.*;
-import static savedata.SaveGameProgress.*;
-import static savedata.SaveHoldItem.*;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,12 +9,6 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.time.temporal.ValueRange;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -51,8 +42,8 @@ public class MenuItemDispose extends JPanel{
 	JScrollPane itemScroll = new JScrollPane();
 	ItemImagePanel CoreImagePanel = new ItemImagePanel();
 	ItemImagePanel WeaponImagePanel = new ItemImagePanel();
-	HoldItem HoldItem = new HoldItem();
-	CreateDisplayList DisplayListCreation = new CreateDisplayList(HoldItem);
+	OperateData OperateData = new OperateData();
+	CreateDisplayList DisplayListCreation = new CreateDisplayList(OperateData);
 	List<BufferedImage> coreImageList = new DefaultUnit().getCoreImage(2);
 	List<BufferedImage> weaponImageList = new DefaultUnit().getWeaponImage(2);
 	
@@ -119,9 +110,9 @@ public class MenuItemDispose extends JPanel{
 		disposeButton.addActionListener(e->{
 			DefaultUnit DefaultUnit = new DefaultUnit();
 			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				HoldItem.recycle(CoreImagePanel, HoldItem.getCoreNumberList(), HoldItem.getUsedCoreNumber(), coreImageList, IntStream.range(0, defaultdata.DefaultUnit.CORE_SPECIES).mapToObj(i -> DefaultUnit.getCoreData(i).getRarity()).toList());
+				OperateData.recycle(CoreImagePanel, OperateData.getCoreNumberList(), OperateData.getUsedCoreNumber(), coreImageList, IntStream.range(0, defaultdata.DefaultUnit.CORE_SPECIES).mapToObj(i -> DefaultUnit.getCoreData(i).getRarity()).toList());
 			}else {
-				HoldItem.recycle(WeaponImagePanel, HoldItem.getWeaponNumberList(), HoldItem.getUsedWeaponNumber(), weaponImageList, IntStream.range(0, defaultdata.DefaultUnit.WEAPON_SPECIES).mapToObj(i -> DefaultUnit.getWeaponData(i).getRarity()).toList());
+				OperateData.recycle(WeaponImagePanel, OperateData.getWeaponNumberList(), OperateData.getUsedWeaponNumber(), weaponImageList, IntStream.range(0, defaultdata.DefaultUnit.WEAPON_SPECIES).mapToObj(i -> DefaultUnit.getWeaponData(i).getRarity()).toList());
 			}
 		});
 	}
@@ -150,8 +141,8 @@ public class MenuItemDispose extends JPanel{
 	}
 	
 	private void addScroll() {
-		CoreImagePanel.setImagePanel(coreImageList, DisplayListCreation.getInitialCoreDisplayList(), HoldItem.getCoreNumberList(), true);
-		WeaponImagePanel.setImagePanel(weaponImageList, DisplayListCreation.getInitialWeaponDisplayList(), HoldItem.getWeaponNumberList(), false);
+		CoreImagePanel.setImagePanel(coreImageList, DisplayListCreation.getInitialCoreDisplayList(), OperateData.getCoreNumberList(), true);
+		WeaponImagePanel.setImagePanel(weaponImageList, DisplayListCreation.getInitialWeaponDisplayList(), OperateData.getWeaponNumberList(), false);
 		itemScroll.getViewport().setView(CoreImagePanel);
     	add(itemScroll);
 	}
@@ -162,11 +153,11 @@ public class MenuItemDispose extends JPanel{
 	}
 }
 
-//所持アイテムと編成の確認
-class HoldItem{
-	SaveHoldItem SaveHoldItem;
-	SaveComposition SaveComposition;
-	SaveGameProgress SaveGameProgress;
+//セーブデータの確認
+class OperateData{
+	SaveHoldItem SaveHoldItem = new SaveHoldItem();
+	SaveComposition SaveComposition = new SaveComposition();
+	SaveGameProgress SaveGameProgress = new SaveGameProgress();
 	List<Integer> coreNumberList;
 	List<Integer> weaponNumberList;
 	List<List<List<Integer>>> allCompositionList;
@@ -174,25 +165,15 @@ class HoldItem{
 	int[] usedCoreNumber;
 	int[] usedWeaponNumber;
 	
-	protected HoldItem() {
+	protected OperateData() {
 		load();
 		itemCount();
 	}
 	
 	private void load() {
-		try {
-			ObjectInputStream itemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(HOLD_FILE)));
-			SaveHoldItem = (SaveHoldItem) itemData.readObject();
-			itemData.close();
-			ObjectInputStream compositionData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(COMPOSITION_FILE)));
-			SaveComposition = (SaveComposition) compositionData.readObject();
-			compositionData.close();
-			ObjectInputStream loadProgressData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(PROGRESS_FILE)));
-			SaveGameProgress = (SaveGameProgress) loadProgressData.readObject();
-			loadProgressData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+		SaveHoldItem.load();
+		SaveComposition.load();
+		SaveGameProgress.load();
 		coreNumberList = SaveHoldItem.getCoreNumberList();
 		weaponNumberList = SaveHoldItem.getWeaponNumberList();
 		allCompositionList = SaveComposition.getAllCompositionList();
@@ -200,16 +181,8 @@ class HoldItem{
 	}
 	
 	private void save() {
-		try {
-			ObjectOutputStream saveItemData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(HOLD_FILE)));
-			saveItemData.writeObject(new SaveHoldItem(coreNumberList, weaponNumberList));
-			saveItemData.close();
-			ObjectOutputStream saveProgressData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(PROGRESS_FILE)));
-			saveProgressData.writeObject(new SaveGameProgress(SaveGameProgress.getClearStatus(), SaveGameProgress.getMeritStatus(), medal, SaveGameProgress.getSelectStage()));
-			saveProgressData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+		SaveHoldItem.save(coreNumberList, weaponNumberList);
+		SaveGameProgress.save(SaveGameProgress.getClearStatus(), SaveGameProgress.getMeritStatus(), medal, SaveGameProgress.getSelectStage());
 	}
 	
 	private void itemCount() {
@@ -298,23 +271,23 @@ class HoldItem{
 class CreateDisplayList{
 	DisplaySort coreDisplaySort = new DisplaySort();
 	DisplaySort weaponDisplaySort = new DisplaySort();
-	HoldItem HoldItem;
+	OperateData OperateData;
 	
-	protected CreateDisplayList(HoldItem HoldItem) {
-		this.HoldItem = HoldItem;
+	protected CreateDisplayList(OperateData OperateData) {
+		this.OperateData = OperateData;
 		coreDisplaySort.core(getInitialCoreDisplayList());
 		weaponDisplaySort.weapon(getInitialWeaponDisplayList());
 	}
 	
 	protected List<Integer> getInitialCoreDisplayList(){
-		List<Integer> displayList = getDisplayList(HoldItem.getCoreNumberList());
+		List<Integer> displayList = getDisplayList(OperateData.getCoreNumberList());
 		//初期コアはリサイクル禁止
 		displayList.remove(0);
 		return displayList;
 	}
 	
 	protected List<Integer> getInitialWeaponDisplayList(){
-		return getDisplayList(HoldItem.getWeaponNumberList());
+		return getDisplayList(OperateData.getWeaponNumberList());
 	}
 	
 	private List<Integer> getDisplayList(List<Integer> list){

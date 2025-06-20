@@ -1,8 +1,6 @@
 package defendthecastle;
 
 import static javax.swing.JOptionPane.*;
-import static savedata.SaveComposition.*;
-import static savedata.SaveHoldItem.*;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,12 +9,6 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.time.temporal.ValueRange;
 import java.util.ArrayList;
 import java.util.List;
@@ -408,8 +400,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 
 //セーブデータ処理
 class SaveData{
-	SaveHoldItem SaveHoldItem;
-	SaveComposition SaveComposition;
+	SaveHoldItem SaveHoldItem = new SaveHoldItem();
+	SaveComposition SaveComposition = new SaveComposition();
 	List<Integer> coreNumberList = new ArrayList<>();
 	List<Integer> weaponNumberList = new ArrayList<>();
 	List<List<List<Integer>>> allCompositionList = new ArrayList<>();
@@ -423,16 +415,8 @@ class SaveData{
 	}
 	
 	private void load() {
-		try {
-			ObjectInputStream itemData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(HOLD_FILE)));
-			SaveHoldItem = (SaveHoldItem) itemData.readObject();
-			itemData.close();
-			ObjectInputStream compositionData = new ObjectInputStream(new BufferedInputStream(new FileInputStream(COMPOSITION_FILE)));
-			SaveComposition = (SaveComposition) compositionData.readObject();
-			compositionData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+		SaveHoldItem.load();
+		SaveComposition.load();
 		input();
 	}
 	
@@ -445,13 +429,7 @@ class SaveData{
 	}
 	
 	private void save() {
-		try {
-			ObjectOutputStream compositionData = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(COMPOSITION_FILE)));
-			compositionData.writeObject(new SaveComposition(allCompositionList, compositionNameList, selectNumber));
-			compositionData.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+		SaveComposition.save(allCompositionList, compositionNameList, selectNumber);
 	}
 	
 	protected void countNumber() {
@@ -504,6 +482,7 @@ class SaveData{
 	protected void swapComposition(int max, int min) {
 		if(max == min) {
 			showMessageDialog(null, "入れ替える2つの編成を選択してください");
+			return;
 		}
 		int select = showConfirmDialog(null, "選択中の編成を入れ替えますか", "入替確認", YES_NO_OPTION, QUESTION_MESSAGE);
 		switch(select) {
@@ -558,7 +537,7 @@ class SaveData{
 		int select = showConfirmDialog(null, "現在の編成をリセットしますか", "リセット確認", YES_NO_OPTION, QUESTION_MESSAGE);
 		switch(select) {
 		case 0:
-			allCompositionList.set(selectNumber, new ArrayList<>(IntStream.range(0, 8).mapToObj(i -> new ArrayList<>(DEFAULT)).toList()));
+			allCompositionList.set(selectNumber, new ArrayList<>(IntStream.range(0, 8).mapToObj(i -> new ArrayList<>(savedata.SaveComposition.DEFAULT)).toList()));
 		default:
 			break;
 		}
