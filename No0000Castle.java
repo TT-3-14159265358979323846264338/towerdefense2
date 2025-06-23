@@ -10,33 +10,28 @@ public class No0000Castle extends FacilityData{
 	}
 
 	@Override
-	public String getFrontImageName() {
-		return "image/field/castle.png";
+	public List<String> getActionFrontImageName() {
+		return Arrays.asList("image/field/castle.png");
 	}
 
 	@Override
-	public String getSideImageName() {
-		return "image/field/castle.png";
+	public List<String> getActionSideImageName() {
+		return Arrays.asList("image/field/castle.png");
 	}
 
 	@Override
-	public String getBreakImagename() {
+	public String getBreakImageName() {
 		return "image/field/castle.png";
-	}
-
-	@Override
-	public List<String> getActionImageName() {
-		return null;
 	}
 
 	@Override
 	public List<Integer> getElement() {
-		return null;
+		return Arrays.asList();
 	}
 
 	@Override
 	public List<Integer> getWeaponStatus() {
-		return null;
+		return Arrays.asList();
 	}
 
 	@Override

@@ -6,20 +6,18 @@ public abstract class FacilityData {
 	//設備の名前
 	public abstract String getName();
 	
-	//設備の画像ファイル名
-	public abstract String getFrontImageName();
-	public abstract String getSideImageName();
+	
+	//攻撃時の画像ファイル名
+	public abstract List<String> getActionFrontImageName();
+	public abstract List<String> getActionSideImageName();
 	
 	//設備の破損時画像ファイル名
-	public abstract String getBreakImagename();
+	public abstract String getBreakImageName();
 	
-	//攻撃時の画像ファイル名　攻撃しない時はnull
-	public abstract List<String> getActionImageName();
-	
-	//武器属性はその武器の全ての属性(DefaultStage.ELEMENT_MAP)を登録　攻撃しない時はnull
+	//武器属性はその武器の全ての属性(DefaultStage.ELEMENT_MAP)を登録　攻撃しない時は空のlist
 	public abstract List<Integer> getElement();
 	
-	//DefaultStage.WEAPON_MAPの順にステータスをリスト化　攻撃しない時はnull
+	//DefaultStage.WEAPON_MAPの順にステータスをリスト化　攻撃しない時は空のlist
 	public abstract List<Integer> getWeaponStatus();
 	
 	//DefaultStage.UNIT_MAPの順にステータスをリスト化　足止め数∞の時は-1
