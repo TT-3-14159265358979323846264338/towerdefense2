@@ -29,7 +29,7 @@ public class DefaultOther {
 	}
 
 	public List<BufferedImage> getHalfBallImage(double ratio) {
-		return new EditImage().inputList(HALF_BALL, ratio);
+		return new EditImage().input(HALF_BALL, ratio);
 	}
 
 	public BufferedImage getHandleImage(double ratio) {
@@ -37,7 +37,7 @@ public class DefaultOther {
 	}
 
 	public List<BufferedImage> getMachineImage(double ratio) {
-		return new EditImage().inputList(MACHINE, ratio);
+		return new EditImage().input(MACHINE, ratio);
 	}
 
 	public BufferedImage getTurnImage(double ratio) {

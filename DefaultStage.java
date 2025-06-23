@@ -84,6 +84,6 @@ public class DefaultStage {
 	
 	//画像取込み
 	public List<BufferedImage> getPlacementImage(double ratio){
-		return new EditImage().inputList(PLACEMENT_NAME_LIST, ratio);
+		return new EditImage().input(PLACEMENT_NAME_LIST, ratio);
 	}
 }

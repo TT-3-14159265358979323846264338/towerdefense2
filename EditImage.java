@@ -35,7 +35,7 @@ public class EditImage{
 		return image;
 	}
 	
-	protected List<BufferedImage> inputList(List<String> imageNameList, double ratio){
+	public List<BufferedImage> input(List<String> imageNameList, double ratio){
 		return imageNameList.stream().map(i -> (i == null)? null: input(i, ratio)).toList();
 	}
 	
@@ -117,8 +117,8 @@ public class EditImage{
 		IntStream.range(0, placementImage.size()).forEach(i -> StageData.getPlacementPoint().get(i).stream().forEach(j -> drawImage.accept(placementImage.get(i), j)));
 		//設備の表示
 		FacilityData[] FacilityData = IntStream.range(0, DefaultStage.FACILITY_SPECIES).mapToObj(i -> new DefaultStage().getFacilityData(i)).toArray(FacilityData[]::new);
-		List<BufferedImage> frontFacilityImage = Stream.of(FacilityData).map(i -> input(i.getFrontImageName(), 4)).toList();
-		List<BufferedImage> sideFacilityImage = Stream.of(FacilityData).map(i -> input(i.getSideImageName(), 4)).toList();
+		List<BufferedImage> frontFacilityImage = Stream.of(FacilityData).map(i -> input(i.getActionFrontImageName().get(0), 4)).toList();
+		List<BufferedImage> sideFacilityImage = Stream.of(FacilityData).map(i -> input(i.getActionSideImageName().get(0), 4)).toList();
 		IntStream.range(0, StageData.getFacility().size()).forEach(i -> {
 			drawImage.accept(StageData.getFacilityDirection().get(i)? frontFacilityImage.get(StageData.getFacility().get(i)): sideFacilityImage.get(StageData.getFacility().get(i)), StageData.getFacilityPoint().get(i));
 		});
