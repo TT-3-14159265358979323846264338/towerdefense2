@@ -61,9 +61,9 @@ public class MenuComposition extends JPanel implements MouseListener{
 	protected MenuComposition(MainFrame MainFrame) {
 		addMouseListener(this);
 		setBackground(new Color(240, 170, 80));
-		addCompositionNameLabel();
-		addCompositionLabel();
-		addTypeLabel();
+		add(compositionNameLabel);
+		add(compositionLabel);
+		add(typeLabel);
 		addNewButton();
 		addRemoveButton();
 		addSwapButton();
@@ -80,58 +80,26 @@ public class MenuComposition extends JPanel implements MouseListener{
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		setCompositionNameLabel();
-		setCompositionLabel();
-		setTypeLabel();
-		setNewButton();
-		setRemoveButton();
-		setSwapButton();
-		setNameChangeButton();
-		setSaveButton();
-		setLoadButton();
-		setResetButton();
-		setReturnButton();
-		setCompositionScroll();
-		setSwitchButton();
-		setSortButton();
-		setItemScroll();
+		setLabel(compositionNameLabel, "編成名", 10, 10, 130, 30);
+		setLabel(compositionLabel, "ユニット編成", 230, 10, 130, 30);
+		setLabel(typeLabel, (itemScroll.getViewport().getView() == CoreImagePanel)? "コアリスト": "武器リスト", 570, 10, 130, 30);
+		setButton(newButton, "編成追加", 10, 250, 100, 60);
+		setButton(removeButton, "編成削除", 120, 250, 100, 60);
+		setButton(swapButton, "編成入替", 10, 320, 100, 60);
+		setButton(nameChangeButton, "名称変更", 120, 320, 100, 60);
+		setButton(saveButton, "セーブ", 10, 390, 100, 60);
+		setButton(loadButton, "ロード", 120, 390, 100, 60);
+		setButton(resetButton, "リセット", 10, 460, 100, 60);
+		setButton(returnButton, "戻る", 120, 460, 100, 60);
+		setButton(switchButton, "表示切替", 570, 460, 185, 60);
+		setButton(sortButton, "ソート", 765, 460, 185, 60);
+		compositionJList.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+		setScroll(compositionScroll, 10, 40, 210, 200);
+		setScroll(itemScroll, 570, 40, 380, 410);
 		drawComposition(g);
+		SaveData.selectNumberUpdate(compositionJList.getSelectedIndex());
 		SaveData.countNumber();
 		requestFocus();
-	}
-	
-	private void addCompositionNameLabel() {
-		add(compositionNameLabel);
-	}
-	
-	private void setCompositionNameLabel() {
-		compositionNameLabel.setText("編成名");
-		compositionNameLabel.setBounds(10, 10, 130, 30);
-		setLabel(compositionNameLabel);
-	}
-	
-	private void addCompositionLabel() {
-		add(compositionLabel);
-	}
-	
-	private void setCompositionLabel() {
-		compositionLabel.setText("ユニット編成");
-		compositionLabel.setBounds(230, 10, 130, 30);
-		setLabel(compositionLabel);
-	}
-	
-	private void addTypeLabel() {
-		add(typeLabel);
-	}
-	
-	private void setTypeLabel() {
-		typeLabel.setText((itemScroll.getViewport().getView() == CoreImagePanel)? "コアリスト": "武器リスト");
-		typeLabel.setBounds(570, 10, 130, 30);
-		setLabel(typeLabel);
-	}
-	
-	private void setLabel(JLabel label) {
-		label.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
 	}
 	
 	private void addNewButton(){
@@ -142,12 +110,6 @@ public class MenuComposition extends JPanel implements MouseListener{
 		});
 	}
 	
-	private void setNewButton(){
-		newButton.setText("編成追加");
-		newButton.setBounds(10, 250, 100, 60);
-		setButton(newButton);
-	}
-	
 	private void addRemoveButton() {
 		add(removeButton);
 		removeButton.addActionListener(e->{
@@ -156,24 +118,12 @@ public class MenuComposition extends JPanel implements MouseListener{
 		});
 	}
 	
-	private void setRemoveButton() {
-		removeButton.setText("編成削除");
-		removeButton.setBounds(120, 250, 100, 60);
-		setButton(removeButton);
-	}
-	
 	private void addSwapButton(){
 		add(swapButton);
 		swapButton.addActionListener(e->{
 			SaveData.swapComposition(compositionJList.getMaxSelectionIndex(), compositionJList.getMinSelectionIndex());
 			modelUpdate();
 		});
-	}
-	
-	private void setSwapButton(){
-		swapButton.setText("編成入替");
-		swapButton.setBounds(10, 320, 100, 60);
-		setButton(swapButton);
 	}
 	
 	private void addNameChangeButton() {
@@ -186,23 +136,11 @@ public class MenuComposition extends JPanel implements MouseListener{
 		});
 	}
 	
-	private void setNameChangeButton() {
-		nameChangeButton.setText("名称変更");
-		nameChangeButton.setBounds(120, 320, 100, 60);
-		setButton(nameChangeButton);
-	}
-	
 	private void addSaveButton() {
 		add(saveButton);
 		saveButton.addActionListener(e->{
 			SaveData.saveProcessing();
 		});
-	}
-	
-	private void setSaveButton() {
-		saveButton.setText("セーブ");
-		saveButton.setBounds(10, 390, 100, 60);
-		setButton(saveButton);
 	}
 	
 	private void addLoadButton() {
@@ -213,23 +151,11 @@ public class MenuComposition extends JPanel implements MouseListener{
 		});
 	}
 	
-	private void setLoadButton() {
-		loadButton.setText("ロード");
-		loadButton.setBounds(120, 390, 100, 60);
-		setButton(loadButton);
-	}
-	
 	private void addResetButton() {
 		add(resetButton);
 		resetButton.addActionListener(e->{
 			SaveData.resetComposition();
 		});
-	}
-	
-	private void setResetButton() {
-		resetButton.setText("リセット");
-		resetButton.setBounds(10, 460, 100, 60);
-		setButton(resetButton);
 	}
 	
 	private void addReturnButton(MainFrame MainFrame) {
@@ -241,23 +167,11 @@ public class MenuComposition extends JPanel implements MouseListener{
 		});
 	}
 	
-	private void setReturnButton() {
-		returnButton.setText("戻る");
-		returnButton.setBounds(120, 460, 100, 60);
-		setButton(returnButton);
-	}
-	
 	private void addSwitchButton() {
 		add(switchButton);
 		switchButton.addActionListener(e->{
 			itemScroll.getViewport().setView((itemScroll.getViewport().getView() == CoreImagePanel)? WeaponImagePanel: CoreImagePanel);
 		});
-	}
-	
-	private void setSwitchButton() {
-		switchButton.setText("表示切替");
-		switchButton.setBounds(570, 460, 185, 60);
-		setButton(switchButton);
 	}
 	
 	private void addSortButton() {
@@ -271,34 +185,11 @@ public class MenuComposition extends JPanel implements MouseListener{
 		});
 	}
 	
-	private void setSortButton() {
-		sortButton.setText("ソート");
-		sortButton.setBounds(765, 460, 185, 60);
-		setButton(sortButton);
-	}
-	
-	private void setButton(JButton button) {
-		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 16));
-	}
-	
 	private void addCompositionScroll() {
 		modelUpdate();
 		compositionScroll.getViewport().setView(compositionJList);
     	add(compositionScroll);
     	new DelaySelect(compositionJList, SaveData.getSelectNumber()).start();
-	}
-	
-	private void modelUpdate() {
-		compositionListModel.clear();
-		SaveData.getCompositionNameList().stream().forEach(i -> compositionListModel.addElement(i));
-		compositionJList.setSelectedIndex(SaveData.getSelectNumber());
-	}
-	
-	private void setCompositionScroll() {
-		compositionJList.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
-		compositionScroll.setPreferredSize(new Dimension(210, 200));
-    	compositionScroll.setBounds(10, 40, 210, 200);
-    	SaveData.selectNumberUpdate(compositionJList.getSelectedIndex());
 	}
 	
 	private void addItemScroll() {
@@ -308,9 +199,27 @@ public class MenuComposition extends JPanel implements MouseListener{
     	add(itemScroll);
 	}
 	
-	private void setItemScroll() {
-		itemScroll.setBounds(570, 40, 380, 410);
-		itemScroll.setPreferredSize(itemScroll.getSize());
+	private void setLabel(JLabel label, String name, int x, int y, int width, int height) {
+		label.setText(name);
+		label.setBounds(x, y, width, height);
+		label.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+	}
+	
+	private void setButton(JButton button, String name, int x, int y, int width, int height) {
+		button.setText(name);
+		button.setBounds(x, y, width, height);
+		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 16));
+	}
+	
+	private void setScroll(JScrollPane scroll, int x, int y, int width, int height) {
+		scroll.setBounds(x, y, width, height);
+		scroll.setPreferredSize(scroll.getSize());
+	}
+	
+	private void modelUpdate() {
+		compositionListModel.clear();
+		SaveData.getCompositionNameList().stream().forEach(i -> compositionListModel.addElement(i));
+		compositionJList.setSelectedIndex(SaveData.getSelectNumber());
 	}
 	
 	private void drawComposition(Graphics g) {

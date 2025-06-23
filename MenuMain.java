@@ -51,12 +51,13 @@ public class MenuMain extends JPanel implements ActionListener{
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		setItemGetButton();
-		setItemDisposeButton();
-		setCompositionButton();
-		setBattleButton();
-		setTestButton();
+		setButton(itemGetButton, "ガチャ", 10, 400, 130, 60);
+		setButton(itemDisposeButton, "リサイクル", 150, 400, 130, 60);
+		setButton(compositionButton, "ユニット編成", 290, 400, 130, 60);
+		setButton(selectStageButton, "ステージ選択", 430, 400, 130, 60);
+		setButton(testButton, "セーブデータ編集", 410, 0, 160, 40);
 		drawImage(g);
+		requestFocus();
 	}
 	
 	private void addItemGetButton() {
@@ -67,24 +68,12 @@ public class MenuMain extends JPanel implements ActionListener{
 		});
 	}
 	
-	private void setItemGetButton() {
-		itemGetButton.setText("ガチャ");
-		itemGetButton.setBounds(10, 400, 130, 60);
-		setButton(itemGetButton);
-	}
-	
 	private void addItemDisposeButton() {
 		add(itemDisposeButton);
 		itemDisposeButton.addActionListener(e->{
 			timerStop();
 			MainFrame.itemDisposeMenuDraw();
 		});
-	}
-	
-	private void setItemDisposeButton() {
-		itemDisposeButton.setText("リサイクル");
-		itemDisposeButton.setBounds(150, 400, 130, 60);
-		setButton(itemDisposeButton);
 	}
 	
 	private void addCompositionButton() {
@@ -95,12 +84,6 @@ public class MenuMain extends JPanel implements ActionListener{
 		});
 	}
 	
-	private void setCompositionButton() {
-		compositionButton.setText("ユニット編成");
-		compositionButton.setBounds(290, 400, 130, 60);
-		setButton(compositionButton);
-	}
-	
 	private void addBattleButton() {
 		add(selectStageButton);
 		selectStageButton.addActionListener(e->{
@@ -109,35 +92,16 @@ public class MenuMain extends JPanel implements ActionListener{
 		});
 	}
 	
-	private void setBattleButton() {
-		selectStageButton.setText("ステージ選択");
-		selectStageButton.setBounds(430, 400, 130, 60);
-		setButton(selectStageButton);
+	private void setButton(JButton button, String name, int x, int y, int width, int height) {
+		button.setText(name);
+		button.setBounds(x, y, width, height);
+		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
 	}
 	
 	private void timerStop() {
 		Stream.of(FallMotion).forEach(i -> i.timerStop());
 		Stream.of(FinalMotion).forEach(i -> i.timerStop());
 		timer.stop();
-	}
-	
-	//テスト用
-	private void addTestButton() {
-		add(testButton);
-		testButton.addActionListener(e->{
-			new TestDataEdit();
-		});
-	}
-	private void setTestButton() {
-		testButton.setText("セーブデータ編集");
-		testButton.setBounds(410, 0, 160, 40);
-		setButton(testButton);
-	}
-	//ここまで
-	
-	private void setButton(JButton button) {
-		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
-		button.setFocusable(false);
 	}
 	
 	private void drawImage(Graphics g) {
@@ -160,6 +124,14 @@ public class MenuMain extends JPanel implements ActionListener{
 			timer.stop();
 			Stream.of(FinalMotion).forEach(i -> i.timerStart());
 		}
+	}
+	
+	//テスト用
+	private void addTestButton() {
+		add(testButton);
+		testButton.addActionListener(e->{
+			new TestDataEdit();
+		});
 	}
 }
 

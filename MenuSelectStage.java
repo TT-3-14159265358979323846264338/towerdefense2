@@ -1,7 +1,5 @@
 package defendthecastle;
 
-import static javax.swing.JOptionPane.*;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -48,11 +46,11 @@ public class MenuSelectStage extends JPanel{
 	
 	protected MenuSelectStage(MainFrame MainFrame) {
 		setBackground(new Color(240, 170, 80));
-		addStageLabel();
-		addInformationLabel();
+		add(stageLabel);
+		add(informationLabel);
 		addReturnButton(MainFrame);
-		addNormalModeButton();
-		addHardModeButton();
+		addNormalModeButton(MainFrame);
+		addHardModeButton(MainFrame);
 		addStageScroll();
 		addMeritScroll();
 		addEnemyScroll();
@@ -60,40 +58,16 @@ public class MenuSelectStage extends JPanel{
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		setStageLabel();
-		setInformationLabel();
-		setReturnButton();
-		setNormalModeButton();
-		setHardModeButton();
-		setStageScroll();
-		setMeritScroll();
-		setEnemyScroll();
-		drawField(g);
+		setLabel(stageLabel, "ステージ選択", 10, 10, 200, 30);
+		setLabel(informationLabel, "ステージ情報", 170, 10, 200, 30);
+		setButton(returnButton, "戻る", 10, 460, 150, 60);
+		setButton(normalModeButton, "normal", 580, 460, 155, 60);
+		setButton(hardModeButton, "hard", 745, 460, 155, 60);
+		setScroll(stageScroll, 10, 40, 150, 410);
+		setScroll(meritScroll, 170, 275, 400, 245);
+		setScroll(enemyScroll, 580, 40, 320, 410);
+		g.drawImage(stageImage.get(SelectPanel.getSelelct()), 170, 40, this);
 		requestFocus();
-	}
-	
-	private void addStageLabel() {
-		add(stageLabel);
-	}
-	
-	private void setStageLabel() {
-		stageLabel.setText("ステージ選択");
-		stageLabel.setBounds(10, 10, 200, 30);
-		setLabel(stageLabel);
-	}
-	
-	private void addInformationLabel() {
-		add(informationLabel);
-	}
-	
-	private void setInformationLabel() {
-		informationLabel.setText("ステージ情報");
-		informationLabel.setBounds(170, 10, 200, 30);
-		setLabel(informationLabel);
-	}
-	
-	private void setLabel(JLabel label) {
-		label.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
 	}
 	
 	private void addReturnButton(MainFrame MainFrame) {
@@ -103,42 +77,22 @@ public class MenuSelectStage extends JPanel{
 		});
 	}
 	
-	private void setReturnButton() {
-		returnButton.setText("戻る");
-		returnButton.setBounds(10, 460, 150, 60);
-		setButton(returnButton);
-	}
-	
-	private void addNormalModeButton() {
+	private void addNormalModeButton(MainFrame MainFrame) {
 		add(normalModeButton);
 		normalModeButton.addActionListener(e->{
 			ProgressData.save(SelectPanel.getSelelct());
-			showMessageDialog(null, "調整中\nnormal mode でゲーム開始");
+			//難易度コードは後で追記
+			MainFrame.battleDraw(StageData[SelectPanel.getSelelct()], 0);
 		});
 	}
 	
-	private void setNormalModeButton() {
-		normalModeButton.setText("normal");
-		normalModeButton.setBounds(580, 460, 155, 60);
-		setButton(normalModeButton);
-	}
-	
-	private void addHardModeButton() {
+	private void addHardModeButton(MainFrame MainFrame) {
 		add(hardModeButton);
 		hardModeButton.addActionListener(e->{
 			ProgressData.save(SelectPanel.getSelelct());
-			showMessageDialog(null, "調整中\nhard mode でゲーム開始");
+			//難易度コードは後で追記
+			MainFrame.battleDraw(StageData[SelectPanel.getSelelct()], 1);
 		});
-	}
-	
-	private void setHardModeButton() {
-		hardModeButton.setText("hard");
-		hardModeButton.setBounds(745, 460, 155, 60);
-		setButton(hardModeButton);
-	}
-	
-	private void setButton(JButton button) {
-		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
 	}
 	
 	private void addStageScroll() {
@@ -146,19 +100,9 @@ public class MenuSelectStage extends JPanel{
     	add(stageScroll);
 	}
 	
-	private void setStageScroll() {
-		stageScroll.setBounds(10, 40, 150, 410);
-		stageScroll.setPreferredSize(stageScroll.getSize());
-	}
-	
 	private void addMeritScroll() {
 		meritScroll.getViewport().setView(MeritPanel);
     	add(meritScroll);
-	}
-	
-	private void setMeritScroll() {
-		meritScroll.setBounds(170, 275, 400, 245);
-		meritScroll.setPreferredSize(meritScroll.getSize());
 	}
 	
 	private void addEnemyScroll() {
@@ -166,13 +110,21 @@ public class MenuSelectStage extends JPanel{
     	add(enemyScroll);
 	}
 	
-	private void setEnemyScroll() {
-		enemyScroll.setBounds(580, 40, 320, 410);
-		enemyScroll.setPreferredSize(enemyScroll.getSize());
+	private void setLabel(JLabel label, String name, int x, int y, int width, int height) {
+		label.setText(name);
+		label.setBounds(x, y, width, height);
+		label.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
 	}
 	
-	private void drawField(Graphics g){
-		g.drawImage(stageImage.get(SelectPanel.getSelelct()), 170, 40, this);
+	private void setButton(JButton button, String name, int x, int y, int width, int height) {
+		button.setText(name);
+		button.setBounds(x, y, width, height);
+		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+	}
+	
+	private void setScroll(JScrollPane scroll, int x, int y, int width, int height) {
+		scroll.setBounds(x, y, width, height);
+		scroll.setPreferredSize(scroll.getSize());
 	}
 }
 

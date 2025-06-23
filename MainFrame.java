@@ -2,6 +2,9 @@ package defendthecastle;
 
 import javax.swing.JFrame;
 
+import battle.Battle;
+import defaultdata.stage.StageData;
+
 //メイン画面切り替え
 public class MainFrame extends JFrame{
 	protected MainFrame() {
@@ -43,11 +46,19 @@ public class MainFrame extends JFrame{
 		setLocationRelativeTo(null);
 	}
 	
-	protected void selectStageDraw() {
+	public void selectStageDraw() {
 		getContentPane().removeAll();
 		setTitle("ステージ選択");
 		setSize(925, 570);
 		add(new MenuSelectStage(this));
+		setLocationRelativeTo(null);
+	}
+	
+	protected void battleDraw(StageData StageData, int difficultyCode) {
+		getContentPane().removeAll();
+		setTitle(StageData.getName());
+		setSize(1235, 600);
+		add(new Battle(this, StageData, difficultyCode));
 		setLocationRelativeTo(null);
 	}
 }

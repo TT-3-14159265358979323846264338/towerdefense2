@@ -76,25 +76,20 @@ public class MenuItemGet extends JPanel implements ActionListener{
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		setMedalLabel();
-		setGachaDetailButton();
-		setRepeatButton();
-		setReturnButton();
-		setGachaScroll();
+		setLabel(medalLabel, "メダル: " + HoldMedal.getMedal() + "枚", 350, 20, 200, 30);
+		setButton(gachaDetailButton, "<html>ガチャ詳細", 350, 330, 210, 60);
+		setButton(repeatButton, "<html>&nbsp;" + DefaultLineup.getRepeatNumber() + "連<br>" + HoldMedal.useMedal() + "枚", 350, 400, 100, 60);
+		setButton(returnButton, "<html>戻る", 460, 400, 100, 60);
+		selectGachaJList.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+		setScroll(selectGachaScroll, 350, 60, 210, 260);
 		drawGachaImage(g);
+		DefaultLineup.changeGachaMode(selectGachaJList.getSelectedIndex());
 		requestFocus();
 	}
 	
 	private void addMedalLabel() {
 		add(medalLabel);
 		medalLabel.setHorizontalAlignment(JLabel.CENTER);
-	}
-	
-	private void setMedalLabel() {
-		medalLabel.setText("メダル: " + HoldMedal.getMedal() + "枚");
-		medalLabel.setBounds(0, 0, 200, 30);
-		medalLabel.setBounds(350, 20, 200, 30);
-		medalLabel.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
 	}
 	
 	private void addGachaDetailButton() {
@@ -104,23 +99,11 @@ public class MenuItemGet extends JPanel implements ActionListener{
 		});
 	}
 	
-	private void setGachaDetailButton() {
-		gachaDetailButton.setText("<html>ガチャ詳細");
-		gachaDetailButton.setBounds(350, 330, 210, 60);
-		setButton(gachaDetailButton);
-	}
-	
 	private void addRepeatButton() {
 		add(repeatButton);
 		repeatButton.addActionListener(e->{
 			DefaultLineup.changeRepeatNumber();
 		});
-	}
-	
-	private void setRepeatButton() {
-		repeatButton.setText("<html>&nbsp;" + DefaultLineup.getRepeatNumber() + "連<br>" + HoldMedal.useMedal() + "枚");
-		repeatButton.setBounds(350, 400, 100, 60);
-		setButton(repeatButton);
 	}
 	
 	private void addReturnButton(MainFrame MainFrame) {
@@ -130,27 +113,28 @@ public class MenuItemGet extends JPanel implements ActionListener{
 		});
 	}
 	
-	private void setReturnButton() {
-		returnButton.setText("<html>戻る");
-		returnButton.setBounds(460, 400, 100, 60);
-		setButton(returnButton);
-	}
-	
-	private void setButton(JButton button) {
-		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 18));
-	}
-	
 	private void addGachaScroll() {
 		selectGachaScroll.getViewport().setView(selectGachaJList);
     	add(selectGachaScroll);
     	selectGachaJList.setSelectedIndex(0);
 	}
 	
-	private void setGachaScroll() {
-		selectGachaJList.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
-		selectGachaScroll.setBounds(350, 60, 210, 260);
-		selectGachaScroll.setPreferredSize(selectGachaScroll.getSize());
-		DefaultLineup.changeGachaMode(selectGachaJList.getSelectedIndex());
+	private void setLabel(JLabel label, String name, int x, int y, int width, int height) {
+		label.setText(name);
+		label.setBounds(0, 0, 200, 30);
+		label.setBounds(x, y, width, height);
+		label.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+	}
+	
+	private void setButton(JButton button, String name, int x, int y, int width, int height) {
+		button.setText(name);
+		button.setBounds(x, y, width, height);
+		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 18));
+	}
+	
+	private void setScroll(JScrollPane scroll, int x, int y, int width, int height) {
+		scroll.setBounds(x, y, width, height);
+		scroll.setPreferredSize(scroll.getSize());
 	}
 
 	protected void activatePanel() {

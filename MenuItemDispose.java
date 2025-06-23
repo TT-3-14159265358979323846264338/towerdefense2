@@ -59,20 +59,13 @@ public class MenuItemDispose extends JPanel{
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		setTypeLabel();
-		setSwitchButton();
-		setSortButton();
-		setDisposeButton();
-		setReturnButton();
-		setItemScroll();
+		setLabel(typeLabel, (itemScroll.getViewport().getView() == CoreImagePanel)? "コアリスト": "武器リスト", 20, 10, 400, 30);
+		setButton(switchButton, "表示切替", 20, 530, 150, 60);
+		setButton(sortButton, "ソート", 190, 530, 150, 60);
+		setButton(disposeButton, "リサイクル", 360, 530, 150, 60);
+		setButton(returnButton, "戻る", 530, 530, 150, 60);
+		setScroll(itemScroll, 20, 50, 660, 470);
 		requestFocus();
-	}
-	
-	
-	private void setTypeLabel() {
-		typeLabel.setText((itemScroll.getViewport().getView() == CoreImagePanel)? "コアリスト": "武器リスト");
-		typeLabel.setBounds(20, 10, 400, 30);
-		typeLabel.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 25));
 	}
 	
 	private void addSwitchButton() {
@@ -80,12 +73,6 @@ public class MenuItemDispose extends JPanel{
 		switchButton.addActionListener(e->{
 			itemScroll.getViewport().setView((itemScroll.getViewport().getView() == CoreImagePanel)? WeaponImagePanel: CoreImagePanel);
 		});
-	}
-	
-	private void setSwitchButton() {
-		switchButton.setText("表示切替");
-		switchButton.setBounds(20, 530, 150, 60);
-		setButton(switchButton);
 	}
 	
 	private void addSortButton() {
@@ -97,12 +84,6 @@ public class MenuItemDispose extends JPanel{
 				WeaponImagePanel.updateList(DisplayListCreation.getWeaponDisplayList());
 			}
 		});
-	}
-	
-	private void setSortButton() {
-		sortButton.setText("ソート");
-		sortButton.setBounds(190, 530, 150, 60);
-		setButton(sortButton);
 	}
 	
 	private void addDisposeButton() {
@@ -117,27 +98,11 @@ public class MenuItemDispose extends JPanel{
 		});
 	}
 	
-	private void setDisposeButton() {
-		disposeButton.setText("リサイクル");
-		disposeButton.setBounds(360, 530, 150, 60);
-		setButton(disposeButton);
-	}
-	
 	private void addReturnButton(MainFrame MainFrame) {
 		add(returnButton);
 		returnButton.addActionListener(e->{
 			MainFrame.mainMenuDraw();
 		});
-	}
-	
-	private void setReturnButton() {
-		returnButton.setText("戻る");
-		returnButton.setBounds(530, 530, 150, 60);
-		setButton(returnButton);
-	}
-	
-	private void setButton(JButton button) {
-		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
 	}
 	
 	private void addScroll() {
@@ -147,9 +112,21 @@ public class MenuItemDispose extends JPanel{
     	add(itemScroll);
 	}
 	
-	private void setItemScroll() {
-		itemScroll.setBounds(20, 50, 660, 470);
-		itemScroll.setPreferredSize(itemScroll.getSize());
+	private void setLabel(JLabel label, String name, int x, int y, int width, int height) {
+		label.setText(name);
+		label.setBounds(x, y, width, height);
+		label.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 25));
+	}
+	
+	private void setButton(JButton button, String name, int x, int y, int width, int height) {
+		button.setText(name);
+		button.setBounds(x, y, width, height);
+		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+	}
+	
+	private void setScroll(JScrollPane scroll, int x, int y, int width, int height) {
+		scroll.setBounds(x, y, width, height);
+		scroll.setPreferredSize(scroll.getSize());
 	}
 }
 
@@ -436,33 +413,13 @@ class RecyclePanel extends JPanel{
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		drawImage(g);
-		setComenntLabel();
-		setResultLabel();
-		setSpinner();
-		setRecycleButton();
-		setReturnButton();
-		requestFocus();
-	}
-	
-	private void drawImage(Graphics g) {
 		g.drawImage(image, 10, 10, null);
-	}
-	
-	private void setComenntLabel() {
-		commentLabel.setText("ガチャメダルへリサイクルする数量を入力してください");
-		commentLabel.setBounds(120, 10, 400, 30);
-		setLabel(commentLabel);
-	}
-	
-	private void setResultLabel() {
-		resultLabel.setText("ガチャメダル: " + getMedal() +  "枚");
-		resultLabel.setBounds(370, 50, 400, 30);
-		setLabel(resultLabel);
-	}
-	
-	private void setLabel(JLabel label) {
-		label.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
+		setLabel(commentLabel, "ガチャメダルへリサイクルする数量を入力してください", 120, 10, 400, 30);
+		setLabel(resultLabel, "ガチャメダル: " + getMedal() +  "枚", 370, 50, 400, 30);
+		setSpinner(countSpinner, 250, 50, 100, 30);
+		setButton(recycleButton, "リサイクル", 170, 100, 120, 40);
+		setButton(returnButton, "戻る", 310, 100, 120, 40);
+		requestFocus();
 	}
 	
 	private void addSpinner(int max) {
@@ -478,12 +435,6 @@ class RecyclePanel extends JPanel{
 		countSpinner.setEditor(editor);
 	}
 	
-	private void setSpinner() {
-		countSpinner.setBounds(250, 50, 100, 30);
-		countSpinner.setPreferredSize(countSpinner.getSize());
-		countSpinner.setFont(new Font("Arail", Font.BOLD, 15));
-	}
-	
 	private void addRecycleButton() {
 		add(recycleButton);
 		recycleButton.addActionListener(e->{
@@ -494,12 +445,6 @@ class RecyclePanel extends JPanel{
 		});
 	}
 	
-	private void setRecycleButton() {
-		recycleButton.setText("リサイクル");
-		recycleButton.setBounds(170, 100, 120, 40);
-		setButton(recycleButton);
-	}
-	
 	private void addReturnButton() {
 		add(returnButton);
 		returnButton.addActionListener(e->{
@@ -507,13 +452,21 @@ class RecyclePanel extends JPanel{
 		});
 	}
 	
-	private void setReturnButton() {
-		returnButton.setText("戻る");
-		returnButton.setBounds(310, 100, 120, 40);
-		setButton(returnButton);
+	private void setLabel(JLabel label, String name, int x, int y, int width, int height) {
+		label.setText(name);
+		label.setBounds(x, y, width, height);
+		label.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
 	}
 	
-	private void setButton(JButton button) {
+	private void setSpinner(JSpinner spinner, int x, int y, int width, int height) {
+		spinner.setBounds(x, y, width, height);
+		spinner.setPreferredSize(spinner.getSize());
+		spinner.setFont(new Font("Arail", Font.BOLD, 15));
+	}
+	
+	private void setButton(JButton button, String name, int x, int y, int width, int height) {
+		button.setText(name);
+		button.setBounds(x, y, width, height);
 		button.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
 	}
 	
