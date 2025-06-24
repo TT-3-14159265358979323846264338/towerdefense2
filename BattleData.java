@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 //各キャラクターの共通システム
 public class BattleData {
-	String name;
 	List<BufferedImage> actionImage;
 	Point position;
 	List<Integer> element;
@@ -24,6 +23,7 @@ public class BattleData {
 	boolean canActivate;
 	
 	protected BattleData() {
+		//特になし
 	}
 	
 	protected void initialize() {
@@ -36,12 +36,8 @@ public class BattleData {
 		HP = unitCalculate(1);
 	}
 	
-	protected String getName() {
-		return name;
-	}
-	
-	protected List<BufferedImage> getActionImage(){
-		return actionImage;
+	protected BufferedImage getActionImage(){
+		return actionImage.get(0);
 	}
 	
 	protected Point getPosition() {

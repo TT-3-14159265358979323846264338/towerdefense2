@@ -20,12 +20,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import defaultdata.DefaultStage;
-import defaultdata.DefaultUnit;
 import defaultdata.EditImage;
 import defaultdata.stage.StageData;
 import defendthecastle.MainFrame;
 import savedata.SaveComposition;
-import screendisplay.StatusCalculation;
 
 //バトル画面制御
 public class Battle extends JPanel implements MouseListener, MouseMotionListener{
@@ -33,11 +31,11 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	JButton targetButton = new JButton();
 	JButton pauseButton = new JButton();
 	JButton returnButton = new JButton();
-	CompositionData CompositionData = new CompositionData();
 	StageData StageData;
 	BufferedImage stageImage;
 	List<BufferedImage> placementImage = new DefaultStage().getPlacementImage(4);
-	BattleUnit[] unitData;
+	BattleUnit[] unitMainData;//右武器/コア用　攻撃・被弾などの判定はこちらで行う
+	BattleUnit[] unitLeftData;//左武器用
 	BattleFacility[] facilityData;
 	BattleEnemy[] enemyData;
 	int targetCode = 0;
@@ -77,6 +75,11 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	
 	private void install(StageData StageData) {
 		stageImage = new EditImage().input(StageData.getImageName(), 2);
+		SaveComposition SaveComposition = new SaveComposition();
+		SaveComposition.load();
+		List<List<Integer>> composition = SaveComposition.getAllCompositionList().get(SaveComposition.getSelectNumber());
+		unitMainData = IntStream.range(0, 8).mapToObj(i -> new BattleUnit(composition.get(i), new Point(1015 + i % 2 * 100, 55 + i / 2 * 100))).toArray(BattleUnit[]::new);
+		unitLeftData = IntStream.range(0, 8).mapToObj(i -> new BattleUnit(composition.get(i))).toArray(BattleUnit[]::new);;
 		facilityData = IntStream.range(0, StageData.getFacility().size()).mapToObj(i -> new BattleFacility(StageData, i)).toArray(BattleFacility[]::new);
 		//enemyData = IntStream.range(0, StageData.getEnemy().size()).mapToObj(i -> new BattleEnemy(StageData, i)).toArray(enemyData[]::new);;
 		
@@ -121,12 +124,12 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	private void drawField(Graphics g) {
 		g.drawImage(stageImage, 0, 0, this);
 		IntStream.range(0, StageData.getPlacementPoint().size()).forEach(i -> StageData.getPlacementPoint().get(i).stream().forEach(j -> g.drawImage(placementImage.get(i), j.x, j.y, this)));
-		IntStream.range(0, facilityData.length).forEach(i -> g.drawImage(facilityData[i].getActionImage().get(0), facilityData[i].getPosition().x, facilityData[i].getPosition().y, this));
+		IntStream.range(0, facilityData.length).forEach(i -> g.drawImage(facilityData[i].getActionImage(), facilityData[i].getPosition().x, facilityData[i].getPosition().y, this));
 	}
 	
 	private void drawComposition(Graphics g) {
 		IntStream.range(0, 8).forEach(i -> {
-			switch(CompositionData.getType(i)) {
+			switch(unitMainData[i].getType()) {
 			case 0:
 				g.setColor(new Color(255, 220, 220));
 				g.fillRect(1010 + i % 2 * 100, 50 + i / 2 * 100, 100, 100);
@@ -150,13 +153,13 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		IntStream.range(0, 5).forEach(i -> g.drawLine(1010, 50 + i * 100, 1210, 50 + i * 100));
 		IntStream.range(0, 8).forEach(i -> {
 			try {
-				g.drawImage(CompositionData.getRightActionImage(i), 1015 + i % 2 * 100, 55 + i / 2 * 100, this);
+				g.drawImage(unitMainData[i].getActionImage(), 1015 + i % 2 * 100, 55 + i / 2 * 100, this);
 			}catch(Exception ignore) {
 				//右武器を装備していないので、無視する
 			}
-			g.drawImage(CompositionData.getCenterActionImage(i), 1015 + i % 2 * 100, 55 + i / 2 * 100, this);
+			g.drawImage(unitMainData[i].getCoreImage(), 1015 + i % 2 * 100, 55 + i / 2 * 100, this);
 			try {
-				g.drawImage(CompositionData.getLeftActionImage(i), 1015 + i % 2 * 100, 55 + i / 2 * 100, this);
+				g.drawImage(unitLeftData[i].getActionImage(), 1015 + i % 2 * 100, 55 + i / 2 * 100, this);
 			}catch(Exception ignore) {
 				//左武器を装備していないので、無視する
 			}
@@ -172,13 +175,13 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		
 		if(canSelect) {
 			try {
-				g.drawImage(CompositionData.getRightActionImage(select), mouse.x - 45, mouse.y - 45, this);
+				g.drawImage(unitMainData[select].getActionImage(), mouse.x - 45, mouse.y - 45, this);
 			}catch(Exception ignore) {
 				//右武器を装備していないので、無視する
 			}
-			g.drawImage(CompositionData.getCenterActionImage(select), mouse.x - 45, mouse.y - 45, this);
+			g.drawImage(unitMainData[select].getCoreImage(), mouse.x - 45, mouse.y - 45, this);
 			try {
-				g.drawImage(CompositionData.getLeftActionImage(select), mouse.x - 45, mouse.y - 45, this);
+				g.drawImage(unitLeftData[select].getActionImage(), mouse.x - 45, mouse.y - 45, this);
 			}catch(Exception ignore) {
 				//左武器を装備していないので、無視する
 			}
@@ -226,59 +229,6 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	@Override
 	public void mouseExited(MouseEvent e) {
 	}
-	
-	
-	
-	
-}
-
-//セーブデータ取込み
-class CompositionData{
-	SaveComposition SaveComposition = new SaveComposition();
-	List<List<Integer>> composition;
-	List<List<BufferedImage>> rightActionImage;
-	List<BufferedImage> centerActionImage;
-	List<List<BufferedImage>> leftActionImage;
-	List<StatusCalculation> status;
-	
-	protected CompositionData() {
-		SaveComposition.load();
-		composition = SaveComposition.getAllCompositionList().get(SaveComposition.getSelectNumber());
-		rightActionImage = composition.stream().map(i -> {
-			try {
-				return new EditImage().input(new DefaultUnit().getWeaponData(i.get(0)).getRightActionImageName(), 4);
-			}catch(Exception noWeapon) {
-				return null;
-			}
-		}).toList();
-		centerActionImage = composition.stream().map(i -> new EditImage().input(new DefaultUnit().getCoreData(i.get(1)).getActionImageName(), 4)).toList();
-		leftActionImage = composition.stream().map(i -> {
-			try {
-				return new EditImage().input(new DefaultUnit().getWeaponData(i.get(2)).getLeftActionImageName(), 4);
-			}catch(Exception noWeapon) {
-				return null;
-			}
-		}).toList();
-		status = composition.stream().map(i -> new StatusCalculation(i)).toList();
-	}
-	
-	protected BufferedImage getRightActionImage(int number) {
-		return rightActionImage.get(number).get(0);
-	}
-	
-	protected BufferedImage getCenterActionImage(int number) {
-		return centerActionImage.get(number);
-	}
-	
-	protected BufferedImage getLeftActionImage(int number) {
-		return leftActionImage.get(number).get(0);
-	}
-	
-	protected int getType(int number) {
-		return status.get(number).getType();
-	}
-	
-	
 	
 	
 	

@@ -16,7 +16,6 @@ public class BattleEnemy extends BattleData implements ActionListener{
 	
 	protected BattleEnemy(StageData StageData, int number) {
 		EnemyData EnemyData = new DefaultEnemy().getEnemyData(StageData.getEnemy().get(number).get(0));
-		name = EnemyData.getName();
 		actionImage = new EditImage().input(EnemyData.getActionImageName(), 4);
 		move = StageData.getMove().get(StageData.getEnemy().get(number).get(1));
 		position = new Point(move.get(0).get(0), move.get(0).get(1));

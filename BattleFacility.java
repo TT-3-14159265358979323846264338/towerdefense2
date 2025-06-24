@@ -16,7 +16,6 @@ public class BattleFacility extends BattleData implements ActionListener{
 	
 	protected BattleFacility(StageData StageData, int number) {
 		FacilityData FacilityData = new DefaultStage().getFacilityData(StageData.getFacility().get(number));
-		name = FacilityData.getName();
 		actionImage = new EditImage().input(StageData.getFacilityDirection().get(number)? FacilityData.getActionFrontImageName(): FacilityData.getActionSideImageName(), 4);
 		breakImage = new EditImage().input(FacilityData.getBreakImageName(), 4);
 		position = StageData.getFacilityPoint().get(number);
