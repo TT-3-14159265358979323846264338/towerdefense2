@@ -1,18 +1,15 @@
 package battle;
 
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import defaultdata.DefaultStage;
-import defaultdata.EditImage;
-import defaultdata.facility.FacilityData;
-
+//各キャラクターの共通システム
 public class BattleData {
 	String name;
 	List<BufferedImage> actionImage;
-	BufferedImage breakImage;
+	Point position;
 	List<Integer> element;
 	List<Integer> defaultWeaponStatus;
 	List<Integer> defaultUnitStatus;
@@ -24,19 +21,12 @@ public class BattleData {
 	List<Double> ratioUnitStatus;
 	List<Double> ratioCutStatus;
 	int HP;
+	boolean canActivate;
 	
-	protected BattleData(FacilityData FacilityData, boolean existsWhich) {
-		name = FacilityData.getName();
-		actionImage = new EditImage().input(existsWhich? FacilityData.getActionFrontImageName(): FacilityData.getActionSideImageName(), 4);
-		breakImage = new EditImage().input(FacilityData.getBreakImageName(), 4);
-		element = FacilityData.getElement().stream().toList();
-		if(FacilityData.getWeaponStatus() == null || FacilityData.getWeaponStatus().isEmpty()) {
-			defaultWeaponStatus = IntStream.range(0, DefaultStage.WEAPON_MAP.size()).mapToObj(i -> 0).toList();
-		}else {
-			defaultWeaponStatus = FacilityData.getWeaponStatus().stream().toList();
-		}
-		defaultUnitStatus = FacilityData.getUnitStatus().stream().toList();
-		defaultCutStatus = FacilityData.getCutStatus().stream().toList();
+	protected BattleData() {
+	}
+	
+	protected void initialize() {
 		collectionWeaponStatus = defaultWeaponStatus.stream().map(i -> 0).collect(Collectors.toList());
 		collectionUnitStatus = defaultUnitStatus.stream().map(i -> 0).collect(Collectors.toList());
 		collectionCutStatus = defaultCutStatus.stream().map(i -> 0).collect(Collectors.toList());
@@ -54,9 +44,8 @@ public class BattleData {
 		return actionImage;
 	}
 	
-	protected void breakFacility() {
-		actionImage.clear();
-		actionImage.add(breakImage);
+	protected Point getPosition() {
+		return position;
 	}
 	
 	protected List<Integer> getElement(){
@@ -111,11 +100,15 @@ public class BattleData {
 		return calculate(defaultWeaponStatus.get(number), collectionWeaponStatus.get(number), ratioWeaponStatus.get(number));
 	}
 	
-	private int unitCalculate(int number) {
+	protected int unitCalculate(int number) {
 		return calculate(defaultUnitStatus.get(number), collectionUnitStatus.get(number), ratioUnitStatus.get(number));
 	}
 	
 	private int calculate(int fixedValue, int flexValue, double ratio) {
 		return (int) ((fixedValue + flexValue) * ratio);
+	}
+	
+	protected boolean getActive() {
+		return canActivate;
 	}
 }
