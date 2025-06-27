@@ -36,7 +36,7 @@ public class No0001Gate extends FacilityData{
 
 	@Override
 	public List<Integer> getUnitStatus() {
-		return Arrays.asList(2000, 2000, 0, 0, -1);
+		return Arrays.asList(2000, 2000, 0, 0, -1, 0);
 	}
 
 	@Override
