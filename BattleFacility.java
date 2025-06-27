@@ -1,7 +1,5 @@
 package battle;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.stream.IntStream;
 
@@ -11,11 +9,12 @@ import defaultdata.facility.FacilityData;
 import defaultdata.stage.StageData;
 
 //設備のバトル情報
-public class BattleFacility extends BattleData implements ActionListener{
+public class BattleFacility extends BattleData{
 	BufferedImage breakImage;
 	
 	protected BattleFacility(StageData StageData, int number) {
 		FacilityData FacilityData = new DefaultStage().getFacilityData(StageData.getFacility().get(number));
+		name = FacilityData.getName();
 		actionImage = new EditImage().input(StageData.getFacilityDirection().get(number)? FacilityData.getActionFrontImageName(): FacilityData.getActionSideImageName(), 4);
 		breakImage = new EditImage().input(FacilityData.getBreakImageName(), 4);
 		position = StageData.getFacilityPoint().get(number);
@@ -31,15 +30,11 @@ public class BattleFacility extends BattleData implements ActionListener{
 		super.initialize();
 	}
 	
-	protected BufferedImage getBreakFacility() {
+	protected BufferedImage getBreakImage() {
 		return breakImage;
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO 自動生成されたメソッド・スタブ
-		
-	}
+	
+	
 	
 	
 	

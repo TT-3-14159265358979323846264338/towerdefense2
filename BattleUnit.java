@@ -1,17 +1,16 @@
 package battle;
 
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
 import defaultdata.DefaultUnit;
 import defaultdata.EditImage;
+import screendisplay.DisplayStatus;
 import screendisplay.StatusCalculation;
 
 //ユニットのバトル情報
-public class BattleUnit extends BattleData implements ActionListener{
+public class BattleUnit extends BattleData{
 	BufferedImage coreImage;
 	Point initialPosition;
 	int type;
@@ -19,6 +18,7 @@ public class BattleUnit extends BattleData implements ActionListener{
 	//右武器/コア用　攻撃・被弾などの判定はこちらで行う
 	protected BattleUnit(List<Integer> composition, Point position) {
 		StatusCalculation StatusCalculation = new StatusCalculation(composition);
+		name = new DisplayStatus().getUnitName(composition);
 		try {
 			actionImage = new EditImage().input(new DefaultUnit().getWeaponData(composition.get(0)).getRightActionImageName(), 4);
 		}catch(Exception ignore) {
@@ -51,22 +51,23 @@ public class BattleUnit extends BattleData implements ActionListener{
 		super.initialize();
 	}
 	
-	protected BufferedImage getCoreImage(){
+	public BufferedImage getCoreImage(){
 		return coreImage;
 	}
 	
-	protected void resetPosition() {
+	protected void activate(Point point) {
+		canActivate = true;
+		position = point;
+	}
+	
+	protected void deactivate() {
+		canActivate = false;
 		position = initialPosition;
+		super.initialize();
 	}
 	
-	protected int getType() {
+	public int getType() {
 		return type;
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO 自動生成されたメソッド・スタブ
-		
 	}
 	
 	

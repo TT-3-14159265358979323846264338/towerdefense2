@@ -1,13 +1,18 @@
 package battle;
 
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-//各キャラクターの共通システム
-public class BattleData {
-	List<BufferedImage> actionImage;
+import javax.swing.Timer;
+
+//全キャラクターの共通システム
+public class BattleData extends atackMotion implements ActionListener{
+	String name;
 	Point position;
 	List<Integer> element;
 	List<Integer> defaultWeaponStatus;
@@ -21,6 +26,7 @@ public class BattleData {
 	List<Double> ratioCutStatus;
 	int HP;
 	boolean canActivate;
+	Timer atackTimer;
 	
 	protected BattleData() {
 		//特になし
@@ -34,17 +40,18 @@ public class BattleData {
 		ratioUnitStatus = defaultUnitStatus.stream().map(i -> 1.0).collect(Collectors.toList());
 		ratioCutStatus = defaultCutStatus.stream().map(i -> 1.0).collect(Collectors.toList());
 		HP = unitCalculate(1);
+		atackTimer = new Timer(getAtackSpeed(), this);
 	}
 	
-	protected BufferedImage getActionImage(){
-		return actionImage.get(0);
+	public String getName() {
+		return name;
 	}
 	
 	protected Point getPosition() {
 		return position;
 	}
 	
-	protected List<Integer> getElement(){
+	public List<Integer> getElement(){
 		return element;
 	}
 	
@@ -88,23 +95,99 @@ public class BattleData {
 		return unitCalculate(5);
 	}
 	
-	protected int getCut(int number) {
-		return calculate(defaultCutStatus.get(number), collectionCutStatus.get(number), ratioCutStatus.get(number));
+	public List<Integer> getWeapon(){
+		return IntStream.range(0, defaultWeaponStatus.size()).mapToObj(i -> weaponCalculate(i)).toList();
 	}
 	
 	private int weaponCalculate(int number) {
 		return calculate(defaultWeaponStatus.get(number), collectionWeaponStatus.get(number), ratioWeaponStatus.get(number));
 	}
 	
-	protected int unitCalculate(int number) {
+	public List<Integer> getUnit(){
+		return IntStream.range(0, defaultUnitStatus.size()).mapToObj(i -> unitCalculate(i)).toList();
+	}
+	
+	private int unitCalculate(int number) {
 		return calculate(defaultUnitStatus.get(number), collectionUnitStatus.get(number), ratioUnitStatus.get(number));
+	}
+	
+	public List<Integer> getCut(){
+		return IntStream.range(0, defaultCutStatus.size()).mapToObj(i -> getCut(i)).toList();
+	}
+	
+	protected int getCut(int number) {
+		return calculate(defaultCutStatus.get(number), collectionCutStatus.get(number), ratioCutStatus.get(number));
 	}
 	
 	private int calculate(int fixedValue, int flexValue, double ratio) {
 		return (int) ((fixedValue + flexValue) * ratio);
 	}
 	
-	protected boolean getActive() {
+	protected void deactivate() {
+		if(HP <= 0 ) {
+			canActivate = false;
+		}
+	}
+	
+	protected boolean getActivate() {
 		return canActivate;
+	}
+	
+	protected void atackTimerStart() {
+		if(!atackTimer.isRunning()) {
+			atackTimer.start();
+		}
+	}
+	
+	protected void atackTimerStop() {
+		if(atackTimer.isRunning()) {
+			atackTimer.stop();
+		}
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO 自動生成されたメソッド・スタブ
+		
+	}
+}
+
+//攻撃動作
+class atackMotion implements ActionListener{
+	List<BufferedImage> actionImage;
+	Timer motionTimer = new Timer(10, this);
+	int motionNumber = 0;
+	
+	protected BufferedImage getActionImage(){
+		try {
+			return actionImage.get(motionNumber);
+		}catch(Exception e) {
+			return null;
+		}
+	}
+	
+	public BufferedImage getDefaultImage() {
+		try {
+			return actionImage.get(0);
+		}catch(Exception e) {
+			return null;
+		}
+	}
+	
+	protected void motionTimerStart() {
+		if(!motionTimer.isRunning()) {
+			motionTimer.start();
+		}
+	}
+	
+	protected void motionTimerStop() {
+		if(motionTimer.isRunning()) {
+			motionTimer.stop();
+		}
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		motionNumber = (motionNumber == 5)? 0: motionNumber + 1;
 	}
 }

@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -19,8 +20,12 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import battle.BattleEnemy;
+import battle.BattleFacility;
+import battle.BattleUnit;
 import defaultdata.DefaultEnemy;
 import defaultdata.DefaultUnit;
+import defaultdata.EditImage;
 import defaultdata.core.CoreData;
 import defaultdata.enemy.EnemyData;
 import defaultdata.weapon.WeaponData;
@@ -63,6 +68,30 @@ public class DisplayStatus extends StatusPanel{
 		super.setStatusPanel(image);
 	}
 	
+	public void unit(BattleUnit unitMainData, BattleUnit unitLeftData) {
+		setLabelName(unitMainData.getName());
+		setWeapon(unitMainData, unitLeftData);
+		setUnit(unitMainData.getUnit(), DefaultUnit.WEAPON_UNIT_MAP);
+		setCut(unitMainData.getCut());
+		super.setStatusPanel(new EditImage().compositeImage(Arrays.asList(unitMainData.getDefaultImage(), unitMainData.getCoreImage(), unitLeftData.getDefaultImage())));
+	}
+	
+	public void facility(BattleFacility facilityData) {
+		setLabelName(facilityData.getName());
+		setWeapon(facilityData);
+		setUnit(facilityData.getUnit(), DefaultUnit.WEAPON_UNIT_MAP);
+		setCut(facilityData.getCut());
+		super.setStatusPanel(facilityData.getDefaultImage());
+	}
+	
+	public void enemy(BattleEnemy enemyData) {
+		setLabelName(enemyData.getName());
+		setWeapon(enemyData);
+		setUnit(enemyData.getUnit(), DefaultEnemy.UNIT_MAP);
+		setCut(enemyData.getCut());
+		super.setStatusPanel(enemyData.getDefaultImage());
+	}
+	
 	private void setLabelName(String unitName) {
 		name[0].setText("【名称】");
 		name[1].setText(unitName);
@@ -74,7 +103,7 @@ public class DisplayStatus extends StatusPanel{
 		return "★" + rarity + " ";
 	}
 	
-	private String getUnitName(List<Integer> compositionList) {
+	public String getUnitName(List<Integer> compositionList) {
 		String name = "";
 		DefaultUnit DefaultUnit = new DefaultUnit();
 		try {
@@ -153,6 +182,48 @@ public class DisplayStatus extends StatusPanel{
 		weapon[15].setText("" + getElement(EnemyData.getElement()));
 	}
 	
+	private void setWeapon(BattleUnit unitMainData, BattleUnit unitLeftData) {
+		IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 1].setText(DefaultUnit.WEAPON_WEAPON_MAP.get(i)));
+		weapon[5].setText("距離タイプ");
+		weapon[6].setText("属性");
+		weapon[8].setText("左武器");
+		if(unitLeftData.getDefaultImage() != null) {
+			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 9].setText("" + unitLeftData.getWeapon().get(i)));
+			weapon[13].setText("" + DefaultUnit.DISTANCE_MAP.get(unitMainData.getType()));
+			weapon[14].setText("" + getElement(unitLeftData.getElement()));
+		}
+		weapon[16].setText("右武器");
+		if(unitMainData.getDefaultImage() != null) {
+			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 17].setText("" + unitMainData.getWeapon().get(i)));
+			weapon[21].setText("" + DefaultUnit.DISTANCE_MAP.get(unitMainData.getType()));
+			weapon[22].setText("" + getElement(unitMainData.getElement()));
+		}
+	}
+	
+	private void setWeapon(BattleFacility facilityData) {
+		IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 1].setText(DefaultUnit.WEAPON_WEAPON_MAP.get(i)));
+		weapon[5].setText("属性");
+		weapon[8].setText("攻撃性能");
+		if(!facilityData.getElement().isEmpty()) {
+			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 9].setText("" + facilityData.getWeapon().get(i)));
+			weapon[13].setText("" + getElement(facilityData.getElement()));
+		}
+	}
+	
+	private void setWeapon(BattleEnemy enemyData) {
+		IntStream.range(0, DefaultEnemy.WEAPON_MAP.size()).forEach(i -> {
+			weapon[i + 1].setText(DefaultEnemy.WEAPON_MAP.get(i));
+			weapon[i + 9].setText("" + enemyData.getWeapon().get(i));
+		});
+		weapon[5].setText("移動タイプ");
+		weapon[6].setText("種別");
+		weapon[7].setText("属性");
+		weapon[8].setText("攻撃性能");
+		weapon[13].setText("" + DefaultEnemy.MOVE_MAP.get(enemyData.getMove()));
+		weapon[14].setText("" + DefaultEnemy.TYPE_MAP.get(enemyData.getType()));
+		weapon[15].setText("" + getElement(enemyData.getElement()));
+	}
+	
 	private String getElement(List<Integer> elementList) {
 		String element = "";
 		for(int i: elementList) {
@@ -171,7 +242,11 @@ public class DisplayStatus extends StatusPanel{
 	private void setUnit(List<Integer> statusList, Map<Integer, String> map) {
 		IntStream.range(0, statusList.size()).forEach(i -> {
 			unit[i].setText(map.get(i));
-			unit[i + 6].setText(statusList.get(i) + "");
+			if(statusList.get(i) < 0) {
+				unit[i + 6].setText("無限");
+			}else {
+				unit[i + 6].setText(statusList.get(i) + "");
+			}
 		});
 	}
 	
