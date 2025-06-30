@@ -9,17 +9,23 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.time.temporal.ValueRange;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import defaultdata.DefaultStage;
@@ -53,6 +59,9 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	int select;
 	boolean canSelect;
 	final static int SIZE = 28;
+	int time;
+	boolean canStop;
+	Object obj = new Object();
 	
 	public Battle(MainFrame MainFrame, StageData StageData, int difficultyCode) {
 		addMouseListener(this);
@@ -61,8 +70,9 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		install(StageData);
 		addRangeDrawButton();
 		addTargetButton();
-		addPauseButton();
+		addPauseButton(MainFrame);
 		addReturnButton(MainFrame);
+		mainTimer();
 	}
 	
 	protected void paintComponent(Graphics g) {
@@ -92,6 +102,28 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		
 	}
 	
+	private void mainTimer() {
+		Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
+			if(canStop) {
+				synchronized(obj) {
+					try {
+						obj.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					canStop = false;
+				}
+			}
+			time += 10;
+		}, 0, 10, TimeUnit.MILLISECONDS);
+	}
+	
+	protected void timerRestart() {
+		synchronized(obj) {
+			obj.notify();
+		}
+	}
+	
 	private void addRangeDrawButton() {
 		add(rangeDrawButton);
 		rangeDrawButton.addActionListener(e->{
@@ -106,10 +138,11 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		});
 	}
 	
-	private void addPauseButton() {
+	private void addPauseButton(MainFrame MainFrame) {
 		add(pauseButton);
 		pauseButton.addActionListener(e->{
-			showMessageDialog(null, "現在調整中");
+			canStop = true;
+			new Pause(this, MainFrame);
 		});
 	}
 	
@@ -278,11 +311,82 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 			}
 		});
 	}
+}
+
+//一時停止中の画面
+class Pause extends JDialog implements WindowListener{
+	Battle Battle;
 	
+	public Pause(Battle Battle, MainFrame MainFrame) {
+		this.Battle = Battle;
+		setModalityType(ModalityType.APPLICATION_MODAL);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setResizable(false);
+		setTitle("一時停止");
+		setSize(285, 140);
+		setLocationRelativeTo(null);
+		add(new PausePanel(this, MainFrame));
+		setVisible(true);
+		addWindowListener(this);
+	}
 	
+	protected void disposeFrame() {
+		dispose();
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+	}
+	@Override
+	public void windowClosing(WindowEvent e) {
+	}
+	@Override
+	public void windowClosed(WindowEvent e) {
+		Battle.timerRestart();
+	}
+	@Override
+	public void windowIconified(WindowEvent e) {
+	}
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+	}
+	@Override
+	public void windowActivated(WindowEvent e) {
+	}
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+	}
+}
+
+class PausePanel extends JPanel{
+	JLabel comment = new JLabel();
+	JButton restartButton = new JButton();
+	JButton returnButton = new JButton();
 	
+	protected PausePanel(Pause Pause, MainFrame MainFrame) {
+		add(comment);
+		comment.setText("ゲームを一時停止しています。");
+		comment.setHorizontalAlignment(JLabel.CENTER);
+		add(restartButton);
+		restartButton.addActionListener(e->{
+			Pause.disposeFrame();
+		});
+		restartButton.setText("再開");
+		add(returnButton);
+		returnButton.addActionListener(e->{
+			Pause.disposeFrame();
+			MainFrame.selectStageDraw();
+		});
+		returnButton.setText("降参");
+	}
 	
-	
-	
-	
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		comment.setBounds(10, 10, 250, 40);
+		comment.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
+		restartButton.setBounds(10, 50, 120, 40);
+		restartButton.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+		returnButton.setBounds(140, 50, 120, 40);
+		returnButton.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+	}
 }
