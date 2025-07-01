@@ -31,6 +31,6 @@ public abstract class StageData {
 	//敵情報表示順
 	public abstract List<Integer> getDisplayOrder();
 	
-	//移動情報　①List: 移動番号, ②List: 移動経路(位置x, 位置y, 移動方向番号, 描写可否番号, 停止時間) の順にリスト化
-	public abstract List<List<List<Integer>>> getMove();
+	//移動情報　①List: 移動番号, ②List: 移動経路(初期位置x, 初期位置y, 移動方向番号/停止時間, 描写中止時間) の順にリスト化
+	public abstract List<List<List<Integer>>> getRoute();
 }

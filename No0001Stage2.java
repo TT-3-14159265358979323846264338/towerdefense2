@@ -27,7 +27,7 @@ public class No0001Stage2 extends StageData {
 
 	@Override
 	public List<Point> getFacilityPoint() {
-		return Arrays.asList(new Point(430, 20), new Point(450, 260), new Point(190, 80), new Point(715, 80));
+		return Arrays.asList(new Point(430, 20), new Point(450, 260), new Point(190, 80), new Point(720, 80));
 	}
 
 	@Override
@@ -89,8 +89,8 @@ public class No0001Stage2 extends StageData {
 				Arrays.asList(0, 1, 100),
 				Arrays.asList(1, 0, 200),
 				Arrays.asList(1, 1, 200),
-				Arrays.asList(0, 3, 400),
-				Arrays.asList(0, 4, 400));
+				Arrays.asList(0, 0, 400),
+				Arrays.asList(0, 1, 400));
 	}
 
 	@Override
@@ -99,8 +99,20 @@ public class No0001Stage2 extends StageData {
 	}
 
 	@Override
-	public List<List<List<Integer>>> getMove() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	public List<List<List<Integer>>> getRoute() {
+		return Arrays.asList(
+				Arrays.asList(
+						Arrays.asList(0, 0, 4, 0),
+						Arrays.asList(0, 100, 2, 0),
+						Arrays.asList(100, 100, 4, 0),
+						Arrays.asList(100, 200, 2, 0)
+						),
+				Arrays.asList(
+						Arrays.asList(0, 0, 2, 0),
+						Arrays.asList(100, 0, 4, 0),
+						Arrays.asList(100, 100, 4, 0),
+						Arrays.asList(200, 200, 3, 0)
+						)
+				);
 	}
 }

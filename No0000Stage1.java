@@ -95,8 +95,25 @@ public class No0000Stage1 extends StageData{
 	}
 
 	@Override
-	public List<List<List<Integer>>> getMove() {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+	public List<List<List<Integer>>> getRoute() {
+		return Arrays.asList(
+				Arrays.asList(
+						Arrays.asList(0, 0, 4, 0),
+						Arrays.asList(0, 100, 2, 0),
+						Arrays.asList(100, 100, 1000, 0),
+						Arrays.asList(100, 100, 2, 0),
+						Arrays.asList(200, 100, 2000, 1000),
+						Arrays.asList(200, 100, 0, 0),
+						Arrays.asList(200, 0, 7, 1000),
+						Arrays.asList(100, 0, 4, 0),
+						Arrays.asList(100, 100, 4, 0)),
+				Arrays.asList(
+						Arrays.asList(0, 0, 2, 0),
+						Arrays.asList(100, 0, 4, 0),
+						Arrays.asList(100, 100, 2, 1000),
+						Arrays.asList(200, 100, 4, 0),
+						Arrays.asList(200, 200, 4, 0)
+						)
+				);
 	}
 }
