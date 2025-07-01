@@ -1,17 +1,17 @@
 package battle;
 
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.swing.Timer;
-
 //全キャラクターの共通システム
-public class BattleData extends atackMotion implements ActionListener{
+public class BattleData{
+	Battle Battle;
+	List<BufferedImage> actionImage;
+	int motionNumber = 0;
 	String name;
 	Point position;
 	List<Integer> element;
@@ -26,11 +26,7 @@ public class BattleData extends atackMotion implements ActionListener{
 	List<Double> ratioCutStatus;
 	int HP;
 	boolean canActivate;
-	Timer atackTimer;
-	
-	protected BattleData() {
-		//特になし
-	}
+	Object waitObject;
 	
 	protected void initialize() {
 		collectionWeaponStatus = defaultWeaponStatus.stream().map(i -> 0).collect(Collectors.toList());
@@ -40,7 +36,36 @@ public class BattleData extends atackMotion implements ActionListener{
 		ratioUnitStatus = defaultUnitStatus.stream().map(i -> 1.0).collect(Collectors.toList());
 		ratioCutStatus = defaultCutStatus.stream().map(i -> 1.0).collect(Collectors.toList());
 		HP = unitCalculate(1);
-		atackTimer = new Timer(getAtackSpeed(), this);
+	}
+	
+	protected BufferedImage getActionImage(){
+		return actionImage.get(motionNumber);
+	}
+	
+	public BufferedImage getDefaultImage() {
+		return actionImage.get(0);
+	}
+	
+	protected void motionTimer() {
+		//motionNumber = (motionNumber == 5)? 0: motionNumber + 1;
+	}
+	
+	protected void atackTimer() {
+		
+	}
+	
+	protected CompletableFuture<Void> mainTimerMonitoring() {
+		return CompletableFuture.runAsync(() -> {
+			if(Battle.getManiTimerStatus()) {
+				synchronized(waitObject) {
+					try {
+						waitObject.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
 	}
 	
 	public String getName() {
@@ -87,7 +112,7 @@ public class BattleData extends atackMotion implements ActionListener{
 		return unitCalculate(3);
 	}
 	
-	protected int getMove() {
+	protected int getMoveSpeed() {
 		return unitCalculate(4);
 	}
 	
@@ -131,63 +156,5 @@ public class BattleData extends atackMotion implements ActionListener{
 	
 	protected boolean getActivate() {
 		return canActivate;
-	}
-	
-	protected void atackTimerStart() {
-		if(!atackTimer.isRunning()) {
-			atackTimer.start();
-		}
-	}
-	
-	protected void atackTimerStop() {
-		if(atackTimer.isRunning()) {
-			atackTimer.stop();
-		}
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO 自動生成されたメソッド・スタブ
-		
-	}
-}
-
-//攻撃動作
-class atackMotion implements ActionListener{
-	List<BufferedImage> actionImage;
-	Timer motionTimer = new Timer(10, this);
-	int motionNumber = 0;
-	
-	protected BufferedImage getActionImage(){
-		try {
-			return actionImage.get(motionNumber);
-		}catch(Exception e) {
-			return null;
-		}
-	}
-	
-	public BufferedImage getDefaultImage() {
-		try {
-			return actionImage.get(0);
-		}catch(Exception e) {
-			return null;
-		}
-	}
-	
-	protected void motionTimerStart() {
-		if(!motionTimer.isRunning()) {
-			motionTimer.start();
-		}
-	}
-	
-	protected void motionTimerStop() {
-		if(motionTimer.isRunning()) {
-			motionTimer.stop();
-		}
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		motionNumber = (motionNumber == 5)? 0: motionNumber + 1;
 	}
 }

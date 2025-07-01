@@ -12,7 +12,9 @@ import defaultdata.stage.StageData;
 public class BattleFacility extends BattleData{
 	BufferedImage breakImage;
 	
-	protected BattleFacility(StageData StageData, int number) {
+	protected BattleFacility(Battle Battle, StageData StageData, int number) {
+		this.Battle = Battle;
+		waitObject = Battle.getWaitObject();
 		FacilityData FacilityData = new DefaultStage().getFacilityData(StageData.getFacility().get(number));
 		name = FacilityData.getName();
 		actionImage = new EditImage().input(StageData.getFacilityDirection().get(number)? FacilityData.getActionFrontImageName(): FacilityData.getActionSideImageName(), 4);
