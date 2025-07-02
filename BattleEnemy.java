@@ -4,8 +4,8 @@ import java.awt.Point;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
 
 import defaultdata.DefaultEnemy;
 import defaultdata.EditImage;
@@ -22,7 +22,6 @@ public class BattleEnemy extends BattleData{
 	
 	protected BattleEnemy(Battle Battle, StageData StageData, int number) {
 		this.Battle = Battle;
-		waitObject = Battle.getWaitObject();
 		EnemyData EnemyData = new DefaultEnemy().getEnemyData(StageData.getEnemy().get(number).get(0));
 		name = EnemyData.getName();
 		actionImage = new EditImage().input(EnemyData.getActionImageName(), 4);
@@ -48,27 +47,32 @@ public class BattleEnemy extends BattleData{
 		return type;
 	}
 	
-	private void routeTimer() {
-		Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
+	protected void routeTimer() {
+		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		int nowSpeed = getMoveSpeedOrBlock();
+		if(nowSpeed <= 0) {
+			scheduler.scheduleWithFixedDelay(() -> {
+				if(actitateTime <= Battle.getMainTime()) {
+					canActivate = true;
+					scheduler.shutdown();
+				}
+			}, 0, 10, TimeUnit.MILLISECONDS);
+			return;
+		}
+		scheduler.scheduleWithFixedDelay(() -> {
 			if(canActivate) {
-				IntStream.range(0, getMoveSpeed() / 10).forEach(i -> CompletableFuture.allOf(mainTimerMonitoring(), routeTimerMonitoring()).join());
+				CompletableFuture.runAsync(() -> Battle.timerWait()).join();
 				move();
+				if(nowSpeed != getMoveSpeedOrBlock()) {
+					routeTimer();
+					scheduler.shutdown();
+				}
 			}else {
 				if(actitateTime <= Battle.getMainTime()) {
 					canActivate = true;
 				}
 			}
-		}, 0, 10, TimeUnit.MILLISECONDS);
-	}
-	
-	private synchronized CompletableFuture<Void> routeTimerMonitoring(){
-		return CompletableFuture.runAsync(() -> {
-			try {
-				Thread.sleep(getMoveSpeed() / 10);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		});
+		}, 0, 2000000 / nowSpeed, TimeUnit.MICROSECONDS);
 	}
 	
 	private void move() {
@@ -79,54 +83,50 @@ public class BattleEnemy extends BattleData{
 				routeNumber++;
 			}
 		}catch (Exception ignore) {
+			//最後のrouteに入ったので、これ以上routeNumberは増えない
 		}
 	}
 	
 	private void moveDistance() {
 		int x;
 		int y;
-		try {
-			switch(route.get(routeNumber).get(2)) {
-			case 0:
-				x = 0;
-				y = -5;
-				break;
-			case 1:
-				x = 5;
-				y = -5;
-				break;
-			case 2:
-				x = 5;
-				y = 0;
-				break;
-			case 3:
-				x = 5;
-				y = 5;
-				break;
-			case 4:
-				x = 0;
-				y = 5;
-				break;
-			case 5:
-				x = -5;
-				y = 5;
-				break;
-			case 6:
-				x = -5;
-				y = 0;
-				break;
-			case 7:
-				x = -5;
-				y = -5;
-				break;
-			default:
-				x = 0;
-				y = 0;
-				break;
-			}
-		}catch (Exception e) {
+		switch(route.get(routeNumber).get(2)) {
+		case 0:
+			x = 0;
+			y = -2;
+			break;
+		case 1:
+			x = 2;
+			y = -2;
+			break;
+		case 2:
+			x = 2;
+			y = 0;
+			break;
+		case 3:
+			x = 2;
+			y = 2;
+			break;
+		case 4:
+			x = 0;
+			y = 2;
+			break;
+		case 5:
+			x = -2;
+			y = 2;
+			break;
+		case 6:
+			x = -2;
+			y = 0;
+			break;
+		case 7:
+			x = -2;
+			y = -2;
+			break;
+		default:
 			x = 0;
 			y = 0;
+			break;
 		}
 		position.x += x;
 		position.y += y;

@@ -19,7 +19,6 @@ public class BattleUnit extends BattleData{
 	//右武器/コア用　攻撃・被弾などの判定はこちらで行う
 	protected BattleUnit(Battle Battle, List<Integer> composition, Point position) {
 		this.Battle = Battle;
-		waitObject = Battle.getWaitObject();
 		StatusCalculation StatusCalculation = new StatusCalculation(composition);
 		name = new DisplayStatus().getUnitName(composition);
 		try {

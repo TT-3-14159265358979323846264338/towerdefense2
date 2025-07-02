@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.time.temporal.ValueRange;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,6 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	final static int SIZE = 28;
 	int time;
 	boolean canStop;
-	Object waitObject = new Object();
 	
 	public Battle(MainFrame MainFrame, StageData StageData, int difficultyCode) {
 		addMouseListener(this);
@@ -99,43 +99,32 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		unitLeftData = IntStream.range(0, composition.size()).mapToObj(i -> new BattleUnit(this, composition.get(i))).toArray(BattleUnit[]::new);;
 		facilityData = IntStream.range(0, StageData.getFacility().size()).mapToObj(i -> new BattleFacility(this, StageData, i)).toArray(BattleFacility[]::new);
 		enemyData = IntStream.range(0, StageData.getEnemy().size()).mapToObj(i -> new BattleEnemy(this, StageData, i)).toArray(BattleEnemy[]::new);
-		
-		
-		
 	}
 	
 	private void mainTimer() {
 		Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
-			if(canStop) {
-				synchronized(waitObject) {
-					try {
-						waitObject.wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+			timerWait();
 			time += 10;
 		}, 0, 10, TimeUnit.MILLISECONDS);
 	}
 	
-	protected void timerRestart() {
-		synchronized(waitObject) {
-			waitObject.notifyAll();
-			canStop = false;
+	protected synchronized void timerWait() {
+		if(canStop) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	protected boolean getManiTimerStatus() {
-		return canStop;
+	protected synchronized void timerRestart() {
+		notifyAll();
+		canStop = false;
 	}
 	
 	protected int getMainTime() {
 		return time;
-	}
-	
-	protected Object getWaitObject() {
-		return waitObject;
 	}
 	
 	private void addRangeDrawButton() {
@@ -188,7 +177,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	}
 	
 	private void drawEnemy(Graphics g) {
-		IntStream.range(0, enemyData.length).filter(i -> enemyData[i].getActivate()).forEach(i -> g.drawImage(enemyData[i].getActionImage(), enemyData[i].getPosition().x, enemyData[i].getPosition().y, this));
+		IntStream.range(0, enemyData.length).filter(i -> enemyData[i].getActivate()).boxed().sorted(Comparator.reverseOrder()).forEach(i -> g.drawImage(enemyData[i].getActionImage(), enemyData[i].getPosition().x, enemyData[i].getPosition().y, this));
 	}
 	
 	private void drawBackground(Graphics g) {

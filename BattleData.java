@@ -3,7 +3,6 @@ package battle;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -24,9 +23,8 @@ public class BattleData{
 	List<Double> ratioWeaponStatus;
 	List<Double> ratioUnitStatus;
 	List<Double> ratioCutStatus;
-	int HP;
+	int nowHP;
 	boolean canActivate;
-	Object waitObject;
 	
 	protected void initialize() {
 		collectionWeaponStatus = defaultWeaponStatus.stream().map(i -> 0).collect(Collectors.toList());
@@ -35,7 +33,7 @@ public class BattleData{
 		ratioWeaponStatus = defaultWeaponStatus.stream().map(i -> 1.0).collect(Collectors.toList());
 		ratioUnitStatus = defaultUnitStatus.stream().map(i -> 1.0).collect(Collectors.toList());
 		ratioCutStatus = defaultCutStatus.stream().map(i -> 1.0).collect(Collectors.toList());
-		HP = unitCalculate(1);
+		nowHP = unitCalculate(1);
 	}
 	
 	protected BufferedImage getActionImage(){
@@ -52,20 +50,6 @@ public class BattleData{
 	
 	protected void atackTimer() {
 		
-	}
-	
-	protected CompletableFuture<Void> mainTimerMonitoring() {
-		return CompletableFuture.runAsync(() -> {
-			if(Battle.getManiTimerStatus()) {
-				synchronized(waitObject) {
-					try {
-						waitObject.wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		});
 	}
 	
 	public String getName() {
@@ -101,7 +85,7 @@ public class BattleData{
 	}
 	
 	protected int getNowHP() {
-		return HP;
+		return nowHP;
 	}
 	
 	protected int getDefense() {
@@ -112,7 +96,7 @@ public class BattleData{
 		return unitCalculate(3);
 	}
 	
-	protected int getMoveSpeed() {
+	protected int getMoveSpeedOrBlock() {
 		return unitCalculate(4);
 	}
 	
@@ -149,7 +133,7 @@ public class BattleData{
 	}
 	
 	protected void deactivate() {
-		if(HP <= 0 ) {
+		if(nowHP <= 0 ) {
 			canActivate = false;
 		}
 	}
