@@ -31,46 +31,47 @@ public class No0001Stage2 extends StageData {
 	}
 
 	@Override
-	public List<List<Point>> getPlacementPoint() {
+	public List<List<List<Double>>> getPlacementPoint() {
 		double size = 29.5;
-		Point center = new Point(483, 265);
+		double centerX = 483;
+		double centerY = 265;
 		return Arrays.asList(
-				Arrays.asList(new Point((int) (center.x - size * 7), (int) (center.y - size * 5)),
-						new Point((int) (center.x - size * 5), (int) (center.y - size * 5)),
-						new Point((int) (center.x + size * 5), (int) (center.y - size * 5)),
-						new Point((int) (center.x + size * 7), (int) (center.y - size * 5)),
+				Arrays.asList(Arrays.asList(centerX - size * 7, centerY - size * 5),
+						Arrays.asList(centerX - size * 5, centerY - size * 5),
+						Arrays.asList(centerX + size * 5, centerY - size * 5),
+						Arrays.asList(centerX + size * 7, centerY - size * 5),
 						
-						new Point((int) (center.x - size), (int) (center.y - size)),
-						new Point((int) (center.x + size), (int) (center.y - size))),
-				Arrays.asList(new Point((int) (center.x - size * 9), (int) (center.y - size * 8)),
-						new Point((int) (center.x + size * 9), (int) (center.y - size * 8)),
+						Arrays.asList(centerX - size, centerY - size),
+						Arrays.asList(centerX + size, centerY - size)),
+				Arrays.asList(Arrays.asList(centerX - size * 9, centerY - size * 8),
+						Arrays.asList(centerX + size * 9, centerY - size * 8),
 						
-						new Point((int) (center.x - size * 6), (int) (center.y - size * 7)),
-						new Point((int) (center.x - size * 4), (int) (center.y - size * 7)),
-						new Point((int) (center.x + size * 6), (int) (center.y - size * 7)),
-						new Point((int) (center.x + size * 4), (int) (center.y - size * 7)),
+						Arrays.asList(centerX - size * 6, centerY - size * 7),
+						Arrays.asList(centerX - size * 4, centerY - size * 7),
+						Arrays.asList(centerX + size * 6, centerY - size * 7),
+						Arrays.asList(centerX + size * 4, centerY - size * 7),
 						
-						new Point((int) (center.x - size * 9), (int) (center.y - size * 3)),
-						new Point((int) (center.x - size * 5), (int) (center.y - size * 3)),
-						new Point((int) (center.x - size * 3), (int) (center.y - size * 3)),
-						new Point((int) (center.x + size * 9), (int) (center.y - size * 3)),
-						new Point((int) (center.x + size * 5), (int) (center.y - size * 3)),
-						new Point((int) (center.x + size * 3), (int) (center.y - size * 3)),
+						Arrays.asList(centerX - size * 9, centerY - size * 3),
+						Arrays.asList(centerX - size * 5, centerY - size * 3),
+						Arrays.asList(centerX - size * 3, centerY - size * 3),
+						Arrays.asList(centerX + size * 9, centerY - size * 3),
+						Arrays.asList(centerX + size * 5, centerY - size * 3),
+						Arrays.asList(centerX + size * 3, centerY - size * 3),
 						
-						new Point((int) (center.x - size * 9), (int) (center.y - size)),
-						new Point((int) (center.x + size * 9), (int) (center.y - size)),
+						Arrays.asList(centerX - size * 9, centerY - size),
+						Arrays.asList(centerX + size * 9, centerY - size),
 						
-						new Point((int) (center.x - size * 7), (int) (center.y + size)),
-						new Point((int) (center.x - size * 5), (int) (center.y + size)),
-						new Point((int) (center.x - size * 3), (int) (center.y + size)),
-						new Point((int) (center.x + size * 7), (int) (center.y + size)),
-						new Point((int) (center.x + size * 5), (int) (center.y + size)),
-						new Point((int) (center.x + size * 3), (int) (center.y + size))),
-				Arrays.asList(new Point((int) (center.x - size * 3), (int) (center.y - size * 5)),
-						new Point((int) (center.x + size * 3), (int) (center.y - size * 5)),
+						Arrays.asList(centerX - size * 7, centerY + size),
+						Arrays.asList(centerX - size * 5, centerY + size),
+						Arrays.asList(centerX - size * 3, centerY + size),
+						Arrays.asList(centerX + size * 7, centerY + size),
+						Arrays.asList(centerX + size * 5, centerY + size),
+						Arrays.asList(centerX + size * 3, centerY + size)),
+				Arrays.asList(Arrays.asList(centerX - size * 3, centerY - size * 5),
+						Arrays.asList(centerX + size * 3, centerY - size * 5),
 						
-						new Point((int) (center.x - size), (int) (center.y - size * 3)),
-						new Point((int) (center.x + size), (int) (center.y - size * 3))
+						Arrays.asList(centerX - size, centerY - size * 3),
+						Arrays.asList(centerX + size, centerY - size * 3)
 						));
 	}
 
@@ -85,12 +86,12 @@ public class No0001Stage2 extends StageData {
 	@Override
 	public List<List<Integer>> getEnemy() {
 		return Arrays.asList(
-				Arrays.asList(0, 0, 100),
-				Arrays.asList(0, 1, 100),
-				Arrays.asList(1, 0, 200),
-				Arrays.asList(1, 1, 200),
-				Arrays.asList(0, 0, 400),
-				Arrays.asList(0, 1, 400));
+				Arrays.asList(0, 0, 1000),
+				Arrays.asList(0, 1, 1000),
+				Arrays.asList(1, 0, 2000),
+				Arrays.asList(1, 1, 2000),
+				Arrays.asList(0, 0, 3000),
+				Arrays.asList(0, 1, 3000));
 	}
 
 	@Override
@@ -111,7 +112,7 @@ public class No0001Stage2 extends StageData {
 						Arrays.asList(0, 0, 2, 0),
 						Arrays.asList(100, 0, 4, 0),
 						Arrays.asList(100, 100, 4, 0),
-						Arrays.asList(200, 200, 3, 0)
+						Arrays.asList(100, 200, 1, 0)
 						)
 				);
 	}
