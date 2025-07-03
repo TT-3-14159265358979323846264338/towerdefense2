@@ -1,6 +1,5 @@
 package battle;
 
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,7 +11,8 @@ public class BattleData{
 	List<BufferedImage> actionImage;
 	int motionNumber = 0;
 	String name;
-	Point position;
+	double positionX;
+	double positionY;
 	List<Integer> element;
 	List<Integer> defaultWeaponStatus;
 	List<Integer> defaultUnitStatus;
@@ -56,8 +56,12 @@ public class BattleData{
 		return name;
 	}
 	
-	protected Point getPosition() {
-		return position;
+	protected double getPositionX() {
+		return positionX;
+	}
+	
+	protected double getPositionY() {
+		return positionY;
 	}
 	
 	public List<Integer> getElement(){

@@ -17,7 +17,7 @@ public class BattleUnit extends BattleData{
 	int type;
 	
 	//右武器/コア用　攻撃・被弾などの判定はこちらで行う
-	protected BattleUnit(Battle Battle, List<Integer> composition, Point position) {
+	protected BattleUnit(Battle Battle, List<Integer> composition, int positionX, int positionY) {
 		this.Battle = Battle;
 		StatusCalculation StatusCalculation = new StatusCalculation(composition);
 		name = new DisplayStatus().getUnitName(composition);
@@ -27,8 +27,9 @@ public class BattleUnit extends BattleData{
 			actionImage = Arrays.asList(getBlankImage());
 		}
 		coreImage = new EditImage().input(new DefaultUnit().getCoreData(composition.get(1)).getActionImageName(), 4);
-		this.position = position;
-		initialPosition = position;
+		this.positionX = positionX;
+		this.positionY = positionY;
+		initialPosition = new Point(positionX, positionY);;
 		type = StatusCalculation.getType();
 		element = StatusCalculation.getRightElement();
 		defaultWeaponStatus = StatusCalculation.getRightWeaponStatus();
@@ -64,14 +65,16 @@ public class BattleUnit extends BattleData{
 		return coreImage;
 	}
 	
-	protected void activate(Point point) {
+	protected void activate(int x, int y) {
 		canActivate = true;
-		position = point;
+		positionX = x;
+		positionY = y;
 	}
 	
 	protected void deactivate() {
 		canActivate = false;
-		position = initialPosition;
+		positionX = initialPosition.x;
+		positionY = initialPosition.y;
 		super.initialize();
 	}
 	

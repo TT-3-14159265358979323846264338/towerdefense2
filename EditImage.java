@@ -114,7 +114,7 @@ public class EditImage{
 		};
 		//配置マスの表示
 		List<BufferedImage> placementImage = new DefaultStage().getPlacementImage(4);
-		IntStream.range(0, placementImage.size()).forEach(i -> StageData.getPlacementPoint().get(i).stream().forEach(j -> drawImage.accept(placementImage.get(i), j)));
+		IntStream.range(0, placementImage.size()).forEach(i -> StageData.getPlacementPoint().get(i).stream().forEach(j -> g.drawImage(placementImage.get(i), j.get(0).intValue(), j.get(1).intValue(), null)));
 		//設備の表示
 		FacilityData[] FacilityData = IntStream.range(0, DefaultStage.FACILITY_SPECIES).mapToObj(i -> new DefaultStage().getFacilityData(i)).toArray(FacilityData[]::new);
 		List<BufferedImage> frontFacilityImage = Stream.of(FacilityData).map(i -> input(i.getActionFrontImageName().get(0), 4)).toList();

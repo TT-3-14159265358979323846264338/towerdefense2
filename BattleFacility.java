@@ -18,7 +18,8 @@ public class BattleFacility extends BattleData{
 		name = FacilityData.getName();
 		actionImage = new EditImage().input(StageData.getFacilityDirection().get(number)? FacilityData.getActionFrontImageName(): FacilityData.getActionSideImageName(), 4);
 		breakImage = new EditImage().input(FacilityData.getBreakImageName(), 4);
-		position = StageData.getFacilityPoint().get(number);
+		positionX = StageData.getFacilityPoint().get(number).x;
+		positionY = StageData.getFacilityPoint().get(number).y;
 		element = FacilityData.getElement().stream().toList();
 		if(FacilityData.getWeaponStatus() == null || FacilityData.getWeaponStatus().isEmpty()) {
 			defaultWeaponStatus = IntStream.range(0, DefaultStage.WEAPON_MAP.size()).mapToObj(i -> 0).toList();
