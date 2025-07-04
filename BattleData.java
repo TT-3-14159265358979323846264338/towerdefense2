@@ -136,12 +136,6 @@ public class BattleData{
 		return (int) ((fixedValue + flexValue) * ratio);
 	}
 	
-	protected void deactivate() {
-		if(nowHP <= 0 ) {
-			canActivate = false;
-		}
-	}
-	
 	protected boolean getActivate() {
 		return canActivate;
 	}
