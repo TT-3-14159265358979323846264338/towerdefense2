@@ -98,53 +98,61 @@ public class No0000Stage1 extends StageData{
 	@Override
 	public List<List<List<Integer>>> getRoute() {
 		return Arrays.asList(
+				//route0: 通常ルート1
 				Arrays.asList(
-						Arrays.asList(30, 500, 0, 0),
-						Arrays.asList(30, 310, 100, 0),
-						Arrays.asList(30, 310, 4, 0),
-						Arrays.asList(610, 310, 8, 0),
-						Arrays.asList(610, 440, 4, 0),
-						Arrays.asList(725, 440, 0, 0),
-						Arrays.asList(725, 260, 4, 0),
-						Arrays.asList(920, 260, 0, 0),
-						Arrays.asList(920, 90, 12, 0)
+						Arrays.asList(30, 500, 270, 0, 0),
+						Arrays.asList(0, 310, 0, 100, 0),
+						Arrays.asList(0, 0, 0, 0, 0),
+						Arrays.asList(600, 0, 90, 0, 0),
+						Arrays.asList(0, 440, 0, 0, 0),
+						Arrays.asList(725, 0, 270, 0, 0),
+						Arrays.asList(0, 260, 0, 0, 0),
+						Arrays.asList(920, 0, 270, 0, 0),
+						Arrays.asList(0, 90, 180, 0, 0)
 						),
+				//route1: 通常ルート2
 				Arrays.asList(
-						Arrays.asList(30, 510, 0, 0),
-						Arrays.asList(30, 320, 100, 0),
-						Arrays.asList(30, 320, 4, 0),
-						Arrays.asList(370, 320, 8, 0),
-						Arrays.asList(370, 450, 4, 0),
-						Arrays.asList(725, 450, 0, 0),
-						Arrays.asList(725, 260, 4, 0),
-						Arrays.asList(910, 260, 0, 0),
-						Arrays.asList(910, 25, 12, 0)
+						Arrays.asList(30, 510, 270, 0, 0),
+						Arrays.asList(0, 320, 0, 100, 0),
+						Arrays.asList(0, 0, 0, 0, 0),
+						Arrays.asList(370, 0, 90, 0, 0),
+						Arrays.asList(0, 450, 0, 0, 0),
+						Arrays.asList(725, 0, 270, 0, 0),
+						Arrays.asList(0, 260, 0, 0, 0),
+						Arrays.asList(910, 0, 270, 0, 0),
+						Arrays.asList(0, 25, 180, 0, 0)
 						),
+				//route2: N字飛行
 				Arrays.asList(
-						Arrays.asList(0, 510, 0, 0),
-						Arrays.asList(0, 290, 2, 100),
-						Arrays.asList(100, 190, 100, 100),
-						Arrays.asList(100, 190, 1, 0),
-						Arrays.asList(125, 140, 2, 0),
-						Arrays.asList(175, 90, 3, 0),
-						Arrays.asList(225, 65, 4, 0),
-						Arrays.asList(275, 65, 5, 0),
-						Arrays.asList(325, 90, 6, 0),
-						Arrays.asList(475, 240, 5, 0),
-						Arrays.asList(595, 300, 4, 0),
-						Arrays.asList(650, 300, 3, 0),
-						Arrays.asList(700, 275, 2, 0),
-						Arrays.asList(750, 225, 1, 0),
-						Arrays.asList(775, 175, 0, 0)
-						
-						
+						Arrays.asList(10, 510, 270, 0, 0),
+						Arrays.asList(0, 290, 315, 0, 100),
+						Arrays.asList(100, 0, 0, 100, 100),
+						Arrays.asList(0, 0, 290, 0, 0),
+						Arrays.asList(125, 0, 315, 0, 0),
+						Arrays.asList(175, 0, 340, 0, 0),
+						Arrays.asList(225, 0, 0, 0, 0),
+						Arrays.asList(275, 0, 20, 0, 0),
+						Arrays.asList(325, 0, 45, 0, 0),
+						Arrays.asList(475, 0, 20, 0, 0),
+						Arrays.asList(595, 0, 0, 0, 0),
+						Arrays.asList(650, 0, 340, 0, 0),
+						Arrays.asList(700, 0, 315, 0, 0),
+						Arrays.asList(750, 0, 290, 0, 0),
+						Arrays.asList(775, 0, 270, 0, 0),
+						Arrays.asList(0, 70, 245, 0, 0),
+						Arrays.asList(0, 50, 225, 0, 0),
+						Arrays.asList(0, 30, 200, 0, 0),
+						Arrays.asList(0, 10, 180, 0, 0),
+						Arrays.asList(655, 0, 155, 0, 0),
+						Arrays.asList(630, 0, 135, 0, 0)
 						),
+				//route3: 右下から直行
 				Arrays.asList(
-						Arrays.asList(900, 510, 0, 0),
-						Arrays.asList(900, 440, 200, 0),
-						Arrays.asList(900, 440, 14, 0),
-						Arrays.asList(660, 200, 200, 0),
-						Arrays.asList(660, 200, 14, 0)
+						Arrays.asList(900, 510, 270, 0, 0),
+						Arrays.asList(0, 440, 0, 200, 0),
+						Arrays.asList(0, 0, 225, 0, 0),
+						Arrays.asList(660, 0, 0, 200, 0),
+						Arrays.asList(0, 0, 225, 0, 0)
 						)
 				);
 	}
@@ -161,22 +169,22 @@ public class No0000Stage1 extends StageData{
 テスト用route
 		return Arrays.asList(
 				Arrays.asList(
-						Arrays.asList(0, 0, 4, 0),
-						Arrays.asList(0, 100, 2, 0),
-						Arrays.asList(100, 100, 100, 0),
-						Arrays.asList(100, 100, 2, 0),
-						Arrays.asList(200, 100, 200, 100),
-						Arrays.asList(200, 100, 0, 0),
-						Arrays.asList(200, 0, 6, 100),
-						Arrays.asList(100, 0, 4, 0),
-						Arrays.asList(100, 100, 5, 0)),
+						Arrays.asList(10, 10, 90, 0, 0),
+						Arrays.asList(0, 100, 0, 0, 0),
+						Arrays.asList(100, 0, 0, 100, 0),
+						Arrays.asList(0, 0, 0, 0, 0),
+						Arrays.asList(200, 0, 0, 200, 100),
+						Arrays.asList(0, 0, 270, 0, 0),
+						Arrays.asList(0, 10, 180, 0, 100),
+						Arrays.asList(100, 0, 90, 0, 0),
+						Arrays.asList(0, 100, 315, 0, 0)),
 				Arrays.asList(
-						Arrays.asList(0, 0, 2, 0),
-						Arrays.asList(100, 0, 4, 0),
-						Arrays.asList(100, 100, 2, 100),
-						Arrays.asList(200, 100, 4, 100),
-						Arrays.asList(200, 200, 4, 0),
-						Arrays.asList(200, 200, 7, 0)
+						Arrays.asList(10, 10, 0, 0, 0),
+						Arrays.asList(100, 0, 90, 0, 0),
+						Arrays.asList(0, 100, 0, 0, 100),
+						Arrays.asList(200, 0, 90, 0, 100),
+						Arrays.asList(0, 200, 90, 0, 0),
+						Arrays.asList(0, 300, 225, 0, 0)
 						)
 				);
 */

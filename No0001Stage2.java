@@ -87,11 +87,14 @@ public class No0001Stage2 extends StageData {
 	public List<List<Integer>> getEnemy() {
 		return Arrays.asList(
 				Arrays.asList(0, 0, 1000),
-				Arrays.asList(0, 1, 1000),
-				Arrays.asList(1, 0, 2000),
-				Arrays.asList(1, 1, 2000),
-				Arrays.asList(0, 0, 3000),
-				Arrays.asList(0, 1, 3000));
+				Arrays.asList(1, 1, 1000),
+				Arrays.asList(0, 2, 2000),
+				Arrays.asList(1, 3, 2000),
+				Arrays.asList(0, 4, 3000),
+				Arrays.asList(1, 5, 3000),
+				Arrays.asList(0, 6, 4000),
+				Arrays.asList(1, 7, 4000)
+				);
 	}
 
 	@Override
@@ -102,17 +105,49 @@ public class No0001Stage2 extends StageData {
 	@Override
 	public List<List<List<Integer>>> getRoute() {
 		return Arrays.asList(
+				//route0: 左下から中央城門へ1
 				Arrays.asList(
-						Arrays.asList(0, 0, 4, 0),
-						Arrays.asList(0, 100, 2, 0),
-						Arrays.asList(100, 100, 4, 0),
-						Arrays.asList(100, 200, 2, 0)
+						Arrays.asList(-50, 400, 0, 0, 0),
+						Arrays.asList(460, 0, 270, 0, 0)
 						),
+				//route1: 左下から中央城門へ2
 				Arrays.asList(
-						Arrays.asList(0, 0, 2, 0),
-						Arrays.asList(100, 0, 4, 0),
-						Arrays.asList(100, 100, 4, 0),
-						Arrays.asList(100, 200, 1, 0)
+						Arrays.asList(-50, 420, 0, 0, 0),
+						Arrays.asList(450, 0, 270, 0, 0)
+						),
+				//route2: 左下から左城門へ1
+				Arrays.asList(
+						Arrays.asList(-50, 400, 0, 0, 0),
+						Arrays.asList(80, 0, 270, 0, 0),
+						Arrays.asList(0, 70, 0, 0, 0)
+						),
+				//route3: 左下から左城門へ2
+				Arrays.asList(
+						Arrays.asList(-50, 420, 0, 0, 0),
+						Arrays.asList(60, 0, 270, 0, 0),
+						Arrays.asList(0, 80, 0, 0, 0)
+						),
+				//route4: 右下から中央城門へ1
+				Arrays.asList(
+						Arrays.asList(835, 510, 270, 0, 0),
+						Arrays.asList(0, 400, 180, 0, 0),
+						Arrays.asList(450, 0, 270, 0, 0)
+						),
+				//route5: 右下から中央城門へ2
+				Arrays.asList(
+						Arrays.asList(855, 510, 270, 0, 0),
+						Arrays.asList(0, 420, 180, 0, 0),
+						Arrays.asList(460, 0, 270, 0, 0)
+						),
+				//route6: 右下から右城門へ1
+				Arrays.asList(
+						Arrays.asList(835, 510, 270, 0, 0),
+						Arrays.asList(0, 70, 180, 0, 0)
+						),
+				//route7: 右下から右城門へ2
+				Arrays.asList(
+						Arrays.asList(855, 510, 270, 0, 0),
+						Arrays.asList(0, 80, 180, 0, 0)
 						)
 				);
 	}
