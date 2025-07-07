@@ -55,6 +55,12 @@ public class BattleUnit extends BattleData{
 		super.initialize();
 	}
 	
+	protected void install(BattleUnit[] unitMainData, BattleFacility[] facilityData, BattleEnemy[] enemyData) {
+		allyData.add(unitMainData);
+		allyData.add(facilityData);
+		this.enemyData.add(enemyData);
+	}
+	
 	private BufferedImage getBlankImage() {
 		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 		image.setRGB(0, 0, 0);
@@ -65,10 +71,15 @@ public class BattleUnit extends BattleData{
 		return coreImage;
 	}
 	
+	public int getType() {
+		return type;
+	}
+	
 	protected void activate(int x, int y) {
 		canActivate = true;
 		positionX = x;
 		positionY = y;
+		atackTimer();
 	}
 	
 	protected void deactivate() {
@@ -76,10 +87,6 @@ public class BattleUnit extends BattleData{
 		positionX = initialPosition.x;
 		positionY = initialPosition.y;
 		super.initialize();
-	}
-	
-	public int getType() {
-		return type;
 	}
 	
 	

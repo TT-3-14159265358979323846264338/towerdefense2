@@ -42,9 +42,9 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	JButton targetButton = new JButton();
 	JButton pauseButton = new JButton();
 	JButton returnButton = new JButton();
-	StageData StageData;
 	BufferedImage stageImage;
 	List<BufferedImage> placementImage = new DefaultStage().getPlacementImage(4);
+	List<List<List<Double>>> placementList;
 	BattleUnit[] unitMainData;//右武器/コア用　攻撃・被弾などの判定はこちらで行う
 	BattleUnit[] unitLeftData;//左武器用
 	BattleFacility[] facilityData;
@@ -66,8 +66,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	public Battle(MainFrame MainFrame, StageData StageData, int difficultyCode) {
 		addMouseListener(this);
     	addMouseMotionListener(this);
-    	this.StageData = StageData;
-		install(StageData);
+    	install(StageData);
 		addRangeDrawButton();
 		addTargetButton();
 		addPauseButton(MainFrame);
@@ -92,6 +91,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	
 	private void install(StageData StageData) {
 		stageImage = new EditImage().input(StageData.getImageName(), 2);
+		placementList = StageData.getPlacementPoint();
 		SaveComposition SaveComposition = new SaveComposition();
 		SaveComposition.load();
 		List<List<Integer>> composition = SaveComposition.getAllCompositionList().get(SaveComposition.getSelectNumber());
@@ -99,6 +99,10 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		unitLeftData = IntStream.range(0, composition.size()).mapToObj(i -> new BattleUnit(this, composition.get(i))).toArray(BattleUnit[]::new);;
 		facilityData = IntStream.range(0, StageData.getFacility().size()).mapToObj(i -> new BattleFacility(this, StageData, i)).toArray(BattleFacility[]::new);
 		enemyData = IntStream.range(0, StageData.getEnemy().size()).mapToObj(i -> new BattleEnemy(this, StageData, i)).toArray(BattleEnemy[]::new);
+		Stream.of(unitMainData).forEach(i -> i.install(unitMainData, facilityData, enemyData));
+		Stream.of(unitLeftData).forEach(i -> i.install(unitMainData, facilityData, enemyData));
+		Stream.of(facilityData).forEach(i -> i.install(unitMainData, facilityData, enemyData));
+		Stream.of(enemyData).forEach(i -> i.install(unitMainData, facilityData, enemyData));
 	}
 	
 	private void mainTimer() {
@@ -172,7 +176,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	
 	private void drawField(Graphics g) {
 		g.drawImage(stageImage, 0, 0, this);
-		IntStream.range(0, StageData.getPlacementPoint().size()).forEach(i -> StageData.getPlacementPoint().get(i).stream().forEach(j -> g.drawImage(placementImage.get(i), j.get(0).intValue(), j.get(1).intValue(), this)));
+		IntStream.range(0, placementList.size()).forEach(i -> placementList.get(i).stream().forEach(j -> g.drawImage(placementImage.get(i), j.get(0).intValue(), j.get(1).intValue(), this)));
 		IntStream.range(0, facilityData.length).forEach(i -> g.drawImage(facilityData[i].getActivate()? facilityData[i].getActionImage(): facilityData[i].getBreakImage(), (int) facilityData[i].getPositionX(), (int) facilityData[i].getPositionY(), this));
 	}
 	
@@ -294,10 +298,11 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 			return Stream.of(unitMainData).noneMatch(i -> (int) i.getPositionX() == correctPosition.apply(point.get(0))
 					&& (int) i.getPositionY() == correctPosition.apply(point.get(1)));
 		};
-		StageData.getPlacementPoint().get(placementCode).stream().filter(i -> positionCheck.test(i)).forEach(i -> {
+		placementList.get(placementCode).stream().filter(i -> positionCheck.test(i)).forEach(i -> {
 			if(ValueRange.of(i.get(0).intValue(), i.get(0).intValue() + SIZE).isValidIntValue(mouse.x)
 					&& ValueRange.of(i.get(1).intValue(), i.get(1).intValue() + SIZE).isValidIntValue(mouse.y)) {
 				unitMainData[select].activate(correctPosition.apply(i.get(0)), correctPosition.apply(i.get(1)));
+				unitLeftData[select].activate(correctPosition.apply(i.get(0)), correctPosition.apply(i.get(1)));
 			}
 		});
 	}

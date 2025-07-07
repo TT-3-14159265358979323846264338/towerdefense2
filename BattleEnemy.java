@@ -41,6 +41,12 @@ public class BattleEnemy extends BattleData{
 		routeTimer();
 	}
 	
+	protected void install(BattleUnit[] unitMainData, BattleFacility[] facilityData, BattleEnemy[] enemyData) {
+		allyData.add(enemyData);
+		this.enemyData.add(enemyData);
+		this.enemyData.add(facilityData);
+	}
+	
 	public int getMove() {
 		return move;
 	}
@@ -63,6 +69,7 @@ public class BattleEnemy extends BattleData{
 		scheduler.scheduleWithFixedDelay(() -> {
 			if(actitateTime <= Battle.getMainTime()) {
 				canActivate = true;
+				atackTimer();
 				scheduler.shutdown();
 			}
 		}, 0, 10, TimeUnit.MILLISECONDS);
@@ -70,19 +77,19 @@ public class BattleEnemy extends BattleData{
 	
 	private void constantMove(ScheduledExecutorService scheduler, int nowSpeed) {
 		scheduler.scheduleWithFixedDelay(() -> {
-			CompletableFuture.allOf(CompletableFuture.runAsync(() -> Battle.timerWait()), CompletableFuture.runAsync(() -> block())).join();
+			CompletableFuture.allOf(CompletableFuture.runAsync(() -> Battle.timerWait()), CompletableFuture.runAsync(() -> timerWait())).join();
+			moveSpeedMonitoring(scheduler, nowSpeed);
 			if(nowHP <= 0) {
-				crush(scheduler);
+				scheduler.shutdown();
 				return;
 			}
 			if(canActivate || 0 < deactivateCount) {
 				move();
 				routeChange();
-				speedMonitoring(scheduler, nowSpeed);
 				return;
 			}
 			if(actitateTime <= Battle.getMainTime()) {
-				activateMode();
+				activate();
 			}
 		}, 0, 2000000 / nowSpeed, TimeUnit.MICROSECONDS);
 	}
@@ -103,7 +110,7 @@ public class BattleEnemy extends BattleData{
 		if(0 < deactivateCount) {
 			deactivateCount++;
 			if(deactivateCount == route.get(routeNumber).get(4)) {
-				activateMode();
+				activate();
 			}
 		}
 		//移動停止中の時は指定の描写回数になったら次のルートに入る
@@ -112,8 +119,8 @@ public class BattleEnemy extends BattleData{
 			if(pauseCount == route.get(routeNumber).get(3)) {
 				routeNumber++;
 				pauseCount = 0;
-				activateMode();
-				deactivateMode();
+				activate();
+				deactivate();
 			}
 			return;
 		}
@@ -122,43 +129,33 @@ public class BattleEnemy extends BattleData{
 			if(Math.abs(route.get(routeNumber + 1).get(0) - positionX) <= 2
 					|| Math.abs(route.get(routeNumber + 1).get(1) - positionY) <= 2) {
 				routeNumber++;
-				activateMode();
-				deactivateMode();
+				activate();
+				deactivate();
 			}
 		}catch (Exception ignore) {
 			//最後のrouteに入ったので、これ以上routeNumberは増えない
 		}
 	}
 	
-	private void speedMonitoring(ScheduledExecutorService scheduler, int nowSpeed) {
+	private void moveSpeedMonitoring(ScheduledExecutorService scheduler, int nowSpeed) {
 		if(nowSpeed != getMoveSpeedOrBlock()) {
 			routeTimer();
 			scheduler.shutdown();
 		}
 	}
 	
-	private void activateMode() {
-		deactivateCount = 0;
-		canActivate = true;
+	private void activate() {
+		if(!canActivate) {
+			deactivateCount = 0;
+			canActivate = true;
+			atackTimer();
+		}
 	}
 	
-	private void deactivateMode(){
+	private void deactivate(){
 		if(0 < route.get(routeNumber).get(4)) {
 			deactivateCount++;
 			canActivate = false;
 		}
 	}
-	
-	private void crush(ScheduledExecutorService scheduler){
-		canActivate = false;
-		scheduler.shutdown();
-	}
-	
-	private void block() {
-		
-	}
-	
-	
-	
-	
 }

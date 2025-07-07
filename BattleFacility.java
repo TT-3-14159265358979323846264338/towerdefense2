@@ -30,13 +30,22 @@ public class BattleFacility extends BattleData{
 		defaultCutStatus = FacilityData.getCutStatus().stream().toList();
 		canActivate = true;
 		super.initialize();
+		atackTimer();
+	}
+	
+	protected void install(BattleUnit[] unitMainData, BattleFacility[] facilityData, BattleEnemy[] enemyData) {
+		allyData.add(unitMainData);
+		allyData.add(facilityData);
+		this.enemyData.add(enemyData);
 	}
 	
 	protected BufferedImage getBreakImage() {
 		return breakImage;
 	}
 	
-	
+	protected void deactivate() {
+		canActivate = false;
+	}
 	
 	
 	

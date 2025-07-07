@@ -1,15 +1,23 @@
 package battle;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 //全キャラクターの共通システム
 public class BattleData{
 	Battle Battle;
+	List<BattleData[]> allyData = new ArrayList<>();
+	List<BattleData[]> enemyData = new ArrayList<>();
 	List<BufferedImage> actionImage;
 	int motionNumber = 0;
+	boolean canAtack;
 	String name;
 	double positionX;
 	double positionY;
@@ -44,12 +52,72 @@ public class BattleData{
 		return actionImage.get(0);
 	}
 	
-	protected void motionTimer() {
-		//motionNumber = (motionNumber == 5)? 0: motionNumber + 1;
+	protected void atackTimer() {
+		int nowSpeed = getAtackSpeed();
+		if(nowSpeed <= 0) {
+			return;
+		}
+		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		scheduler.scheduleWithFixedDelay(() -> {
+			CompletableFuture.runAsync(() -> Battle.timerWait()).join();
+			atackSpeedMonitoring(scheduler, nowSpeed);
+			if(!canActivate) {
+				scheduler.shutdown();
+				return;
+			}
+			if(0 < getAtack()) {
+				atackJudgment();
+				return;
+			}
+			if(getAtack() < 0) {
+				healJudgment();
+				return;
+			}
+			scheduler.shutdown();
+		}, 0, getAtackSpeed(), TimeUnit.MILLISECONDS);
 	}
 	
-	protected void atackTimer() {
+	private void atackJudgment() {
 		
+	}
+	
+	private void healJudgment() {
+		
+	}
+	
+	private void atackSpeedMonitoring(ScheduledExecutorService scheduler, int nowSpeed) {
+		if(nowSpeed != getAtackSpeed()) {
+			atackTimer();
+			scheduler.shutdown();
+		}
+	}
+	
+	protected synchronized void timerWait() {
+		if(canAtack) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private synchronized void timerRestart() {
+		notifyAll();
+		canAtack = false;
+	}
+	
+	private void motionTimer() {
+		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		scheduler.scheduleWithFixedDelay(() -> {
+			CompletableFuture.runAsync(() -> Battle.timerWait()).join();
+			if(5 < motionNumber) {
+				motionNumber = 0;
+				timerRestart();
+				scheduler.shutdown();
+			}
+			motionNumber++;
+		}, 0, 1000 * getAtackSpeed() / 5, TimeUnit.MICROSECONDS);
 	}
 	
 	public String getName() {
