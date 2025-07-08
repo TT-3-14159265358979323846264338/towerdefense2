@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import battle.BattleEnemy;
 import battle.BattleFacility;
 import battle.BattleUnit;
+import defaultdata.DefaultAtackPattern;
 import defaultdata.DefaultEnemy;
 import defaultdata.DefaultUnit;
 import defaultdata.EditImage;
@@ -126,23 +127,25 @@ public class DisplayStatus extends StatusPanel{
 	private void setWeapon(List<Double> statusList) {
 		IntStream.range(0, DefaultUnit.CORE_WEAPON_MAP.size()).forEach(i -> {
 			weapon[i + 1].setText(DefaultUnit.CORE_WEAPON_MAP.get(i));
-			weapon[i + 9].setText(statusList.get(i) + "倍");
+			weapon[i + 10].setText(statusList.get(i) + "倍");
 		});
-		weapon[8].setText("武器性能");
+		weapon[9].setText("武器性能");
 	}
 	
 	private void setWeapon(WeaponData WeaponData) {
 		IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> {
 			weapon[i + 1].setText(DefaultUnit.WEAPON_WEAPON_MAP.get(i));
-			weapon[i + 9].setText("" + WeaponData.getWeaponStatus().get(i));
+			weapon[i + 10].setText("" + WeaponData.getWeaponStatus().get(i));
 		});
 		weapon[5].setText("距離タイプ");
 		weapon[6].setText("装備タイプ");
 		weapon[7].setText("属性");
-		weapon[8].setText("武器性能");
-		weapon[13].setText("" + DefaultUnit.DISTANCE_MAP.get(WeaponData.getDistance()));
-		weapon[14].setText("" + DefaultUnit.HANDLE_MAP.get(WeaponData.getHandle()));
-		weapon[15].setText("" + getElement(WeaponData.getElement()));
+		weapon[8].setText("ターゲット");
+		weapon[9].setText("武器性能");
+		weapon[14].setText("" + DefaultUnit.DISTANCE_MAP.get(WeaponData.getDistance()));
+		weapon[15].setText("" + DefaultUnit.HANDLE_MAP.get(WeaponData.getHandle()));
+		weapon[16].setText("" + getElement(WeaponData.getElement()));
+		weapon[17].setText("" + new DefaultAtackPattern().getAtackPattern(WeaponData.getAtackPattern()).getExplanation());
 	}
 	
 	private void setWeapon(StatusCalculation StatusCalculation, List<Integer> compositionList) {
@@ -150,78 +153,89 @@ public class DisplayStatus extends StatusPanel{
 		weapon[5].setText("距離タイプ");
 		weapon[6].setText("装備タイプ");
 		weapon[7].setText("属性");
-		weapon[8].setText("左武器");
+		weapon[8].setText("ターゲット");
+		weapon[9].setText("左武器");
 		if(0 <= compositionList.get(2)) {
 			WeaponData WeaponData = new DefaultUnit().getWeaponData(compositionList.get(2));
-			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 9].setText("" + StatusCalculation.getLeftWeaponStatus().get(i)));
-			weapon[13].setText("" + DefaultUnit.DISTANCE_MAP.get(WeaponData.getDistance()));
-			weapon[14].setText("" + DefaultUnit.HANDLE_MAP.get(WeaponData.getHandle()));
-			weapon[15].setText("" + getElement(StatusCalculation.getLeftElement()));
+			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 10].setText("" + StatusCalculation.getLeftWeaponStatus().get(i)));
+			weapon[14].setText("" + DefaultUnit.DISTANCE_MAP.get(WeaponData.getDistance()));
+			weapon[15].setText("" + DefaultUnit.HANDLE_MAP.get(WeaponData.getHandle()));
+			weapon[16].setText("" + getElement(StatusCalculation.getLeftElement()));
+			weapon[17].setText("" + new DefaultAtackPattern().getAtackPattern(WeaponData.getAtackPattern()).getExplanation());
 		}
-		weapon[16].setText("右武器");
+		weapon[18].setText("右武器");
 		if(0 <= compositionList.get(0)) {
 			WeaponData WeaponData = new DefaultUnit().getWeaponData(compositionList.get(0));
-			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 17].setText("" + StatusCalculation.getRightWeaponStatus().get(i)));
-			weapon[21].setText("" + DefaultUnit.DISTANCE_MAP.get(WeaponData.getDistance()));
-			weapon[22].setText("" + DefaultUnit.HANDLE_MAP.get(WeaponData.getHandle()));
-			weapon[23].setText("" + getElement(StatusCalculation.getRightElement()));
+			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 19].setText("" + StatusCalculation.getRightWeaponStatus().get(i)));
+			weapon[23].setText("" + DefaultUnit.DISTANCE_MAP.get(WeaponData.getDistance()));
+			weapon[24].setText("" + DefaultUnit.HANDLE_MAP.get(WeaponData.getHandle()));
+			weapon[25].setText("" + getElement(StatusCalculation.getRightElement()));
+			weapon[26].setText("" + new DefaultAtackPattern().getAtackPattern(WeaponData.getAtackPattern()).getExplanation());
 		}
 	}
 	
 	private void setWeapon(EnemyData EnemyData) {
 		IntStream.range(0, DefaultEnemy.WEAPON_MAP.size()).forEach(i -> {
 			weapon[i + 1].setText(DefaultEnemy.WEAPON_MAP.get(i));
-			weapon[i + 9].setText("" + EnemyData.getWeaponStatus().get(i));
+			weapon[i + 10].setText("" + EnemyData.getWeaponStatus().get(i));
 		});
 		weapon[5].setText("移動タイプ");
 		weapon[6].setText("種別");
 		weapon[7].setText("属性");
-		weapon[8].setText("攻撃性能");
-		weapon[13].setText("" + DefaultEnemy.MOVE_MAP.get(EnemyData.getMove()));
-		weapon[14].setText("" + DefaultEnemy.TYPE_MAP.get(EnemyData.getType()));
-		weapon[15].setText("" + getElement(EnemyData.getElement()));
+		weapon[8].setText("ターゲット");
+		weapon[9].setText("攻撃性能");
+		weapon[14].setText("" + DefaultEnemy.MOVE_MAP.get(EnemyData.getMove()));
+		weapon[15].setText("" + DefaultEnemy.TYPE_MAP.get(EnemyData.getType()));
+		weapon[16].setText("" + getElement(EnemyData.getElement()));
+		weapon[17].setText("" + new DefaultAtackPattern().getAtackPattern(EnemyData.getAtackPattern()).getExplanation());
 	}
 	
 	private void setWeapon(BattleUnit unitMainData, BattleUnit unitLeftData) {
 		IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 1].setText(DefaultUnit.WEAPON_WEAPON_MAP.get(i)));
 		weapon[5].setText("距離タイプ");
 		weapon[6].setText("属性");
-		weapon[8].setText("左武器");
-		if(unitLeftData.getDefaultImage() != null) {
-			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 9].setText("" + unitLeftData.getWeapon().get(i)));
-			weapon[13].setText("" + DefaultUnit.DISTANCE_MAP.get(unitMainData.getType()));
-			weapon[14].setText("" + getElement(unitLeftData.getElement()));
+		weapon[7].setText("ターゲット");
+		weapon[9].setText("左武器");
+		if(0 <= unitLeftData.getElement().get(0)) {
+			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 10].setText("" + unitLeftData.getWeapon().get(i)));
+			weapon[14].setText("" + DefaultUnit.DISTANCE_MAP.get(unitMainData.getType()));
+			weapon[15].setText("" + getElement(unitLeftData.getElement()));
+			weapon[16].setText("" + unitLeftData.getAtackPattern().getExplanation());
 		}
-		weapon[16].setText("右武器");
-		if(unitMainData.getDefaultImage() != null) {
-			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 17].setText("" + unitMainData.getWeapon().get(i)));
-			weapon[21].setText("" + DefaultUnit.DISTANCE_MAP.get(unitMainData.getType()));
-			weapon[22].setText("" + getElement(unitMainData.getElement()));
+		weapon[18].setText("右武器");
+		if(0 <= unitMainData.getElement().get(0)) {
+			System.out.println(unitMainData.getType());
+			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 19].setText("" + unitMainData.getWeapon().get(i)));
+			weapon[23].setText("" + DefaultUnit.DISTANCE_MAP.get(unitMainData.getType()));
+			weapon[24].setText("" + getElement(unitMainData.getElement()));
+			weapon[25].setText("" + unitMainData.getAtackPattern().getExplanation());
 		}
 	}
 	
 	private void setWeapon(BattleFacility facilityData) {
 		IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 1].setText(DefaultUnit.WEAPON_WEAPON_MAP.get(i)));
 		weapon[5].setText("属性");
-		weapon[8].setText("攻撃性能");
+		weapon[6].setText("ターゲット");
+		weapon[9].setText("攻撃性能");
 		if(!facilityData.getElement().isEmpty()) {
-			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 9].setText("" + facilityData.getWeapon().get(i)));
-			weapon[13].setText("" + getElement(facilityData.getElement()));
+			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 10].setText("" + facilityData.getWeapon().get(i)));
+			weapon[14].setText("" + getElement(facilityData.getElement()));
 		}
 	}
 	
 	private void setWeapon(BattleEnemy enemyData) {
 		IntStream.range(0, DefaultEnemy.WEAPON_MAP.size()).forEach(i -> {
 			weapon[i + 1].setText(DefaultEnemy.WEAPON_MAP.get(i));
-			weapon[i + 9].setText("" + enemyData.getWeapon().get(i));
+			weapon[i + 10].setText("" + enemyData.getWeapon().get(i));
 		});
 		weapon[5].setText("移動タイプ");
 		weapon[6].setText("種別");
 		weapon[7].setText("属性");
-		weapon[8].setText("攻撃性能");
-		weapon[13].setText("" + DefaultEnemy.MOVE_MAP.get(enemyData.getMove()));
-		weapon[14].setText("" + DefaultEnemy.TYPE_MAP.get(enemyData.getType()));
-		weapon[15].setText("" + getElement(enemyData.getElement()));
+		weapon[8].setText("ターゲット");
+		weapon[9].setText("攻撃性能");
+		weapon[14].setText("" + DefaultEnemy.MOVE_MAP.get(enemyData.getMove()));
+		weapon[15].setText("" + DefaultEnemy.TYPE_MAP.get(enemyData.getType()));
+		weapon[16].setText("" + getElement(enemyData.getElement()));
 	}
 	
 	private String getElement(List<Integer> elementList) {
@@ -251,8 +265,8 @@ public class DisplayStatus extends StatusPanel{
 	}
 	
 	private void setCut(List<Integer> cutList) {
-		IntStream.range(0, cutList.size()).forEach(i -> cut[i].setText(DefaultUnit.ELEMENT_MAP.get(i) + "耐性"));
-		IntStream.range(0, cutList.size()).forEach(i -> cut[i + 11].setText(cutList.get(i) + "%"));
+		IntStream.range(0, cutList.size()).forEach(i -> cut[i].setText(DefaultUnit.ELEMENT_MAP.get(i) + ((i == 11)? "倍率": "耐性")));
+		IntStream.range(0, cutList.size()).forEach(i -> cut[i + 12].setText(cutList.get(i) + "%"));
 	}
 }
 
@@ -263,7 +277,7 @@ class StstusDialog extends JDialog{
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setTitle("ステータス");
-		setSize(720, 680);
+		setSize(720, 700);
 		setLocationRelativeTo(null);
 		add(StatusPanel);
 		setVisible(true);
@@ -277,9 +291,9 @@ class StatusPanel extends JPanel{
 		return IntStream.range(0, size).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
 	};
 	JLabel[] name = initialize.apply(4);
-	JLabel[] weapon = initialize.apply(24);
+	JLabel[] weapon = initialize.apply(27);
 	JLabel[] unit = initialize.apply(12);
-	JLabel[] cut = initialize.apply(22);
+	JLabel[] cut = initialize.apply(24);
 	int startX = 20;
 	int startY = 20;
 	int sizeX = 110;
@@ -345,40 +359,40 @@ class StatusPanel extends JPanel{
 		name[0].setBounds(startX, startY, sizeX, sizeY);
 		name[1].setBounds(startX + 20, startY + sizeY, sizeX * 5, sizeY);
 		name[2].setBounds(startX + sizeX * 3, startY + sizeY * 3, sizeX * 3, sizeY);
-		name[3].setBounds(startX, startY + sizeY * 13, sizeX * 3, sizeY);
-		imageLabel.setBounds(startX, startY + sizeY * 3, sizeX * 3, sizeY * 9);
-		IntStream.range(0, weapon.length).forEach(i -> weapon[i].setBounds(startX + (i / 8 + 3) * sizeX, startY + (i % 8 + 4) * sizeY, sizeX, sizeY));
-		IntStream.range(0, unit.length).forEach(i -> unit[i].setBounds(startX + (i / 6) * sizeX, startY + (i % 6 + 14) * sizeY, sizeX, sizeY));
+		name[3].setBounds(startX, startY + sizeY * 14, sizeX * 3, sizeY);
+		imageLabel.setBounds(startX, startY + sizeY * 3, sizeX * 3, sizeY * 10);
+		IntStream.range(0, weapon.length).forEach(i -> weapon[i].setBounds(startX + (i / 9 + 3) * sizeX, startY + (i % 9 + 4) * sizeY, sizeX, sizeY));
+		IntStream.range(0, unit.length).forEach(i -> unit[i].setBounds(startX + (i / 6) * sizeX, startY + (i % 6 + 15) * sizeY, sizeX, sizeY));
 		IntStream.range(0, cut.length / 2).forEach(i -> {
-			cut[i].setBounds(startX + (i / 6 * 2 + 2) * sizeX, startY + (i % 6 + 14) * sizeY, sizeX, sizeY);
-			cut[i + cut.length / 2].setBounds(startX + (i / 6 * 2 + 3) * sizeX, startY + (i % 6 + 14) * sizeY, sizeX, sizeY);
+			cut[i].setBounds(startX + (i / 6 * 2 + 2) * sizeX, startY + (i % 6 + 15) * sizeY, sizeX, sizeY);
+			cut[i + cut.length / 2].setBounds(startX + (i / 6 * 2 + 3) * sizeX, startY + (i % 6 + 15) * sizeY, sizeX, sizeY);
 		});
 	}
 	
 	private void drawBackground(Graphics g) {
 		g.setColor(Color.WHITE);	
 		g.fillRect(startX, startY, sizeX * 6, sizeY * 2);
-		g.fillRect(startX, startY + sizeY * 3, sizeX * 6, sizeY * 9);
-		g.fillRect(startX, startY + sizeY * 13, sizeX * 6, sizeY * 7);
+		g.fillRect(startX, startY + sizeY * 3, sizeX * 6, sizeY * 10);
+		g.fillRect(startX, startY + sizeY * 14, sizeX * 6, sizeY * 7);
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(startX + sizeX * 3, startY + sizeY * 4, sizeX * 3, sizeY);
-		g.fillRect(startX + sizeX * 3, startY + sizeY * 5, sizeX, sizeY * 7);
-		IntStream.range(0, 3).forEach(i -> g.fillRect(startX + sizeX * i * 2, startY + sizeY * 14, sizeX, sizeY * 6));
+		g.fillRect(startX + sizeX * 3, startY + sizeY * 5, sizeX, sizeY * 8);
+		IntStream.range(0, 3).forEach(i -> g.fillRect(startX + sizeX * i * 2, startY + sizeY * 15, sizeX, sizeY * 6));
 		g.setColor(Color.YELLOW);
-		g.fillRect(startX + sizeX * 4, startY + sizeY * 5, sizeX * 2, sizeY * 7);
-		IntStream.range(0, 3).forEach(i -> g.fillRect(startX + sizeX * (i * 2 + 1), startY + sizeY * 14, sizeX, sizeY * 6));
+		g.fillRect(startX + sizeX * 4, startY + sizeY * 5, sizeX * 2, sizeY * 8);
+		IntStream.range(0, 3).forEach(i -> g.fillRect(startX + sizeX * (i * 2 + 1), startY + sizeY * 15, sizeX, sizeY * 6));
 		g.setColor(Color.BLACK);
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setStroke(new BasicStroke(2));
 		g.drawRect(startX, startY, sizeX * 6, sizeY * 2);
-		g.drawRect(startX, startY + sizeY * 3, sizeX * 3, sizeY * 9);
-		g.drawRect(startX + sizeX * 3, startY + sizeY * 3, sizeX * 3, sizeY * 9);
-		g.drawRect(startX, startY + sizeY * 13, sizeX * 6, sizeY * 7);
+		g.drawRect(startX, startY + sizeY * 3, sizeX * 3, sizeY * 10);
+		g.drawRect(startX + sizeX * 3, startY + sizeY * 3, sizeX * 3, sizeY * 10);
+		g.drawRect(startX, startY + sizeY * 14, sizeX * 6, sizeY * 7);
 		g2.setStroke(new BasicStroke(1));
 		g.drawLine(startX + sizeX * 3, startY + sizeY * 4, startX + sizeX * 4, startY + sizeY * 5);
-		IntStream.range(0, 8).forEach(i -> g.drawLine(startX + sizeX * 3, startY + sizeY * (4 + i), startX + sizeX * 6, startY + sizeY * (4 + i)));
-		IntStream.range(0, 2).forEach(i -> g.drawLine(startX + sizeX * (4 + i), startY + sizeY * 4, startX + sizeX * (4 + i), startY + sizeY * 12));
-		IntStream.range(0, 7).forEach(i -> g.drawLine(startX, startY + sizeY * (14 + i), startX + sizeX * 6, startY + sizeY * (14 + i)));
-		IntStream.range(0, 5).forEach(i -> g.drawLine(startX + sizeX * (1 + i), startY + sizeY * 14, startX + sizeX * (1 + i), startY + sizeY * 20));
+		IntStream.range(0, 9).forEach(i -> g.drawLine(startX + sizeX * 3, startY + sizeY * (4 + i), startX + sizeX * 6, startY + sizeY * (4 + i)));
+		IntStream.range(0, 2).forEach(i -> g.drawLine(startX + sizeX * (4 + i), startY + sizeY * 4, startX + sizeX * (4 + i), startY + sizeY * 13));
+		IntStream.range(0, 6).forEach(i -> g.drawLine(startX, startY + sizeY * (15 + i), startX + sizeX * 6, startY + sizeY * (15 + i)));
+		IntStream.range(0, 5).forEach(i -> g.drawLine(startX + sizeX * (1 + i), startY + sizeY * 15, startX + sizeX * (1 + i), startY + sizeY * 21));
 	}
 }

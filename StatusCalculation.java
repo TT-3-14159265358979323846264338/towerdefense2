@@ -12,10 +12,12 @@ import defaultdata.weapon.WeaponData;
 public class StatusCalculation{
 	int rightType;
 	List<Integer> rightElement;
+	int rightAtackPattern;
 	List<Integer> rightWeaponStatus;
 	List<Integer> rightUnitStatus;
 	int leftType;
 	List<Integer> leftElement;
+	int leftAtackPattern;
 	List<Integer> leftWeaponStatus;
 	List<Integer> leftUnitStatus;
 	List<Double> coreWeaponStatus;
@@ -31,12 +33,14 @@ public class StatusCalculation{
 			WeaponData WeaponData = DefaultUnit.getWeaponData(unitData.get(0));
 			rightType = WeaponData.getDistance();
 			rightElement = WeaponData.getElement();
+			rightAtackPattern = WeaponData.getAtackPattern();
 			rightWeaponStatus = WeaponData.getWeaponStatus();
 			rightUnitStatus = WeaponData.getUnitStatus();
 			rightWeaponCutList = WeaponData.getCutStatus();
 		}catch(Exception noWeapon) {
 			rightType = defaultType();
 			rightElement = defaultElement();
+			rightAtackPattern = defaultType();
 			rightWeaponStatus = defaultWeaponStatus();
 			rightUnitStatus = defaultUnitStatus();
 			rightWeaponCutList = defaultCutList();
@@ -45,12 +49,14 @@ public class StatusCalculation{
 			WeaponData WeaponData = DefaultUnit.getWeaponData(unitData.get(2));
 			leftType = WeaponData.getDistance();
 			leftElement = WeaponData.getElement();
+			leftAtackPattern = WeaponData.getAtackPattern();
 			leftWeaponStatus = WeaponData.getWeaponStatus();
 			leftUnitStatus = WeaponData.getUnitStatus();
 			leftWeaponCutList = WeaponData.getCutStatus();
 		}catch(Exception noWeapon) {
 			leftType = defaultType();
 			leftElement = defaultElement();
+			leftAtackPattern = defaultType();
 			leftWeaponStatus = defaultWeaponStatus();
 			leftUnitStatus = defaultUnitStatus();
 			leftWeaponCutList = defaultCutList();
@@ -78,7 +84,7 @@ public class StatusCalculation{
 	}
 	
 	private List<Integer> defaultCutList(){
-		return Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		return Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	}
 	
 	public int getType() {
@@ -111,6 +117,14 @@ public class StatusCalculation{
 	
 	public List<Integer> getLeftElement(){
 		return leftElement;
+	}
+	
+	public int getRightAtackPattern() {
+		return rightAtackPattern;
+	}
+	
+	public int getLeftAtackPattern() {
+		return leftAtackPattern;
 	}
 	
 	public List<Integer> getUnitStatus(){

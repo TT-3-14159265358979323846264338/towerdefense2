@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import defaultdata.DefaultAtackPattern;
 import defaultdata.DefaultUnit;
 import defaultdata.core.CoreData;
 import defaultdata.weapon.WeaponData;
@@ -50,6 +51,7 @@ public class DisplaySort extends SortPanel{
 		distanceList = Stream.of(WeaponData).map(i -> i.getDistance()).toList();
 		handleList = Stream.of(WeaponData).map(i -> i.getHandle()).toList();
 		elementList = Stream.of(WeaponData).map(i -> i.getElement()).toList();
+		targetList = Stream.of(WeaponData).map(i -> i.getAtackPattern()).toList();
 		super.setSortPanel(defaultList);
 	}
 }
@@ -61,7 +63,7 @@ class SortDialog extends JDialog{
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setResizable(false);
 		setTitle("ソート/絞り込み");
-		setSize(835, 535);
+		setSize(835, 565);
 		setLocationRelativeTo(null);
 		add(SortPanel);
 		setVisible(true);
@@ -76,7 +78,7 @@ class SortDialog extends JDialog{
 class SortPanel extends JPanel {
 	JLabel sortLabel = new JLabel();
 	JLabel filterLabel = new JLabel();
-	JLabel[] commentLabel = IntStream.range(0, 8).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
+	JLabel[] commentLabel = IntStream.range(0, 9).mapToObj(i -> new JLabel()).toArray(JLabel[]::new);
 	JButton sortButton = new JButton();
 	JButton resetButton = new JButton();
 	JButton returnButton = new JButton();
@@ -89,6 +91,7 @@ class SortPanel extends JPanel {
 	JRadioButton[] distance;
 	JRadioButton[] handle;
 	JRadioButton[] element;
+	JRadioButton[] target;
 	ButtonGroup sortGroup = new ButtonGroup();
 	ButtonGroup itemGroup = new ButtonGroup();
 	SortDialog SortDialog = new SortDialog();
@@ -99,6 +102,7 @@ class SortPanel extends JPanel {
 	List<Integer> distanceList;
 	List<Integer> handleList;
 	List<List<Integer>> elementList;
+	List<Integer> targetList;
 	List<Integer> defaultDisplayList;
 	boolean canSort;
 	
@@ -143,6 +147,7 @@ class SortPanel extends JPanel {
 			commentLabel[5].setText("距離タイプ");
 			commentLabel[6].setText("装備タイプ");
 			commentLabel[7].setText("属性");
+			commentLabel[8].setText("ターゲット");
 		}
 		Stream.of(commentLabel).forEach(i -> {
 				i.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
@@ -229,6 +234,7 @@ class SortPanel extends JPanel {
 			distance = initialize.apply(DefaultUnit.DISTANCE_MAP.size());
 			handle = initialize.apply(DefaultUnit.HANDLE_MAP.size());
 			element = initialize.apply(DefaultUnit.ELEMENT_MAP.size());
+			target = initialize.apply(DefaultAtackPattern.PATTERN_SPECIES);
 		}
 	}
 	
@@ -249,6 +255,7 @@ class SortPanel extends JPanel {
 			setAction.accept(distance, DefaultUnit.DISTANCE_MAP);
 			setAction.accept(handle, DefaultUnit.HANDLE_MAP);
 			setAction.accept(element, DefaultUnit.ELEMENT_MAP);
+			IntStream.range(0, target.length).forEach(i -> target[i].setActionCommand("" + i));
 		}
 	}
 	
@@ -267,6 +274,7 @@ class SortPanel extends JPanel {
 			getName.accept(distance, DefaultUnit.DISTANCE_MAP);
 			getName.accept(handle, DefaultUnit.HANDLE_MAP);
 			getName.accept(element, DefaultUnit.ELEMENT_MAP);
+			IntStream.range(0, target.length).forEach(i -> target[i].setText(new DefaultAtackPattern().getAtackPattern(i).getExplanation()));
 		}
 	}
 	
@@ -277,12 +285,13 @@ class SortPanel extends JPanel {
 			commentLabel[i].setBounds(10, 90 + 30 * (i % 4), 300, 30);
 			commentLabel[i + 4].setBounds(10, 280 + 30 * (i % 4), 300, 30);
 		});
+		commentLabel[8].setBounds(10, 430, 300, 30);
 	}
 	
 	private void setButton() {
-		sortButton.setBounds(220, 440, 120, 40);
-		resetButton.setBounds(350, 440, 120, 40);
-		returnButton.setBounds(480, 440, 120, 40);
+		sortButton.setBounds(220, 470, 120, 40);
+		resetButton.setBounds(350, 470, 120, 40);
+		returnButton.setBounds(480, 470, 120, 40);
 	}
 	
 	private void setRadioButton() {
@@ -300,17 +309,18 @@ class SortPanel extends JPanel {
 			IntStream.range(0, distance.length).forEach(i -> distance[i].setBounds(150 + i * sizeX, 280 + sizeY, sizeX, sizeY));
 			IntStream.range(0, handle.length).forEach(i -> handle[i].setBounds(150 + i * sizeX, 280 + sizeY * 2, sizeX, sizeY));
 			IntStream.range(0, element.length).forEach(i -> element[i].setBounds(150 + i % 6 * sizeX, 280 + sizeY * (3 + i / 6), sizeX, sizeY));
+			IntStream.range(0, target.length).forEach(i -> target[i].setBounds(150 + i % 6 * sizeX, 280 + sizeY * 5, sizeX, sizeY));
 		}
 	}
 	
 	private void drawField(Graphics g) {
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(5, 90, 150, 150);
-		g.fillRect(5, 280, 150, 150);
+		g.fillRect(5, 280, 150, 180);
 		g.setColor(Color.YELLOW);
 		g.fillRect(150, 50, 220, 30);
 		g.fillRect(150, 90, 655, 150);
-		g.fillRect(150, 280, 655, 150);
+		g.fillRect(150, 280, 655, 180);
 		g.setColor(Color.BLACK);
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setStroke(new BasicStroke(2));
@@ -319,8 +329,9 @@ class SortPanel extends JPanel {
 		g.drawRect(5, 180, 800, 60);
 		IntStream.range(0, 3).forEach(i -> g.drawRect(5, 280 + i * 30, 800, 30));
 		g.drawRect(5, 370, 800, 60);
+		g.drawRect(5, 430, 800, 30);
 		g.drawLine(150, 90, 150, 240);
-		g.drawLine(150, 280, 150, 430);
+		g.drawLine(150, 280, 150, 460);
 	}
 	
 	public List<Integer> getDisplayList(){
@@ -380,7 +391,8 @@ class SortPanel extends JPanel {
 		displayList = getRarityList(displayList);
 		displayList = getTypeList(displayList, distance, DefaultUnit.DISTANCE_MAP, distanceList);
 		displayList = getTypeList(displayList, handle, DefaultUnit.HANDLE_MAP, handleList);
-		return getElementList(displayList);
+		displayList = getElementList(displayList);
+		return getTargetList(displayList);
 	}
 	
 	private List<Integer> getRarityList(List<Integer> displayList){
@@ -405,6 +417,13 @@ class SortPanel extends JPanel {
 			return displayList;
 		}
 		return displayList.stream().filter(i -> getActiveButtonStream(element).anyMatch(j -> elementList.get(i).stream().anyMatch(k -> DefaultUnit.ELEMENT_MAP.get(k).equals(j)))).collect(Collectors.toList());
+	}
+	
+	private List<Integer> getTargetList(List<Integer> displayList){
+		if(selectCheck(target)) {
+			return displayList;
+		}
+		return displayList.stream().filter(i -> getActiveButtonStream(target).anyMatch(j -> targetList.get(i) == Integer.parseInt(j))).collect(Collectors.toList());
 	}
 	
 	private boolean selectCheck(JRadioButton[] radio) {

@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import defaultdata.DefaultAtackPattern;
 import defaultdata.DefaultEnemy;
 import defaultdata.EditImage;
 import defaultdata.enemy.EnemyData;
@@ -33,6 +34,7 @@ public class BattleEnemy extends BattleData{
 		positionX = route.get(0).get(0);
 		positionY = route.get(0).get(1);
 		element = EnemyData.getElement().stream().toList();
+		AtackPattern = new DefaultAtackPattern().getAtackPattern(EnemyData.getAtackPattern());
 		defaultWeaponStatus = EnemyData.getWeaponStatus().stream().toList();
 		defaultUnitStatus = EnemyData.getUnitStatus().stream().toList();
 		defaultCutStatus = EnemyData.getCutStatus().stream().toList();
@@ -45,6 +47,14 @@ public class BattleEnemy extends BattleData{
 		allyData.add(enemyData);
 		this.enemyData.add(enemyData);
 		this.enemyData.add(facilityData);
+		if(0 < getAtack()) {
+			AtackPattern.install(this, this.enemyData);
+			return;
+		}
+		if(getAtack() < 0) {
+			AtackPattern.install(this, allyData);
+			return;
+		}
 	}
 	
 	public int getMove() {

@@ -48,6 +48,7 @@ public class DefaultEnemy {
 		ELEMENT_MAP.put(8,"雷");
 		ELEMENT_MAP.put(9,"聖");
 		ELEMENT_MAP.put(10,"闇");
+		ELEMENT_MAP.put(11,"回復");
 	*/
 	
 	//敵の種類

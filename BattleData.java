@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import defaultdata.atackpattern.AtackPattern;
+
 //全キャラクターの共通システム
 public class BattleData{
 	Battle Battle;
@@ -22,6 +24,7 @@ public class BattleData{
 	double positionX;
 	double positionY;
 	List<Integer> element;
+	AtackPattern AtackPattern;
 	List<Integer> defaultWeaponStatus;
 	List<Integer> defaultUnitStatus;
 	List<Integer> defaultCutStatus;
@@ -65,24 +68,8 @@ public class BattleData{
 				scheduler.shutdown();
 				return;
 			}
-			if(0 < getAtack()) {
-				atackJudgment();
-				return;
-			}
-			if(getAtack() < 0) {
-				healJudgment();
-				return;
-			}
-			scheduler.shutdown();
+			attackHandling();
 		}, 0, getAtackSpeed(), TimeUnit.MILLISECONDS);
-	}
-	
-	private void atackJudgment() {
-		
-	}
-	
-	private void healJudgment() {
-		
 	}
 	
 	private void atackSpeedMonitoring(ScheduledExecutorService scheduler, int nowSpeed) {
@@ -90,6 +77,19 @@ public class BattleData{
 			atackTimer();
 			scheduler.shutdown();
 		}
+	}
+	
+	private void attackHandling() {
+		List<BattleData> target = AtackPattern.getTarget();
+		if(target.isEmpty()) {
+			return;
+		}
+		
+		
+		
+		
+		
+		
 	}
 	
 	protected synchronized void timerWait() {
@@ -134,6 +134,10 @@ public class BattleData{
 	
 	public List<Integer> getElement(){
 		return element;
+	}
+	
+	public AtackPattern getAtackPattern() {
+		return AtackPattern;
 	}
 	
 	protected int getAtack() {

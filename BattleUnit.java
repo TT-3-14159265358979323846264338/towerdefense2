@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
 
+import defaultdata.DefaultAtackPattern;
 import defaultdata.DefaultUnit;
 import defaultdata.EditImage;
 import screendisplay.DisplayStatus;
@@ -29,9 +30,10 @@ public class BattleUnit extends BattleData{
 		coreImage = new EditImage().input(new DefaultUnit().getCoreData(composition.get(1)).getActionImageName(), 4);
 		this.positionX = positionX;
 		this.positionY = positionY;
-		initialPosition = new Point(positionX, positionY);;
+		initialPosition = new Point(positionX, positionY);
 		type = StatusCalculation.getType();
 		element = StatusCalculation.getRightElement().stream().toList();
+		AtackPattern = new DefaultAtackPattern().getAtackPattern(StatusCalculation.getRightAtackPattern());
 		defaultWeaponStatus = StatusCalculation.getRightWeaponStatus().stream().toList();
 		defaultUnitStatus = StatusCalculation.getUnitStatus().stream().toList();
 		defaultCutStatus = StatusCalculation.getCutStatus().stream().toList();
@@ -49,6 +51,7 @@ public class BattleUnit extends BattleData{
 			actionImage = Arrays.asList(getBlankImage());
 		}
 		element = StatusCalculation.getLeftElement();
+		AtackPattern = new DefaultAtackPattern().getAtackPattern(StatusCalculation.getLeftAtackPattern());
 		defaultWeaponStatus = StatusCalculation.getLeftWeaponStatus();
 		defaultUnitStatus = StatusCalculation.getUnitStatus();
 		defaultCutStatus = StatusCalculation.getCutStatus();
@@ -59,6 +62,14 @@ public class BattleUnit extends BattleData{
 		allyData.add(unitMainData);
 		allyData.add(facilityData);
 		this.enemyData.add(enemyData);
+		if(0 < getAtack()) {
+			AtackPattern.install(this, this.enemyData);
+			return;
+		}
+		if(getAtack() < 0) {
+			AtackPattern.install(this, allyData);
+			return;
+		}
 	}
 	
 	private BufferedImage getBlankImage() {

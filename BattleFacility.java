@@ -3,6 +3,7 @@ package battle;
 import java.awt.image.BufferedImage;
 import java.util.stream.IntStream;
 
+import defaultdata.DefaultAtackPattern;
 import defaultdata.DefaultStage;
 import defaultdata.EditImage;
 import defaultdata.facility.FacilityData;
@@ -21,6 +22,7 @@ public class BattleFacility extends BattleData{
 		positionX = StageData.getFacilityPoint().get(number).x;
 		positionY = StageData.getFacilityPoint().get(number).y;
 		element = FacilityData.getElement().stream().toList();
+		AtackPattern = new DefaultAtackPattern().getAtackPattern(FacilityData.getAtackPattern());
 		if(FacilityData.getWeaponStatus() == null || FacilityData.getWeaponStatus().isEmpty()) {
 			defaultWeaponStatus = IntStream.range(0, DefaultStage.WEAPON_MAP.size()).mapToObj(i -> 0).toList();
 		}else {
@@ -37,6 +39,14 @@ public class BattleFacility extends BattleData{
 		allyData.add(unitMainData);
 		allyData.add(facilityData);
 		this.enemyData.add(enemyData);
+		if(0 < getAtack()) {
+			AtackPattern.install(this, this.enemyData);
+			return;
+		}
+		if(getAtack() < 0) {
+			AtackPattern.install(this, allyData);
+			return;
+		}
 	}
 	
 	protected BufferedImage getBreakImage() {
