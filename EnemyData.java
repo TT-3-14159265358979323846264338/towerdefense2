@@ -21,6 +21,9 @@ public abstract class EnemyData {
 	//武器属性はその武器の全ての属性(DefaultStage.ELEMENT_MAP)を登録
 	public abstract List<Integer> getElement();
 	
+	//DefaultAtackPatternのパターン番号
+	public abstract int getAtackPattern();
+	
 	//DefaultStage.WEAPON_MAPの順にステータスをリスト化
 	public abstract List<Integer> getWeaponStatus();
 	
