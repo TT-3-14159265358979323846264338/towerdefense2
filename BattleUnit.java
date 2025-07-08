@@ -31,10 +31,10 @@ public class BattleUnit extends BattleData{
 		this.positionY = positionY;
 		initialPosition = new Point(positionX, positionY);;
 		type = StatusCalculation.getType();
-		element = StatusCalculation.getRightElement();
-		defaultWeaponStatus = StatusCalculation.getRightWeaponStatus();
-		defaultUnitStatus = StatusCalculation.getUnitStatus();
-		defaultCutStatus = StatusCalculation.getCutStatus();
+		element = StatusCalculation.getRightElement().stream().toList();
+		defaultWeaponStatus = StatusCalculation.getRightWeaponStatus().stream().toList();
+		defaultUnitStatus = StatusCalculation.getUnitStatus().stream().toList();
+		defaultCutStatus = StatusCalculation.getCutStatus().stream().toList();
 		canActivate = false;
 		super.initialize();
 	}

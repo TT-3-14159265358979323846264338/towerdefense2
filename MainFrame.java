@@ -1,5 +1,7 @@
 package defendthecastle;
 
+import java.util.List;
+
 import javax.swing.JFrame;
 
 import battle.Battle;
@@ -54,11 +56,11 @@ public class MainFrame extends JFrame{
 		setLocationRelativeTo(null);
 	}
 	
-	protected void battleDraw(StageData StageData, int difficultyCode) {
+	protected void battleDraw(StageData StageData, List<Boolean> clearMerit, int difficultyCode) {
 		getContentPane().removeAll();
 		setTitle(StageData.getName());
 		setSize(1235, 600);
-		add(new Battle(this, StageData, difficultyCode));
+		add(new Battle(this, StageData, clearMerit, difficultyCode));
 		setLocationRelativeTo(null);
 	}
 }

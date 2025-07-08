@@ -82,7 +82,7 @@ public class MenuSelectStage extends JPanel{
 		normalModeButton.addActionListener(e->{
 			ProgressData.save(SelectPanel.getSelelct());
 			//難易度コードは後で追記
-			MainFrame.battleDraw(StageData[SelectPanel.getSelelct()], 0);
+			MainFrame.battleDraw(StageData[SelectPanel.getSelelct()], ProgressData.getMeritStatus().get(SelectPanel.getSelelct()), 0);
 		});
 	}
 	
@@ -91,7 +91,7 @@ public class MenuSelectStage extends JPanel{
 		hardModeButton.addActionListener(e->{
 			ProgressData.save(SelectPanel.getSelelct());
 			//難易度コードは後で追記
-			MainFrame.battleDraw(StageData[SelectPanel.getSelelct()], 1);
+			MainFrame.battleDraw(StageData[SelectPanel.getSelelct()],ProgressData.getMeritStatus().get(SelectPanel.getSelelct()), 1);
 		});
 	}
 	

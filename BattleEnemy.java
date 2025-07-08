@@ -32,7 +32,7 @@ public class BattleEnemy extends BattleData{
 		actitateTime = StageData.getEnemy().get(number).get(2);
 		positionX = route.get(0).get(0);
 		positionY = route.get(0).get(1);
-		element = EnemyData.getElement();
+		element = EnemyData.getElement().stream().toList();
 		defaultWeaponStatus = EnemyData.getWeaponStatus().stream().toList();
 		defaultUnitStatus = EnemyData.getUnitStatus().stream().toList();
 		defaultCutStatus = EnemyData.getCutStatus().stream().toList();

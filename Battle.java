@@ -3,6 +3,7 @@ package battle;
 import static javax.swing.JOptionPane.*;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -14,9 +15,7 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.time.temporal.ValueRange;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -28,6 +27,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import defaultdata.DefaultStage;
 import defaultdata.EditImage;
@@ -39,7 +39,7 @@ import screendisplay.DisplayStatus;
 //バトル画面制御
 public class Battle extends JPanel implements MouseListener, MouseMotionListener{
 	JButton rangeDrawButton = new JButton();
-	JButton targetButton = new JButton();
+	JButton meritButton = new JButton();
 	JButton pauseButton = new JButton();
 	JButton returnButton = new JButton();
 	BufferedImage stageImage;
@@ -49,13 +49,6 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	BattleUnit[] unitLeftData;//左武器用
 	BattleFacility[] facilityData;
 	BattleEnemy[] enemyData;
-	int targetCode = 0;
-	Map<Integer, String> targetMap = new HashMap<>();{
-		targetMap.put(0, "HP割合 低");
-		targetMap.put(1, "HP割合 高");
-		targetMap.put(2, "距離 近");
-		targetMap.put(3, "距離 遠");
-	}
 	Point mouse;
 	int select;
 	boolean canSelect;
@@ -63,12 +56,12 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	int time;
 	boolean canStop;
 	
-	public Battle(MainFrame MainFrame, StageData StageData, int difficultyCode) {
+	public Battle(MainFrame MainFrame, StageData StageData, List<Boolean> clearMerit, int difficultyCode) {
 		addMouseListener(this);
     	addMouseMotionListener(this);
     	install(StageData);
 		addRangeDrawButton();
-		addTargetButton();
+		addMeritButton(StageData, clearMerit);
 		addPauseButton(MainFrame);
 		addReturnButton(MainFrame);
 		mainTimer();
@@ -78,7 +71,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		super.paintComponent(g);
 		rangeDrawButton.setBounds(0, 0, 95, 40);
 		setButton(rangeDrawButton, "射程表示", 1010, 465, 95, 40);
-		setButton(targetButton, targetMap.get(targetCode), 1110, 465, 95, 40);
+		setButton(meritButton, "戦功表示", 1110, 465, 95, 40);
 		setButton(pauseButton, "一時停止", 1010, 515, 95, 40);
 		setButton(returnButton, "降参", 1110, 515, 95, 40);
 		drawField(g);
@@ -138,10 +131,11 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		});
 	}
 	
-	private void addTargetButton() {
-		add(targetButton);
-		targetButton.addActionListener(e->{
-			targetCode = (targetCode < targetMap.size() - 1)? targetCode + 1: 0;
+	private void addMeritButton(StageData StageData, List<Boolean> clearMerit) {
+		add(meritButton);
+		meritButton.addActionListener(e->{
+			canStop = true;
+			new PauseDialog(this, StageData, clearMerit);
 		});
 	}
 	
@@ -149,7 +143,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		add(pauseButton);
 		pauseButton.addActionListener(e->{
 			canStop = true;
-			new Pause(this, MainFrame);
+			new PauseDialog(this, MainFrame);
 		});
 	}
 	
@@ -309,10 +303,23 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 }
 
 //一時停止中の画面
-class Pause extends JDialog implements WindowListener{
+class PauseDialog extends JDialog implements WindowListener{
 	Battle Battle;
 	
-	public Pause(Battle Battle, MainFrame MainFrame) {
+	protected PauseDialog(Battle Battle, StageData StageData, List<Boolean> clearMerit) {
+		this.Battle = Battle;
+		setModalityType(ModalityType.APPLICATION_MODAL);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setResizable(false);
+		setTitle("戦功");
+		setSize(435, 255);
+		setLocationRelativeTo(null);
+		add(new MeritPanel(this, StageData, clearMerit));
+		setVisible(true);
+		addWindowListener(this);
+	}
+	
+	protected PauseDialog(Battle Battle, MainFrame MainFrame) {
 		this.Battle = Battle;
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -325,7 +332,7 @@ class Pause extends JDialog implements WindowListener{
 		addWindowListener(this);
 	}
 	
-	protected void disposeFrame() {
+	protected void disposeDialog() {
 		dispose();
 	}
 
@@ -353,23 +360,60 @@ class Pause extends JDialog implements WindowListener{
 	}
 }
 
+//戦功表示
+class MeritPanel extends JPanel{
+	JButton restartButton = new JButton();
+	JScrollPane meritScroll = new JScrollPane();
+	
+	protected MeritPanel(PauseDialog PauseDialog, StageData StageData, List<Boolean> clearMerit) {
+		add(restartButton);
+		restartButton.addActionListener(e->{
+			PauseDialog.disposeDialog();
+		});
+		restartButton.setText("再開");
+		JPanel panel = new JPanel();
+		panel.setPreferredSize(new Dimension(390, 20 * clearMerit.size()));
+		IntStream.range(0, clearMerit.size()).forEach(i -> {
+			JLabel label = new JLabel();
+			label.setText(StageData.getMerit().get(i));
+			if(clearMerit.get(i)) {
+				label.setForeground(Color.LIGHT_GRAY);
+			}else {
+				label.setForeground(Color.BLACK);
+			}
+			panel.add(label);
+		});
+		meritScroll.getViewport().setView(panel);
+    	add(meritScroll);
+	}
+	
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		restartButton.setBounds(150, 170, 120, 40);
+		restartButton.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+		meritScroll.setBounds(10, 10, 400, 150);
+		meritScroll.setPreferredSize(meritScroll.getSize());
+	}
+}
+
+//一時停止表示
 class PausePanel extends JPanel{
 	JLabel comment = new JLabel();
 	JButton restartButton = new JButton();
 	JButton returnButton = new JButton();
 	
-	protected PausePanel(Pause Pause, MainFrame MainFrame) {
+	protected PausePanel(PauseDialog PauseDialog, MainFrame MainFrame) {
 		add(comment);
 		comment.setText("ゲームを一時停止しています。");
 		comment.setHorizontalAlignment(JLabel.CENTER);
 		add(restartButton);
 		restartButton.addActionListener(e->{
-			Pause.disposeFrame();
+			PauseDialog.disposeDialog();
 		});
 		restartButton.setText("再開");
 		add(returnButton);
 		returnButton.addActionListener(e->{
-			Pause.disposeFrame();
+			PauseDialog.disposeDialog();
 			MainFrame.selectStageDraw();
 		});
 		returnButton.setText("降参");
