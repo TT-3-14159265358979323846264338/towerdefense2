@@ -17,6 +17,9 @@ public abstract class FacilityData {
 	//武器属性はその武器の全ての属性(DefaultStage.ELEMENT_MAP)を登録　攻撃しない時は空のlist
 	public abstract List<Integer> getElement();
 	
+	//DefaultAtackPatternのパターン番号
+	public abstract int getAtackPattern();
+	
 	//DefaultStage.WEAPON_MAPの順にステータスをリスト化　攻撃しない時は空のlist
 	public abstract List<Integer> getWeaponStatus();
 	

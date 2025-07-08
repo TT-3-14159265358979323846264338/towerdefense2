@@ -30,6 +30,11 @@ public class No0001Gate extends FacilityData{
 	}
 
 	@Override
+	public int getAtackPattern() {
+		return 0;
+	}
+
+	@Override
 	public List<Integer> getWeaponStatus() {
 		return Arrays.asList();
 	}
@@ -41,6 +46,6 @@ public class No0001Gate extends FacilityData{
 
 	@Override
 	public List<Integer> getCutStatus() {
-		return Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		return Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	}
 }
