@@ -55,6 +55,11 @@ public class No0000JapaneseSword extends WeaponData{
 	}
 
 	@Override
+	public int getAtackPattern() {
+		return 0;
+	}
+
+	@Override
 	public List<Integer> getWeaponStatus() {
 		return Arrays.asList(100, 30, 1000, 1);
 	}
@@ -66,6 +71,6 @@ public class No0000JapaneseSword extends WeaponData{
 
 	@Override
 	public List<Integer> getCutStatus() {
-		return Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		return Arrays.asList(5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	}
 }
