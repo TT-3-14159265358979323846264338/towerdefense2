@@ -36,6 +36,6 @@ public class No0002NormalDefenseCore extends CoreData{
 	
 	@Override
 	public List<Integer> getCutStatus(){
-		return Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		return Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	}
 }
