@@ -38,6 +38,7 @@ public class DefaultStage {
 		ELEMENT_MAP.put(8,"雷");
 		ELEMENT_MAP.put(9,"聖");
 		ELEMENT_MAP.put(10,"闇");
+		ELEMENT_MAP.put(11,"支援");
 	*/
 	
 	//配置マス画像ファイル

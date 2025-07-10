@@ -62,12 +62,12 @@ public class BattleData{
 		}
 		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 		scheduler.scheduleWithFixedDelay(() -> {
-			CompletableFuture.runAsync(() -> Battle.timerWait()).join();
-			atackSpeedMonitoring(scheduler, nowSpeed);
 			if(!canActivate) {
 				scheduler.shutdown();
 				return;
 			}
+			CompletableFuture.runAsync(() -> Battle.timerWait()).join();
+			atackSpeedMonitoring(scheduler, nowSpeed);
 			attackHandling();
 		}, 0, getAtackSpeed(), TimeUnit.MILLISECONDS);
 	}
@@ -152,7 +152,7 @@ public class BattleData{
 		return weaponCalculate(2);
 	}
 	
-	protected int getAtackNumber() {
+	public int getAtackNumber() {
 		return weaponCalculate(3);
 	}
 	

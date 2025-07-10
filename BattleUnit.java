@@ -62,13 +62,10 @@ public class BattleUnit extends BattleData{
 		allyData.add(unitMainData);
 		allyData.add(facilityData);
 		this.enemyData.add(enemyData);
-		if(0 < getAtack()) {
-			AtackPattern.install(this, this.enemyData);
-			return;
-		}
-		if(getAtack() < 0) {
+		if(element.stream().anyMatch(i -> i == 11)){
 			AtackPattern.install(this, allyData);
-			return;
+		}else {
+			AtackPattern.install(this, this.enemyData);
 		}
 	}
 	

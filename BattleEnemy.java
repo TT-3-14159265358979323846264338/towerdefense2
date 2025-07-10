@@ -47,13 +47,10 @@ public class BattleEnemy extends BattleData{
 		allyData.add(enemyData);
 		this.enemyData.add(enemyData);
 		this.enemyData.add(facilityData);
-		if(0 < getAtack()) {
-			AtackPattern.install(this, this.enemyData);
-			return;
-		}
-		if(getAtack() < 0) {
+		if(element.stream().anyMatch(i -> i == 11)){
 			AtackPattern.install(this, allyData);
-			return;
+		}else {
+			AtackPattern.install(this, this.enemyData);
 		}
 	}
 	
