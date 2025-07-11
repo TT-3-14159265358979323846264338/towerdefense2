@@ -1,7 +1,5 @@
 package battle;
 
-import static javax.swing.JOptionPane.*;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -55,6 +53,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	final static int SIZE = 28;
 	int time;
 	boolean canStop;
+	boolean canRangeDraw;
 	
 	public Battle(MainFrame MainFrame, StageData StageData, List<Boolean> clearMerit, int difficultyCode) {
 		addMouseListener(this);
@@ -127,7 +126,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	private void addRangeDrawButton() {
 		add(rangeDrawButton);
 		rangeDrawButton.addActionListener(e->{
-			showMessageDialog(null, "現在調整中");
+			canRangeDraw = (canRangeDraw)? false: true;
 		});
 	}
 	
@@ -171,11 +170,23 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	private void drawField(Graphics g) {
 		g.drawImage(stageImage, 0, 0, this);
 		IntStream.range(0, placementList.size()).forEach(i -> placementList.get(i).stream().forEach(j -> g.drawImage(placementImage.get(i), j.get(0).intValue(), j.get(1).intValue(), this)));
-		IntStream.range(0, facilityData.length).forEach(i -> g.drawImage(facilityData[i].getActivate()? facilityData[i].getActionImage(): facilityData[i].getBreakImage(), (int) facilityData[i].getPositionX(), (int) facilityData[i].getPositionY(), this));
+		IntStream.range(0, facilityData.length).forEach(i -> {
+			if(canRangeDraw) {
+				rangeDraw(g, new Color(255, 0, 0, 20), (int) facilityData[i].getPositionX(), (int) facilityData[i].getPositionY(), facilityData[i].getRange());
+			}
+			g.drawImage(facilityData[i].getActivate()? facilityData[i].getActionImage(): facilityData[i].getBreakImage(), (int) facilityData[i].getPositionX(), (int) facilityData[i].getPositionY(), this);
+			drawHP(g, facilityData[i]);
+		});
 	}
 	
 	private void drawEnemy(Graphics g) {
-		IntStream.range(0, enemyData.length).filter(i -> enemyData[i].getActivate()).boxed().sorted(Comparator.reverseOrder()).forEach(i -> g.drawImage(enemyData[i].getActionImage(), (int) enemyData[i].getPositionX(), (int) enemyData[i].getPositionY(), this));
+		IntStream.range(0, enemyData.length).filter(i -> enemyData[i].getActivate()).boxed().sorted(Comparator.reverseOrder()).forEach(i -> {
+			if(canRangeDraw) {
+				rangeDraw(g, new Color(255, 0, 0, 20), (int) enemyData[i].getPositionX(), (int) enemyData[i].getPositionY(), enemyData[i].getRange());
+			}
+			g.drawImage(enemyData[i].getActionImage(), (int) enemyData[i].getPositionX(), (int) enemyData[i].getPositionY(), this);
+			drawHP(g, enemyData[i]);
+		});
 	}
 	
 	private void drawBackground(Graphics g) {
@@ -206,18 +217,52 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	
 	private void drawUnit(Graphics g) {
 		IntStream.range(0, 8).forEach(i -> {
-			g.drawImage(unitMainData[i].getActionImage(), (int) unitMainData[i].getPositionX(), (int) unitMainData[i].getPositionY(), this);
-			g.drawImage(unitMainData[i].getCoreImage(), (int) unitMainData[i].getPositionX(), (int) unitMainData[i].getPositionY(), this);
-			g.drawImage(unitLeftData[i].getActionImage(), (int) unitMainData[i].getPositionX(), (int) unitMainData[i].getPositionY(), this);
+			if(unitMainData[i].getActivate() && canRangeDraw) {
+				rangeDraw(g, new Color(255, 0, 0, 20), (int) unitMainData[i].getPositionX(), (int) unitMainData[i].getPositionY(), unitMainData[i].getRange());
+				rangeDraw(g, new Color(0, 0, 255, 20), (int) unitLeftData[i].getPositionX(), (int) unitLeftData[i].getPositionY(), unitLeftData[i].getRange());
+			}
+			int x = (int) unitMainData[i].getPositionX();
+			int y = (int) unitMainData[i].getPositionY();
+			g.drawImage(unitMainData[i].getActionImage(), x, y, this);
+			g.drawImage(unitMainData[i].getCoreImage(), x, y, this);
+			g.drawImage(unitLeftData[i].getActionImage(), x, y, this);
+			if(unitMainData[i].getActivate()) {
+				drawHP(g, unitMainData[i]);
+			}
 		});
 	}
 	
 	private void drawSelectUnit(Graphics g) {
 		if(canSelect) {
-			g.drawImage(unitMainData[select].getDefaultImage(), mouse.x - 45, mouse.y - 45, this);
-			g.drawImage(unitMainData[select].getCoreImage(), mouse.x - 45, mouse.y - 45, this);
-			g.drawImage(unitLeftData[select].getDefaultImage(), mouse.x - 45, mouse.y - 45, this);
+			int x = mouse.x - 45;
+			int y = mouse.y - 45;
+			rangeDraw(g, new Color(255, 0, 0, 20), x, y, unitMainData[select].getRange());
+			rangeDraw(g, new Color(0, 0, 255, 20), x, y, unitLeftData[select].getRange());
+			g.drawImage(unitMainData[select].getDefaultImage(), x, y, this);
+			g.drawImage(unitMainData[select].getCoreImage(), x, y, this);
+			g.drawImage(unitLeftData[select].getDefaultImage(), x, y, this);
 		}
+	}
+	
+	private void rangeDraw(Graphics g, Color color, int x, int y, int range) {
+		int correction = 30;
+		g.setColor(color);
+		g.fillOval((int) (x + correction - range),
+				(int) (y + correction - range),
+				range * 2 + SIZE,
+				range * 2 + SIZE);
+	}
+	
+	private void drawHP(Graphics g, BattleData data) {
+		int x = (int) data.getPositionX() + 30;
+		int y = (int) data.getPositionY() + 60;
+		int height = 5;
+		g.setColor(Color.BLACK);
+		g.fillRect(x, y, SIZE, height);
+		g.setColor(new Color(150, 200, 100));
+		g.fillRect(x, y, SIZE * data.getNowHP() / data.getMaxHP(), height);
+		g.setColor(Color.WHITE);
+		g.drawRect(x, y, SIZE, height);
 	}
 	
 	@Override
