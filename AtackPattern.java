@@ -6,9 +6,9 @@ import battle.BattleData;
 
 public abstract class AtackPattern {
 	BattleData myself;
-	List<BattleData[]> candidate;
+	List<BattleData> candidate;
 	
-	public void install(BattleData myself, List<BattleData[]> candidate) {
+	public void install(BattleData myself, List<BattleData> candidate) {
 		this.myself = myself;
 		this.candidate = candidate;
 	}
@@ -18,4 +18,17 @@ public abstract class AtackPattern {
 	
 	//targetになる相手のBattleDataを返す
 	public abstract List<BattleData> getTarget();
+	
+	//ここから下はfilterやsortedの条件
+	protected boolean activeCheck(BattleData data){
+		return data.getActivate();
+	}
+	
+	protected boolean rangeCheck(BattleData data) {
+		return distanceCalculate(data) <= myself.getRange();
+	}
+	
+	protected double distanceCalculate(BattleData data) {
+		return Math.sqrt(Math.pow(myself.getPositionX() - data.getPositionX(), 2) + Math.pow(myself.getPositionY() - data.getPositionY(), 2));
+	}
 }
