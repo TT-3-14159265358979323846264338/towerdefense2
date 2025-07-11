@@ -1,7 +1,9 @@
 package battle;
 
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import defaultdata.DefaultAtackPattern;
 import defaultdata.DefaultStage;
@@ -35,10 +37,12 @@ public class BattleFacility extends BattleData{
 		atackTimer();
 	}
 	
-	protected void install(BattleUnit[] unitMainData, BattleFacility[] facilityData, BattleEnemy[] enemyData) {
-		allyData.add(unitMainData);
-		allyData.add(facilityData);
-		this.enemyData.add(enemyData);
+	protected void install(BattleData[] unitMainData, BattleData[] facilityData, BattleData[] enemyData) {
+		if(Objects.isNull(AtackPattern)) {
+			return;
+		}
+		allyData = Stream.concat(Stream.of(unitMainData), Stream.of(facilityData)).toList();
+		this.enemyData = Stream.of(enemyData).toList();
 		if(element.stream().anyMatch(i -> i == 11)){
 			AtackPattern.install(this, allyData);
 		}else {

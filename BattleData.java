@@ -1,7 +1,6 @@
 package battle;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -15,8 +14,8 @@ import defaultdata.atackpattern.AtackPattern;
 //全キャラクターの共通システム
 public class BattleData{
 	Battle Battle;
-	List<BattleData[]> allyData = new ArrayList<>();
-	List<BattleData[]> enemyData = new ArrayList<>();
+	List<BattleData> allyData;
+	List<BattleData> enemyData;
 	List<BufferedImage> actionImage;
 	int motionNumber = 0;
 	boolean canAtack;
@@ -66,7 +65,7 @@ public class BattleData{
 				scheduler.shutdown();
 				return;
 			}
-			CompletableFuture.runAsync(() -> Battle.timerWait()).join();
+			CompletableFuture.runAsync(Battle::timerWait).join();
 			atackSpeedMonitoring(scheduler, nowSpeed);
 			attackHandling();
 		}, 0, getAtackSpeed(), TimeUnit.MILLISECONDS);
@@ -84,6 +83,7 @@ public class BattleData{
 		if(target.isEmpty()) {
 			return;
 		}
+		
 		
 		
 		
@@ -124,11 +124,11 @@ public class BattleData{
 		return name;
 	}
 	
-	protected double getPositionX() {
+	public double getPositionX() {
 		return positionX;
 	}
 	
-	protected double getPositionY() {
+	public double getPositionY() {
 		return positionY;
 	}
 	
@@ -144,7 +144,7 @@ public class BattleData{
 		return weaponCalculate(0);
 	}
 	
-	protected int getRange() {
+	public int getRange() {
 		return weaponCalculate(1);
 	}
 	
@@ -208,7 +208,7 @@ public class BattleData{
 		return (int) ((fixedValue + flexValue) * ratio);
 	}
 	
-	protected boolean getActivate() {
+	public boolean getActivate() {
 		return canActivate;
 	}
 }

@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import defaultdata.DefaultAtackPattern;
 import defaultdata.DefaultEnemy;
@@ -43,10 +44,9 @@ public class BattleEnemy extends BattleData{
 		routeTimer();
 	}
 	
-	protected void install(BattleUnit[] unitMainData, BattleFacility[] facilityData, BattleEnemy[] enemyData) {
-		allyData.add(enemyData);
-		this.enemyData.add(enemyData);
-		this.enemyData.add(facilityData);
+	protected void install(BattleData[] unitMainData, BattleData[] facilityData, BattleData[] enemyData) {
+		allyData = Stream.of(enemyData).toList();
+		this.enemyData = Stream.concat(Stream.of(facilityData),Stream.of(unitMainData)).toList();
 		if(element.stream().anyMatch(i -> i == 11)){
 			AtackPattern.install(this, allyData);
 		}else {
@@ -84,7 +84,7 @@ public class BattleEnemy extends BattleData{
 	
 	private void constantMove(ScheduledExecutorService scheduler, int nowSpeed) {
 		scheduler.scheduleWithFixedDelay(() -> {
-			CompletableFuture.allOf(CompletableFuture.runAsync(() -> Battle.timerWait()), CompletableFuture.runAsync(() -> timerWait())).join();
+			CompletableFuture.allOf(CompletableFuture.runAsync(Battle::timerWait), CompletableFuture.runAsync(this::timerWait)).join();
 			moveSpeedMonitoring(scheduler, nowSpeed);
 			if(nowHP <= 0) {
 				scheduler.shutdown();

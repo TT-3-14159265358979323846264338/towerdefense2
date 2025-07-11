@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import defaultdata.DefaultAtackPattern;
 import defaultdata.DefaultUnit;
@@ -50,7 +52,7 @@ public class BattleUnit extends BattleData{
 		}catch(Exception e) {
 			actionImage = Arrays.asList(getBlankImage());
 		}
-		element = StatusCalculation.getLeftElement();
+		element = StatusCalculation.getLeftElement().stream().toList();
 		AtackPattern = new DefaultAtackPattern().getAtackPattern(StatusCalculation.getLeftAtackPattern());
 		defaultWeaponStatus = StatusCalculation.getLeftWeaponStatus();
 		defaultUnitStatus = StatusCalculation.getUnitStatus();
@@ -58,10 +60,12 @@ public class BattleUnit extends BattleData{
 		super.initialize();
 	}
 	
-	protected void install(BattleUnit[] unitMainData, BattleFacility[] facilityData, BattleEnemy[] enemyData) {
-		allyData.add(unitMainData);
-		allyData.add(facilityData);
-		this.enemyData.add(enemyData);
+	protected void install(BattleData[] unitMainData, BattleData[] facilityData, BattleData[] enemyData) {
+		if(Objects.isNull(AtackPattern)) {
+			return;
+		}
+		allyData = Stream.concat(Stream.of(unitMainData), Stream.of(facilityData)).toList();
+		this.enemyData = Stream.of(enemyData).toList();
 		if(element.stream().anyMatch(i -> i == 11)){
 			AtackPattern.install(this, allyData);
 		}else {
