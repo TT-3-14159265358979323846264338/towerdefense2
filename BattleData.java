@@ -65,9 +65,8 @@ public class BattleData{
 				scheduler.shutdown();
 				return;
 			}
-			CompletableFuture.runAsync(Battle::timerWait).join();
 			atackSpeedMonitoring(scheduler, nowSpeed);
-			attackHandling();
+			CompletableFuture.supplyAsync(this::targetCheck).thenAccept(this::motionTimer).thenRun(this::timerWait).join();
 		}, 0, getAtackSpeed(), TimeUnit.MILLISECONDS);
 	}
 	
@@ -78,18 +77,32 @@ public class BattleData{
 		}
 	}
 	
-	private void attackHandling() {
-		List<BattleData> target = AtackPattern.getTarget();
-		if(target.isEmpty()) {
-			return;
-		}
-		
-		
-		
-		
-		
-		
-		
+	private List<BattleData> targetCheck() {
+		List<BattleData> targetList = AtackPattern.getTarget();
+		do {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			CompletableFuture.runAsync(Battle::timerWait).join();
+			targetList = AtackPattern.getTarget();
+		}while(targetList.isEmpty());
+		canAtack = true;
+		return targetList;
+	}
+	
+	private void motionTimer(List<BattleData> targetList) {
+		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		scheduler.scheduleWithFixedDelay(() -> {
+			CompletableFuture.runAsync(Battle::timerWait).join();
+			if(5 <= motionNumber) {
+				targetList.stream().forEach(i -> motionResult(i));
+				timerRestart();
+				scheduler.shutdown();
+			}
+			motionNumber++;
+		}, 0, 1000 * getAtackSpeed() / 5, TimeUnit.MICROSECONDS);
 	}
 	
 	protected synchronized void timerWait() {
@@ -105,19 +118,31 @@ public class BattleData{
 	private synchronized void timerRestart() {
 		notifyAll();
 		canAtack = false;
+		motionNumber = 0;
 	}
 	
-	private void motionTimer() {
-		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-		scheduler.scheduleWithFixedDelay(() -> {
-			CompletableFuture.runAsync(() -> Battle.timerWait()).join();
-			if(5 < motionNumber) {
-				motionNumber = 0;
-				timerRestart();
-				scheduler.shutdown();
-			}
-			motionNumber++;
-		}, 0, 1000 * getAtackSpeed() / 5, TimeUnit.MICROSECONDS);
+	private void motionResult(BattleData target) {
+		if(getAtack() == 0) {
+			buff(target);
+			return;
+		}
+		if(element.stream().anyMatch(i -> i == 11)) {
+			heal(target);
+			return;
+		}
+		atack(target);
+	}
+	
+	private void buff(BattleData target) {
+		
+	}
+	
+	private void heal(BattleData target) {
+		
+	}
+	
+	private void atack(BattleData target) {
+		
 	}
 	
 	public String getName() {

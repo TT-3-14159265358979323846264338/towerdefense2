@@ -46,7 +46,7 @@ public class BattleEnemy extends BattleData{
 	
 	protected void install(BattleData[] unitMainData, BattleData[] facilityData, BattleData[] enemyData) {
 		allyData = Stream.of(enemyData).toList();
-		this.enemyData = Stream.concat(Stream.of(facilityData),Stream.of(unitMainData)).toList();
+		this.enemyData = Stream.concat(Stream.of(facilityData), Stream.of(unitMainData)).toList();
 		if(element.stream().anyMatch(i -> i == 11)){
 			AtackPattern.install(this, allyData);
 		}else {
