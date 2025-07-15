@@ -98,7 +98,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	}
 	
 	private void mainTimer() {
-		Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(() -> {
+		Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(() -> {
 			timerWait();
 			time += 10;
 		}, 0, 10, TimeUnit.MILLISECONDS);

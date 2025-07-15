@@ -35,6 +35,7 @@ public class BattleFacility extends BattleData{
 		canActivate = true;
 		super.initialize();
 		atackTimer();
+		healTimer();
 	}
 	
 	protected void install(BattleData[] unitMainData, BattleData[] facilityData, BattleData[] enemyData) {
@@ -54,7 +55,7 @@ public class BattleFacility extends BattleData{
 		return breakImage;
 	}
 	
-	protected void deactivate() {
+	private void deactivate() {
 		canActivate = false;
 	}
 	

@@ -58,7 +58,7 @@ public class BattleData{
 		if(nowSpeed <= 0) {
 			return;
 		}
-		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 		scheduler.scheduleWithFixedDelay(() -> {
 			if(!canActivate) {
 				scheduler.shutdown();
@@ -90,7 +90,7 @@ public class BattleData{
 	}
 	
 	private void motionTimer(List<BattleData> targetList) {
-		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 		scheduler.scheduleWithFixedDelay(() -> {
 			Battle.timerWait();
 			if(5 <= motionNumber) {
@@ -100,7 +100,7 @@ public class BattleData{
 				return;
 			}
 			motionNumber++;
-		}, 0, 1000 * getAtackSpeed() / 10, TimeUnit.MICROSECONDS);
+		}, 0, 1000 * getAtackSpeed() / 50, TimeUnit.MICROSECONDS);
 	}
 	
 	protected synchronized void timerWait() {
@@ -143,6 +143,19 @@ public class BattleData{
 		
 	}
 	
+	protected void healTimer() {
+		ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+		scheduler.scheduleWithFixedDelay(() -> {
+			Battle.timerWait();
+			if(!canActivate) {
+				scheduler.shutdown();
+				return;
+			}
+			int futureHP = nowHP + getRecover();
+			nowHP = (futureHP < getMaxHP())? futureHP: getMaxHP();
+		}, 0, 3, TimeUnit.SECONDS);
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -163,7 +176,7 @@ public class BattleData{
 		return AtackPattern;
 	}
 	
-	protected int getAtack() {
+	private int getAtack() {
 		return weaponCalculate(0);
 	}
 	
@@ -171,7 +184,7 @@ public class BattleData{
 		return weaponCalculate(1);
 	}
 	
-	protected int getAtackSpeed() {
+	private int getAtackSpeed() {
 		return weaponCalculate(2);
 	}
 	
@@ -187,11 +200,11 @@ public class BattleData{
 		return nowHP;
 	}
 	
-	protected int getDefense() {
+	private int getDefense() {
 		return unitCalculate(2);
 	}
 	
-	protected int getRecover() {
+	private int getRecover() {
 		return unitCalculate(3);
 	}
 	
@@ -199,7 +212,7 @@ public class BattleData{
 		return unitCalculate(4);
 	}
 	
-	protected int getcost() {
+	private int getcost() {
 		return unitCalculate(5);
 	}
 	
@@ -223,7 +236,7 @@ public class BattleData{
 		return IntStream.range(0, defaultCutStatus.size()).mapToObj(i -> getCut(i)).toList();
 	}
 	
-	protected int getCut(int number) {
+	private int getCut(int number) {
 		return calculate(defaultCutStatus.get(number), collectionCutStatus.get(number), ratioCutStatus.get(number));
 	}
 	

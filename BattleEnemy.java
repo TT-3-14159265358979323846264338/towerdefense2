@@ -62,7 +62,7 @@ public class BattleEnemy extends BattleData{
 	}
 	
 	private void routeTimer() {
-		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 		int nowSpeed = getMoveSpeedOrBlock();
 		if(nowSpeed <= 0) {
 			eternalStop(scheduler);
@@ -76,6 +76,7 @@ public class BattleEnemy extends BattleData{
 			if(actitateTime <= Battle.getMainTime()) {
 				canActivate = true;
 				atackTimer();
+				healTimer();
 				scheduler.shutdown();
 			}
 		}, 0, 10, TimeUnit.MILLISECONDS);
@@ -153,6 +154,7 @@ public class BattleEnemy extends BattleData{
 			deactivateCount = 0;
 			canActivate = true;
 			atackTimer();
+			healTimer();
 		}
 	}
 	

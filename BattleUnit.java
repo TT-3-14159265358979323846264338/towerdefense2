@@ -92,9 +92,10 @@ public class BattleUnit extends BattleData{
 		positionX = x;
 		positionY = y;
 		atackTimer();
+		healTimer();
 	}
 	
-	protected void deactivate() {
+	private void deactivate() {
 		canActivate = false;
 		positionX = initialPosition.x;
 		positionY = initialPosition.y;
