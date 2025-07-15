@@ -2,6 +2,7 @@ package defaultdata.atackpattern;
 
 import java.util.List;
 
+import battle.Battle;
 import battle.BattleData;
 
 public abstract class AtackPattern {
@@ -25,7 +26,7 @@ public abstract class AtackPattern {
 	}
 	
 	protected boolean rangeCheck(BattleData data) {
-		return distanceCalculate(data) <= myself.getRange();
+		return distanceCalculate(data) <= myself.getRange() + Battle.SIZE / 2;
 	}
 	
 	protected double distanceCalculate(BattleData data) {
