@@ -27,7 +27,7 @@ public class No0001Stage2 extends StageData {
 
 	@Override
 	public List<Point> getFacilityPoint() {
-		return Arrays.asList(new Point(430, 20), new Point(450, 260), new Point(190, 80), new Point(720, 80));
+		return Arrays.asList(new Point(457, 70), new Point(457, 260), new Point(192, 76), new Point(723, 76));
 	}
 
 	@Override
