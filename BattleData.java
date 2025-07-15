@@ -1,6 +1,7 @@
 package battle;
 
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -64,16 +65,16 @@ public class BattleData{
 		}
 		ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 		scheduler.scheduleWithFixedDelay(() -> {
-			if(!canActivate) {
-				scheduler.shutdown();
-				return;
-			}
 			if(nowSpeed != getAtackSpeed()) {
 				atackTimer();
 				scheduler.shutdown();
 				return;
 			}
 			List<BattleData> targetList = targetCheck();
+			if(targetList.isEmpty()) {
+				scheduler.shutdown();
+				return;
+			}
 			modeChange(targetList);
 			motionTimer(targetList);
 			timerWait();
@@ -83,12 +84,15 @@ public class BattleData{
 	private List<BattleData> targetCheck() {
 		List<BattleData> targetList = AtackPattern.getTarget();
 		do {
+			Battle.timerWait();
+			if(!canActivate) {
+				return Arrays.asList();
+			}
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			Battle.timerWait();
 			targetList = AtackPattern.getTarget();
 		}while(targetList.isEmpty());
 		return targetList;
