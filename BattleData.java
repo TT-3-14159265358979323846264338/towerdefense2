@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import defaultdata.EditImage;
 import defaultdata.atackpattern.AtackPattern;
 
 //全キャラクターの共通システム
@@ -15,7 +16,9 @@ public class BattleData{
 	Battle Battle;
 	List<BattleData> allyData;
 	List<BattleData> enemyData;
-	List<BufferedImage> actionImage;
+	List<BufferedImage> rightActionImage;
+	List<BufferedImage> leftActionImage;
+	boolean existsRight = true;
 	int motionNumber = 0;
 	boolean canAtack;
 	String name;
@@ -36,6 +39,7 @@ public class BattleData{
 	boolean canActivate;
 	
 	protected void initialize() {
+		leftActionImage = rightActionImage.stream().map(i -> new EditImage().mirrorImage(i)).toList();
 		collectionWeaponStatus = defaultWeaponStatus.stream().map(i -> 0).collect(Collectors.toList());
 		collectionUnitStatus = defaultUnitStatus.stream().map(i -> 0).collect(Collectors.toList());
 		collectionCutStatus = defaultCutStatus.stream().map(i -> 0).collect(Collectors.toList());
@@ -46,11 +50,11 @@ public class BattleData{
 	}
 	
 	protected BufferedImage getActionImage(){
-		return actionImage.get(motionNumber);
+		return existsRight? rightActionImage.get(motionNumber): leftActionImage.get(motionNumber);
 	}
 	
 	public BufferedImage getDefaultImage() {
-		return actionImage.get(0);
+		return rightActionImage.get(0);
 	}
 	
 	protected void atackTimer() {
@@ -69,7 +73,9 @@ public class BattleData{
 				scheduler.shutdown();
 				return;
 			}
-			motionTimer(targetCheck());
+			List<BattleData> targetList = targetCheck();
+			modeChange(targetList);
+			motionTimer(targetList);
 			timerWait();
 		}, 0, getAtackSpeed(), TimeUnit.MILLISECONDS);
 	}
@@ -85,8 +91,12 @@ public class BattleData{
 			Battle.timerWait();
 			targetList = AtackPattern.getTarget();
 		}while(targetList.isEmpty());
-		canAtack = true;
 		return targetList;
+	}
+	
+	private void modeChange(List<BattleData> targetList) {
+		canAtack = true;
+		existsRight = (targetList.get(0).getPositionX() <= positionX)? true: false;
 	}
 	
 	private void motionTimer(List<BattleData> targetList) {

@@ -26,7 +26,7 @@ public class BattleEnemy extends BattleData{
 		this.Battle = Battle;
 		EnemyData EnemyData = new DefaultEnemy().getEnemyData(StageData.getEnemy().get(number).get(0));
 		name = EnemyData.getName();
-		actionImage = new EditImage().input(EnemyData.getActionImageName(), 4);
+		rightActionImage = new EditImage().input(EnemyData.getActionImageName(), 4);
 		move = EnemyData.getMove();
 		type = EnemyData.getType();
 		route = StageData.getRoute().get(StageData.getEnemy().get(number).get(1));

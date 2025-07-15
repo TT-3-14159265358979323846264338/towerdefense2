@@ -19,7 +19,7 @@ public class BattleFacility extends BattleData{
 		this.Battle = Battle;
 		FacilityData FacilityData = new DefaultStage().getFacilityData(StageData.getFacility().get(number));
 		name = FacilityData.getName();
-		actionImage = new EditImage().input(StageData.getFacilityDirection().get(number)? FacilityData.getActionFrontImageName(): FacilityData.getActionSideImageName(), 4);
+		rightActionImage = new EditImage().input(StageData.getFacilityDirection().get(number)? FacilityData.getActionFrontImageName(): FacilityData.getActionSideImageName(), 4);
 		breakImage = new EditImage().input(FacilityData.getBreakImageName(), 4);
 		positionX = StageData.getFacilityPoint().get(number).x;
 		positionY = StageData.getFacilityPoint().get(number).y;

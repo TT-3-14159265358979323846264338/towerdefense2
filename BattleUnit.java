@@ -25,9 +25,9 @@ public class BattleUnit extends BattleData{
 		StatusCalculation StatusCalculation = new StatusCalculation(composition);
 		name = new DisplayStatus().getUnitName(composition);
 		try {
-			actionImage = new EditImage().input(new DefaultUnit().getWeaponData(composition.get(0)).getRightActionImageName(), 4);
+			rightActionImage = new EditImage().input(new DefaultUnit().getWeaponData(composition.get(0)).getRightActionImageName(), 4);
 		}catch(Exception e) {
-			actionImage = Arrays.asList(getBlankImage());
+			rightActionImage = Arrays.asList(getBlankImage());
 		}
 		coreImage = new EditImage().input(new DefaultUnit().getCoreData(composition.get(1)).getActionImageName(), 4);
 		this.positionX = positionX;
@@ -48,9 +48,9 @@ public class BattleUnit extends BattleData{
 		this.Battle = Battle;
 		StatusCalculation StatusCalculation = new StatusCalculation(composition);
 		try {
-			actionImage = new EditImage().input(new DefaultUnit().getWeaponData(composition.get(2)).getLeftActionImageName(), 4);
+			rightActionImage = new EditImage().input(new DefaultUnit().getWeaponData(composition.get(2)).getLeftActionImageName(), 4);
 		}catch(Exception e) {
-			actionImage = Arrays.asList(getBlankImage());
+			rightActionImage = Arrays.asList(getBlankImage());
 		}
 		element = StatusCalculation.getLeftElement().stream().toList();
 		AtackPattern = new DefaultAtackPattern().getAtackPattern(StatusCalculation.getLeftAtackPattern());
@@ -99,6 +99,7 @@ public class BattleUnit extends BattleData{
 		canActivate = false;
 		positionX = initialPosition.x;
 		positionY = initialPosition.y;
+		existsRight = true;
 		super.initialize();
 	}
 	

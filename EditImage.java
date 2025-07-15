@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
@@ -82,6 +83,12 @@ public class EditImage{
 		g2.drawImage(originalImage, 0, 0, null);
 		g2.dispose();
 		return image;
+	}
+	
+	public BufferedImage mirrorImage(BufferedImage originalImage) {
+		AffineTransform mirror = AffineTransform.getScaleInstance(-1.0, 1.0);
+		mirror.translate(- originalImage.getWidth(), 0);
+		return new AffineTransformOp(mirror, null).filter(originalImage, null);
 	}
 	
 	public BufferedImage effectImage(BufferedImage originalImage, int expansion, int color) {
