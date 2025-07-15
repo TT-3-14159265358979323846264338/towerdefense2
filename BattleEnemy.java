@@ -1,7 +1,6 @@
 package battle;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -84,8 +83,13 @@ public class BattleEnemy extends BattleData{
 	
 	private void constantMove(ScheduledExecutorService scheduler, int nowSpeed) {
 		scheduler.scheduleWithFixedDelay(() -> {
-			CompletableFuture.allOf(CompletableFuture.runAsync(Battle::timerWait), CompletableFuture.runAsync(this::timerWait)).join();
-			moveSpeedMonitoring(scheduler, nowSpeed);
+			Battle.timerWait();
+			timerWait();
+			if(nowSpeed != getMoveSpeedOrBlock()) {
+				routeTimer();
+				scheduler.shutdown();
+				return;
+			}
 			if(nowHP <= 0) {
 				scheduler.shutdown();
 				return;
@@ -141,13 +145,6 @@ public class BattleEnemy extends BattleData{
 			}
 		}catch (Exception ignore) {
 			//最後のrouteに入ったので、これ以上routeNumberは増えない
-		}
-	}
-	
-	private void moveSpeedMonitoring(ScheduledExecutorService scheduler, int nowSpeed) {
-		if(nowSpeed != getMoveSpeedOrBlock()) {
-			routeTimer();
-			scheduler.shutdown();
 		}
 	}
 	

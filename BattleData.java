@@ -2,7 +2,6 @@ package battle;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -65,16 +64,14 @@ public class BattleData{
 				scheduler.shutdown();
 				return;
 			}
-			atackSpeedMonitoring(scheduler, nowSpeed);
-			CompletableFuture.supplyAsync(this::targetCheck).thenAccept(this::motionTimer).thenRun(this::timerWait).join();
+			if(nowSpeed != getAtackSpeed()) {
+				atackTimer();
+				scheduler.shutdown();
+				return;
+			}
+			motionTimer(targetCheck());
+			timerWait();
 		}, 0, getAtackSpeed(), TimeUnit.MILLISECONDS);
-	}
-	
-	private void atackSpeedMonitoring(ScheduledExecutorService scheduler, int nowSpeed) {
-		if(nowSpeed != getAtackSpeed()) {
-			atackTimer();
-			scheduler.shutdown();
-		}
 	}
 	
 	private List<BattleData> targetCheck() {
@@ -85,7 +82,7 @@ public class BattleData{
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			CompletableFuture.runAsync(Battle::timerWait).join();
+			Battle.timerWait();
 			targetList = AtackPattern.getTarget();
 		}while(targetList.isEmpty());
 		canAtack = true;
@@ -95,14 +92,15 @@ public class BattleData{
 	private void motionTimer(List<BattleData> targetList) {
 		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 		scheduler.scheduleWithFixedDelay(() -> {
-			CompletableFuture.runAsync(Battle::timerWait).join();
+			Battle.timerWait();
 			if(5 <= motionNumber) {
 				targetList.stream().forEach(i -> motionResult(i));
 				timerRestart();
 				scheduler.shutdown();
+				return;
 			}
 			motionNumber++;
-		}, 0, 1000 * getAtackSpeed() / 5, TimeUnit.MICROSECONDS);
+		}, 0, 1000 * getAtackSpeed() / 10, TimeUnit.MICROSECONDS);
 	}
 	
 	protected synchronized void timerWait() {

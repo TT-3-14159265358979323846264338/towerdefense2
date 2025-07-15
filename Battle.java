@@ -50,7 +50,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	Point mouse;
 	int select;
 	boolean canSelect;
-	final static int SIZE = 28;
+	public final static int SIZE = 28;
 	int time;
 	boolean canStop;
 	boolean canRangeDraw;
@@ -245,12 +245,12 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	}
 	
 	private void rangeDraw(Graphics g, Color color, int x, int y, int range) {
-		int correction = 30;
+		int correction = 45;
 		g.setColor(color);
 		g.fillOval((int) (x + correction - range),
 				(int) (y + correction - range),
-				range * 2 + SIZE,
-				range * 2 + SIZE);
+				range * 2,
+				range * 2);
 	}
 	
 	private void drawHP(Graphics g, BattleData data) {
