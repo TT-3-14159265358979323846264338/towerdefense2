@@ -62,7 +62,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		addRangeDrawButton();
 		addMeritButton(StageData, clearMerit);
 		addPauseButton(MainFrame);
-		addReturnButton(MainFrame);
+		addReturnButton(MainFrame, StageData, clearMerit, difficultyCode);
 		mainTimer();
 	}
 	
@@ -72,7 +72,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		setButton(rangeDrawButton, "射程表示", 1010, 465, 95, 40);
 		setButton(meritButton, "戦功表示", 1110, 465, 95, 40);
 		setButton(pauseButton, "一時停止", 1010, 515, 95, 40);
-		setButton(returnButton, "降参", 1110, 515, 95, 40);
+		setButton(returnButton, "降参/再戦", 1110, 515, 95, 40);
 		drawField(g);
 		drawEnemy(g);
 		drawBackground(g);
@@ -142,14 +142,15 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 		add(pauseButton);
 		pauseButton.addActionListener(e->{
 			canStop = true;
-			new PauseDialog(this, MainFrame);
+			new PauseDialog(this);
 		});
 	}
 	
-	private void addReturnButton(MainFrame MainFrame) {
+	private void addReturnButton(MainFrame MainFrame, StageData StageData, List<Boolean> clearMerit, int difficultyCode) {
 		add(returnButton);
 		returnButton.addActionListener(e->{
-			MainFrame.selectStageDraw();
+			canStop = true;
+			new PauseDialog(this, MainFrame, StageData, clearMerit, difficultyCode);
 		});
 	}
 	
@@ -278,17 +279,23 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	public void mouseClicked(MouseEvent e) {
 		int number = clickPointCheck(e, unitMainData);
 		if(0 <= number) {
+			canStop = true;
 			new DisplayStatus().unit(unitMainData[number], unitLeftData[number]);
+			timerRestart();
 			return;
 		}
 		number = clickPointCheck(e, facilityData);
 		if(0 <= number) {
+			canStop = true;
 			new DisplayStatus().facility(facilityData[number]);
+			timerRestart();
 			return;
 		}
 		number = clickPointCheck(e, enemyData);
 		if(0 <= number) {
+			canStop = true;
 			new DisplayStatus().enemy(enemyData[number]);
+			timerRestart();
 		}
 	}
 	@Override
@@ -370,29 +377,38 @@ class PauseDialog extends JDialog implements WindowListener{
 	Battle Battle;
 	
 	protected PauseDialog(Battle Battle, StageData StageData, List<Boolean> clearMerit) {
-		this.Battle = Battle;
-		setModalityType(ModalityType.APPLICATION_MODAL);
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setResizable(false);
+		setDialog(Battle);
 		setTitle("戦功");
 		setSize(435, 255);
 		setLocationRelativeTo(null);
 		add(new MeritPanel(this, StageData, clearMerit));
 		setVisible(true);
-		addWindowListener(this);
 	}
 	
-	protected PauseDialog(Battle Battle, MainFrame MainFrame) {
-		this.Battle = Battle;
-		setModalityType(ModalityType.APPLICATION_MODAL);
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setResizable(false);
+	protected PauseDialog(Battle Battle) {
+		setDialog(Battle);
 		setTitle("一時停止");
 		setSize(285, 140);
 		setLocationRelativeTo(null);
-		add(new PausePanel(this, MainFrame));
+		add(new PausePanel(this));
 		setVisible(true);
+	}
+	
+	protected PauseDialog(Battle Battle, MainFrame MainFrame, StageData StageData, List<Boolean> clearMerit, int difficultyCode) {
+		setDialog(Battle);
+		setTitle("降参/再戦");
+		setSize(415, 140);
+		setLocationRelativeTo(null);
+		add(new ReturnPanel(this, MainFrame, StageData, clearMerit, difficultyCode));
+		setVisible(true);
+	}
+	
+	private void setDialog(Battle Battle) {
+		this.Battle = Battle;
 		addWindowListener(this);
+		setModalityType(ModalityType.APPLICATION_MODAL);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setResizable(false);
 	}
 	
 	protected void disposeDialog() {
@@ -463,11 +479,37 @@ class MeritPanel extends JPanel{
 class PausePanel extends JPanel{
 	JLabel comment = new JLabel();
 	JButton restartButton = new JButton();
-	JButton returnButton = new JButton();
 	
-	protected PausePanel(PauseDialog PauseDialog, MainFrame MainFrame) {
+	protected PausePanel(PauseDialog PauseDialog) {
 		add(comment);
-		comment.setText("ゲームを一時停止しています。");
+		comment.setText("ゲームを一時停止しています");
+		comment.setHorizontalAlignment(JLabel.CENTER);
+		add(restartButton);
+		restartButton.addActionListener(e->{
+			PauseDialog.disposeDialog();
+		});
+		restartButton.setText("再開");
+	}
+	
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		comment.setBounds(10, 10, 250, 40);
+		comment.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
+		restartButton.setBounds(75, 50, 120, 40);
+		restartButton.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+	}
+}
+
+//戻る・再戦
+class ReturnPanel extends JPanel{
+	JLabel comment = new JLabel();
+	JButton restartButton = new JButton();
+	JButton returnButton = new JButton();
+	JButton retryButton = new JButton();
+	
+	protected ReturnPanel(PauseDialog PauseDialog, MainFrame MainFrame, StageData StageData, List<Boolean> clearMerit, int difficultyCode) {
+		add(comment);
+		comment.setText("ゲーム操作を選択してください");
 		comment.setHorizontalAlignment(JLabel.CENTER);
 		add(restartButton);
 		restartButton.addActionListener(e->{
@@ -480,15 +522,23 @@ class PausePanel extends JPanel{
 			MainFrame.selectStageDraw();
 		});
 		returnButton.setText("降参");
+		add(retryButton);
+		retryButton.addActionListener(e->{
+			PauseDialog.disposeDialog();
+			MainFrame.battleDraw(StageData, clearMerit, difficultyCode);
+		});
+		retryButton.setText("再戦");
 	}
 	
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		comment.setBounds(10, 10, 250, 40);
+		comment.setBounds(10, 10, 380, 40);
 		comment.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 15));
 		restartButton.setBounds(10, 50, 120, 40);
 		restartButton.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
 		returnButton.setBounds(140, 50, 120, 40);
 		returnButton.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
+		retryButton.setBounds(270, 50, 120, 40);
+		retryButton.setFont(new Font("ＭＳ ゴシック", Font.BOLD, 20));
 	}
 }

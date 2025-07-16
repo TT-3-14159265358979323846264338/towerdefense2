@@ -204,7 +204,6 @@ public class DisplayStatus extends StatusPanel{
 		}
 		weapon[18].setText("右武器");
 		if(0 <= unitMainData.getElement().get(0)) {
-			System.out.println(unitMainData.getType());
 			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 19].setText("" + unitMainData.getWeapon().get(i)));
 			weapon[23].setText("" + DefaultUnit.DISTANCE_MAP.get(unitMainData.getType()));
 			weapon[24].setText("" + getElement(unitMainData.getElement()));

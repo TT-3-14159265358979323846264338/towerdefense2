@@ -56,7 +56,7 @@ public class MainFrame extends JFrame{
 		setLocationRelativeTo(null);
 	}
 	
-	protected void battleDraw(StageData StageData, List<Boolean> clearMerit, int difficultyCode) {
+	public void battleDraw(StageData StageData, List<Boolean> clearMerit, int difficultyCode) {
 		getContentPane().removeAll();
 		setTitle(StageData.getName());
 		setSize(1235, 600);
