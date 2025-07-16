@@ -276,14 +276,20 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		IntStream.range(0, unitMainData.length).forEach(i -> {
-			int x = (int) unitMainData[i].getPositionX() + 30;
-			int y = (int) unitMainData[i].getPositionY() + 30;
-			if(ValueRange.of(x, x + SIZE).isValidIntValue(e.getX())
-					&& ValueRange.of(y, y + SIZE).isValidIntValue(e.getY())) {
-				new DisplayStatus().unit(unitMainData[i], unitLeftData[i]);
-			}
-		});
+		int number = clickPointCheck(e, unitMainData);
+		if(0 <= number) {
+			new DisplayStatus().unit(unitMainData[number], unitLeftData[number]);
+			return;
+		}
+		number = clickPointCheck(e, facilityData);
+		if(0 <= number) {
+			new DisplayStatus().facility(facilityData[number]);
+			return;
+		}
+		number = clickPointCheck(e, enemyData);
+		if(0 <= number) {
+			new DisplayStatus().enemy(enemyData[number]);
+		}
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -327,6 +333,18 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	}
 	@Override
 	public void mouseExited(MouseEvent e) {
+	}
+	
+	private int clickPointCheck(MouseEvent e, BattleData[] data) {
+		for(int i = 0; i < data.length; i++) {
+			int x = (int) data[i].getPositionX() + 30;
+			int y = (int) data[i].getPositionY() + 30;
+			if(ValueRange.of(x, x + SIZE).isValidIntValue(e.getX())
+					&& ValueRange.of(y, y + SIZE).isValidIntValue(e.getY())) {
+				return i;
+			}
+		}
+		return -1;
 	}
 	
 	private void placeUnit(int placementCode) {

@@ -236,6 +236,7 @@ public class DisplayStatus extends StatusPanel{
 		weapon[14].setText("" + DefaultEnemy.MOVE_MAP.get(enemyData.getMove()));
 		weapon[15].setText("" + DefaultEnemy.TYPE_MAP.get(enemyData.getType()));
 		weapon[16].setText("" + getElement(enemyData.getElement()));
+		weapon[17].setText(enemyData.getAtackPattern().getExplanation());
 	}
 	
 	private String getElement(List<Integer> elementList) {
