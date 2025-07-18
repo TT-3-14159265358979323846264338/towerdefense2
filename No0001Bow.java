@@ -3,6 +3,8 @@ package defaultdata.weapon;
 import java.util.Arrays;
 import java.util.List;
 
+import defaultdata.DefaultAtackPattern;
+
 public class No0001Bow extends WeaponData{
 	@Override
 	public String getName() {
@@ -51,7 +53,7 @@ public class No0001Bow extends WeaponData{
 
 	@Override
 	public int getAtackPattern() {
-		return 0;
+		return DefaultAtackPattern.NEAR;
 	}
 
 	@Override

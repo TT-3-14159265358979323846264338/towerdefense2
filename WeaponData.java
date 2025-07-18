@@ -1,18 +1,34 @@
 package defaultdata.weapon;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 
+import defaultdata.EditImage;
+
 public abstract class WeaponData {
-	//武器の名前
+	//名前
 	public abstract String getName();
 	
-	//通常時の武器画像ファイル名
+	//通常時の画像ファイル名
 	public abstract String getImageName();
 	
-	//攻撃時の武器画像ファイル名
+	//通常時の画像
+	public BufferedImage getImage(double ratio) {
+		return new EditImage().input(getImageName(), ratio);
+	}
+	
+	//攻撃時の画像ファイル名
 	//片手武器の時は右武器のlistにEmptyのlistを入れる
 	public abstract List<String> getRightActionImageName();
 	public abstract List<String> getLeftActionImageName();
+	
+	//攻撃時の画像
+	public List<BufferedImage> getRightActionImage(double ratio) {
+		return new EditImage().input(getRightActionImageName(), ratio);
+	}
+	public List<BufferedImage> getLeftActionImage(double ratio) {
+		return new EditImage().input(getLeftActionImageName(), ratio);
+	}
 	
 	//レアリティ
 	public abstract int getRarity();
