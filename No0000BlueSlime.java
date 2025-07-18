@@ -3,6 +3,8 @@ package defaultdata.enemy;
 import java.util.Arrays;
 import java.util.List;
 
+import defaultdata.DefaultAtackPattern;
+
 public class No0000BlueSlime extends EnemyData{
 	@Override
 	public String getName() {
@@ -41,7 +43,7 @@ public class No0000BlueSlime extends EnemyData{
 
 	@Override
 	public int getAtackPattern() {
-		return 0;
+		return DefaultAtackPattern.NEAR;
 	}
 
 	@Override

@@ -1,16 +1,29 @@
 package defaultdata.enemy;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 
+import defaultdata.EditImage;
+
 public abstract class EnemyData {
-	//敵の名前
+	//名前
 	public abstract String getName();
 	
-	//通常時の敵画像ファイル名
+	//通常時の画像ファイル名
 	public abstract String getImageName();
 	
-	//攻撃時の敵画像ファイル名
+	//通常時の画像
+	public BufferedImage getImage(double ratio) {
+		return new EditImage().input(getImageName(), ratio);
+	}
+	
+	//攻撃時の画像ファイル名
 	public abstract List<String> getActionImageName();
+	
+	//攻撃時の画像
+	public List<BufferedImage> getActionImage(double ratio) {
+		return new EditImage().input(getActionImageName(), ratio);
+	}
 	
 	//移動経路(DefaultEnemy.MOVE_MAP)で登録
 	public abstract int getMove();
