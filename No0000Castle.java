@@ -3,6 +3,8 @@ package defaultdata.facility;
 import java.util.Arrays;
 import java.util.List;
 
+import defaultdata.DefaultAtackPattern;
+
 public class No0000Castle extends FacilityData{
 	@Override
 	public String getName() {
@@ -31,7 +33,7 @@ public class No0000Castle extends FacilityData{
 
 	@Override
 	public int getAtackPattern() {
-		return 0;
+		return DefaultAtackPattern.NEAR;
 	}
 
 	@Override

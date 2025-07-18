@@ -1,9 +1,12 @@
 package defaultdata.facility;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 
+import defaultdata.EditImage;
+
 public abstract class FacilityData {
-	//設備の名前
+	//名前
 	public abstract String getName();
 	
 	
@@ -11,8 +14,21 @@ public abstract class FacilityData {
 	public abstract List<String> getActionFrontImageName();
 	public abstract List<String> getActionSideImageName();
 	
-	//設備の破損時画像ファイル名
+	//攻撃時の画像
+	public List<BufferedImage> getActionFrontImage(double ratio) {
+		return new EditImage().input(getActionFrontImageName(), ratio);
+	}
+	public List<BufferedImage> getActionSideImage(double ratio) {
+		return new EditImage().input(getActionSideImageName(), ratio);
+	}
+	
+	//破損時画像ファイル名
 	public abstract String getBreakImageName();
+	
+	//破損時画像
+	public BufferedImage getBreakImage(double ratio) {
+		return new EditImage().input(getBreakImageName(), ratio);
+	}
 	
 	//武器属性はその武器の全ての属性(DefaultStage.ELEMENT_MAP)を登録　攻撃しない時は空のlist
 	public abstract List<Integer> getElement();
