@@ -1,7 +1,10 @@
 package defaultdata.stage;
 
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.util.List;
+
+import defaultdata.EditImage;
 
 public abstract class StageData {
 	//ステージの名前
@@ -9,6 +12,11 @@ public abstract class StageData {
 	
 	//ステージ画像ファイル名
 	public abstract String getImageName();
+	
+	//ステージ画像
+	public BufferedImage getImage(double ratio) {
+		return new EditImage().input(getImageName(), ratio);
+	}
 	
 	//設備の種類番号
 	public abstract List<Integer> getFacility();

@@ -4,6 +4,9 @@ import java.awt.Point;
 import java.util.Arrays;
 import java.util.List;
 
+import defaultdata.DefaultEnemy;
+import defaultdata.DefaultStage;
+
 public class No0001Stage2 extends StageData {
 	@Override
 	public String getName() {
@@ -17,7 +20,7 @@ public class No0001Stage2 extends StageData {
 
 	@Override
 	public List<Integer> getFacility() {
-		return Arrays.asList(0, 1, 1, 1);
+		return Arrays.asList(DefaultStage.CASTLE, DefaultStage.GATE, DefaultStage.GATE, DefaultStage.GATE);
 	}
 
 	@Override
@@ -86,20 +89,20 @@ public class No0001Stage2 extends StageData {
 	@Override
 	public List<List<Integer>> getEnemy() {
 		return Arrays.asList(
-				Arrays.asList(0, 0, 1000),
-				Arrays.asList(1, 1, 1000),
-				Arrays.asList(0, 2, 2000),
-				Arrays.asList(1, 3, 2000),
-				Arrays.asList(0, 4, 3000),
-				Arrays.asList(1, 5, 3000),
-				Arrays.asList(0, 6, 4000),
-				Arrays.asList(1, 7, 4000)
+				Arrays.asList(DefaultEnemy.BLUE_SLIME, 0, 1000),
+				Arrays.asList(DefaultEnemy.RED_SLIME, 1, 1000),
+				Arrays.asList(DefaultEnemy.BLUE_SLIME, 2, 2000),
+				Arrays.asList(DefaultEnemy.RED_SLIME, 3, 2000),
+				Arrays.asList(DefaultEnemy.BLUE_SLIME, 4, 3000),
+				Arrays.asList(DefaultEnemy.RED_SLIME, 5, 3000),
+				Arrays.asList(DefaultEnemy.BLUE_SLIME, 6, 4000),
+				Arrays.asList(DefaultEnemy.RED_SLIME, 7, 4000)
 				);
 	}
 
 	@Override
 	public List<Integer> getDisplayOrder() {
-		return Arrays.asList(0, 1);
+		return Arrays.asList(DefaultEnemy.BLUE_SLIME, DefaultEnemy.RED_SLIME);
 	}
 
 	@Override
