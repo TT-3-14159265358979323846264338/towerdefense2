@@ -15,7 +15,8 @@ import screendisplay.StatusCalculation;
 
 //ユニットのバトル情報
 public class BattleUnit extends BattleData{
-	BufferedImage coreImage;
+	BufferedImage rightCoreImage;
+	BufferedImage leftCoreImage;
 	Point initialPosition;
 	int type;
 	
@@ -25,11 +26,12 @@ public class BattleUnit extends BattleData{
 		StatusCalculation StatusCalculation = new StatusCalculation(composition);
 		name = new DisplayStatus().getUnitName(composition);
 		try {
-			rightActionImage = new EditImage().input(new DefaultUnit().getWeaponData(composition.get(0)).getRightActionImageName(), 4);
+			rightActionImage = DefaultUnit.WEAPON_DATA_MAP.get(composition.get(0)).getRightActionImage(4);
 		}catch(Exception e) {
 			rightActionImage = Arrays.asList(getBlankImage());
 		}
-		coreImage = new EditImage().input(new DefaultUnit().getCoreData(composition.get(1)).getActionImageName(), 4);
+		rightCoreImage = DefaultUnit.CORE_DATA_MAP.get(composition.get(1)).getActionImage(4);
+		leftCoreImage = new EditImage().mirrorImage(rightCoreImage);
 		this.positionX = positionX;
 		this.positionY = positionY;
 		initialPosition = new Point(positionX, positionY);
@@ -48,7 +50,7 @@ public class BattleUnit extends BattleData{
 		this.Battle = Battle;
 		StatusCalculation StatusCalculation = new StatusCalculation(composition);
 		try {
-			rightActionImage = new EditImage().input(new DefaultUnit().getWeaponData(composition.get(2)).getLeftActionImageName(), 4);
+			rightActionImage = DefaultUnit.WEAPON_DATA_MAP.get(composition.get(2)).getLeftActionImage(4);
 		}catch(Exception e) {
 			rightActionImage = Arrays.asList(getBlankImage());
 		}
@@ -79,8 +81,12 @@ public class BattleUnit extends BattleData{
 		return image;
 	}
 	
-	public BufferedImage getCoreImage(){
-		return coreImage;
+	protected BufferedImage getCoreImage() {
+		return existsRight? rightCoreImage: leftCoreImage;
+	}
+	
+	public BufferedImage getDefaultCoreImage(){
+		return rightCoreImage;
 	}
 	
 	public int getType() {

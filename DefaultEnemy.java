@@ -1,23 +1,22 @@
 package defaultdata;
 
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import defaultdata.enemy.*;
 
 //敵兵データ
 public class DefaultEnemy {
 	//データコード変換
-	public final static Map<Integer, String> WEAPON_MAP = new HashMap<>();{
+	public final static Map<Integer, String> WEAPON_MAP = new HashMap<>();
+	static {
 		WEAPON_MAP.put(0, "攻撃");
 		WEAPON_MAP.put(1, "射程");
 		WEAPON_MAP.put(2, "攻撃速度");
 		WEAPON_MAP.put(3, "攻撃対象");
 	}
-	public final static Map<Integer, String> UNIT_MAP = new HashMap<>();{
+	public final static Map<Integer, String> UNIT_MAP = new HashMap<>();
+	static {
 		UNIT_MAP.put(0, "最大HP");
 		UNIT_MAP.put(1, "HP");
 		UNIT_MAP.put(2, "防御");
@@ -25,12 +24,14 @@ public class DefaultEnemy {
 		UNIT_MAP.put(4, "移動速度");
 		UNIT_MAP.put(5, "撃破コスト");
 	}
-	public final static Map<Integer, String> MOVE_MAP = new HashMap<>();{
+	public final static Map<Integer, String> MOVE_MAP = new HashMap<>();
+	static {
 		MOVE_MAP.put(0, "地上");
 		MOVE_MAP.put(1, "飛行");
 		MOVE_MAP.put(2, "水上");
 	}
-	public final static Map<Integer, String> TYPE_MAP = new HashMap<>();{
+	public final static Map<Integer, String> TYPE_MAP = new HashMap<>();
+	static {
 		TYPE_MAP.put(0, "一般");
 		TYPE_MAP.put(1, "ボス");
 	}
@@ -51,26 +52,18 @@ public class DefaultEnemy {
 		ELEMENT_MAP.put(11,"支援");
 	*/
 	
-	//敵の種類
-	public final static int ENEMY_SPECIES = 2;
+	//コード番号
+	public final static int BLUE_SLIME = 0;
+	public final static int RED_SLIME = 1;
 	
-	//デフォルトデータ収集
-	public EnemyData getEnemyData(int number) {
-		switch(number) {
-		case 0:
-			return new No0000BlueSlime();
-		case 1:
-			return new No0001RedSlime();
-		default:
-			return null;
-		}
-		/*
-		新たなデータを追加したらENEMY_SPECIESにも加算すること
-		 */
+	//全コード統合
+	public final static Map<Integer, EnemyData> DATA_MAP = new HashMap<>();
+	static {
+		DATA_MAP.put(BLUE_SLIME, new No0000BlueSlime());
+		DATA_MAP.put(RED_SLIME, new No0001RedSlime());
 	}
 	
-	//画像取込み
-	public List<BufferedImage> getEnemyImage(double ratio){
-		return new EditImage().input(IntStream.range(0, ENEMY_SPECIES).mapToObj(i -> getEnemyData(i).getImageName()).toList(), ratio);
-	}
+	/*
+	新規で追加する時はコード番号と全コード統合の両方に追加すること
+	*/
 }

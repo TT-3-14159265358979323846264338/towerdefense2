@@ -26,7 +26,6 @@ import javax.swing.SpinnerNumberModel;
 
 import defaultdata.DefaultStage;
 import defaultdata.DefaultUnit;
-import defaultdata.EditImage;
 import defaultdata.stage.StageData;
 import savedata.SaveGameProgress;
 import savedata.SaveHoldItem;
@@ -152,8 +151,8 @@ class EditItem extends JPanel{
 	JLabel[] weaponLabel;
 	JSpinner[] coreSpinner;
 	JSpinner[] weaponSpinner;
-	List<BufferedImage> coreImage = new DefaultUnit().getCoreImage(4);
-	List<BufferedImage> weaponImage = new DefaultUnit().getWeaponImage(4);
+	List<BufferedImage> coreImage = IntStream.range(0, DefaultUnit.CORE_DATA_MAP.size()).mapToObj(i -> DefaultUnit.CORE_DATA_MAP.get(i).getImage(4)).toList();
+	List<BufferedImage> weaponImage = IntStream.range(0, DefaultUnit.WEAPON_DATA_MAP.size()).mapToObj(i -> DefaultUnit.WEAPON_DATA_MAP.get(i).getImage(4)).toList();
 	SaveHoldItem SaveHoldItem = new SaveHoldItem();
 	List<Integer> coreNumberList;
 	List<Integer> weaponNumberList;
@@ -201,9 +200,8 @@ class EditItem extends JPanel{
 		};
 		coreLabel = initialize.apply(coreImage.size());
 		weaponLabel = initialize.apply(weaponImage.size());
-		DefaultUnit DefaultUnit = new DefaultUnit();
-		set.accept(coreLabel, IntStream.range(0, coreLabel.length).mapToObj(i -> DefaultUnit.getCoreData(i).getName()).toList());
-		set.accept(weaponLabel, IntStream.range(0, weaponLabel.length).mapToObj(i -> DefaultUnit.getWeaponData(i).getName()).toList());
+		set.accept(coreLabel, IntStream.range(0, coreLabel.length).mapToObj(i -> DefaultUnit.CORE_DATA_MAP.get(i).getName()).toList());
+		set.accept(weaponLabel, IntStream.range(0, weaponLabel.length).mapToObj(i -> DefaultUnit.WEAPON_DATA_MAP.get(i).getName()).toList());
 	}
 	
 	private void setLabel() {
@@ -262,8 +260,8 @@ class EditProgress extends JPanel{
 	JLabel[] nameLabel;
 	JRadioButton[] stage;
 	List<JRadioButton[]> merit;
-	StageData[] StageData = IntStream.range(0, DefaultStage.STAGE_SPECIES).mapToObj(i -> new DefaultStage().getStageData(i)).toArray(StageData[]::new);
-	List<BufferedImage> stageImage = Stream.of(StageData).map(i -> new EditImage().stageImage(i, 20)).toList();
+	StageData[] StageData = IntStream.range(0, DefaultStage.STAGE_DATA_MAP.size()).mapToObj(i -> DefaultStage.STAGE_DATA_MAP.get(i)).toArray(StageData[]::new);
+	List<BufferedImage> stageImage = Stream.of(StageData).map(i -> i.getImage(20)).toList();
 	SaveGameProgress SaveGameProgress = new SaveGameProgress();
 	List<Boolean> clearStatus;
 	List<List<Boolean>> meritStatus;

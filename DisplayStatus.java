@@ -34,7 +34,7 @@ import defaultdata.weapon.WeaponData;
 //ユニットデータ取込み
 public class DisplayStatus extends StatusPanel{
 	public void core(BufferedImage image, int number) {
-		CoreData CoreData = new DefaultUnit().getCoreData(number);
+		CoreData CoreData = DefaultUnit.CORE_DATA_MAP.get(number);
 		setLabelName(getRarity(CoreData.getRarity()) + CoreData.getName());
 		setWeapon(CoreData.getWeaponStatus());
 		setUnit(CoreData.getUnitStatus(), "倍");
@@ -43,7 +43,7 @@ public class DisplayStatus extends StatusPanel{
 	}
 	
 	public void weapon(BufferedImage image, int number) {
-		WeaponData WeaponData = new DefaultUnit().getWeaponData(number);
+		WeaponData WeaponData = DefaultUnit.WEAPON_DATA_MAP.get(number);
 		setLabelName(getRarity(WeaponData.getRarity()) + WeaponData.getName());
 		setWeapon(WeaponData);
 		setUnit(WeaponData.getUnitStatus(), DefaultUnit.WEAPON_UNIT_MAP);
@@ -60,13 +60,12 @@ public class DisplayStatus extends StatusPanel{
 		super.setStatusPanel(image);
 	}
 	
-	public void enemy(BufferedImage image, int number) {
-		EnemyData EnemyData = new DefaultEnemy().getEnemyData(number);
+	public void enemy(EnemyData EnemyData) {
 		setLabelName(EnemyData.getName());
 		setWeapon(EnemyData);
 		setUnit(EnemyData.getUnitStatus(), DefaultEnemy.UNIT_MAP);
 		setCut(EnemyData.getCutStatus());
-		super.setStatusPanel(image);
+		super.setStatusPanel(EnemyData.getImage(2));
 	}
 	
 	public void unit(BattleUnit unitMainData, BattleUnit unitLeftData) {
@@ -74,7 +73,7 @@ public class DisplayStatus extends StatusPanel{
 		setWeapon(unitMainData, unitLeftData);
 		setUnit(unitMainData.getUnit(), DefaultUnit.WEAPON_UNIT_MAP);
 		setCut(unitMainData.getCut());
-		super.setStatusPanel(new EditImage().compositeImage(Arrays.asList(unitMainData.getDefaultImage(), unitMainData.getCoreImage(), unitLeftData.getDefaultImage())));
+		super.setStatusPanel(new EditImage().compositeImage(Arrays.asList(unitMainData.getDefaultImage(), unitMainData.getDefaultCoreImage(), unitLeftData.getDefaultImage())));
 	}
 	
 	public void facility(BattleFacility facilityData) {
@@ -106,17 +105,16 @@ public class DisplayStatus extends StatusPanel{
 	
 	public String getUnitName(List<Integer> compositionList) {
 		String name = "";
-		DefaultUnit DefaultUnit = new DefaultUnit();
 		try {
-			WeaponData WeaponData = DefaultUnit.getWeaponData(compositionList.get(2));
+			WeaponData WeaponData = DefaultUnit.WEAPON_DATA_MAP.get(compositionList.get(2));
 			name += getRarity(WeaponData.getRarity()) + WeaponData.getName() + " - ";
 		}catch(Exception ignore) {
 			//左武器を装備していないので、無視する
 		}
-		CoreData CoreData = DefaultUnit.getCoreData(compositionList.get(1));
+		CoreData CoreData = DefaultUnit.CORE_DATA_MAP.get(compositionList.get(1));
 		name += getRarity(CoreData.getRarity()) + CoreData.getName() + " - ";
 		try {
-			WeaponData WeaponData = DefaultUnit.getWeaponData(compositionList.get(0));
+			WeaponData WeaponData = DefaultUnit.WEAPON_DATA_MAP.get(compositionList.get(0));
 			name += getRarity(WeaponData.getRarity()) + WeaponData.getName() + " - ";
 		}catch(Exception ignore) {
 			//右武器を装備していないので、無視する
@@ -156,7 +154,7 @@ public class DisplayStatus extends StatusPanel{
 		weapon[8].setText("ターゲット");
 		weapon[9].setText("左武器");
 		if(0 <= compositionList.get(2)) {
-			WeaponData WeaponData = new DefaultUnit().getWeaponData(compositionList.get(2));
+			WeaponData WeaponData = DefaultUnit.WEAPON_DATA_MAP.get(compositionList.get(2));
 			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 10].setText("" + StatusCalculation.getLeftWeaponStatus().get(i)));
 			weapon[14].setText("" + DefaultUnit.DISTANCE_MAP.get(WeaponData.getDistance()));
 			weapon[15].setText("" + DefaultUnit.HANDLE_MAP.get(WeaponData.getHandle()));
@@ -165,7 +163,7 @@ public class DisplayStatus extends StatusPanel{
 		}
 		weapon[18].setText("右武器");
 		if(0 <= compositionList.get(0)) {
-			WeaponData WeaponData = new DefaultUnit().getWeaponData(compositionList.get(0));
+			WeaponData WeaponData = DefaultUnit.WEAPON_DATA_MAP.get(compositionList.get(0));
 			IntStream.range(0, DefaultUnit.WEAPON_WEAPON_MAP.size()).forEach(i -> weapon[i + 19].setText("" + StatusCalculation.getRightWeaponStatus().get(i)));
 			weapon[23].setText("" + DefaultUnit.DISTANCE_MAP.get(WeaponData.getDistance()));
 			weapon[24].setText("" + DefaultUnit.HANDLE_MAP.get(WeaponData.getHandle()));
@@ -257,7 +255,7 @@ public class DisplayStatus extends StatusPanel{
 		IntStream.range(0, statusList.size()).forEach(i -> {
 			unit[i].setText(map.get(i));
 			if(statusList.get(i) < 0) {
-				unit[i + 6].setText("無限");
+				unit[i + 6].setText("∞");
 			}else {
 				unit[i + 6].setText(statusList.get(i) + "");
 			}

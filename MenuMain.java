@@ -31,7 +31,7 @@ public class MenuMain extends JPanel implements ActionListener{
 	JButton compositionButton = new JButton();
 	JButton selectStageButton = new JButton();
 	BufferedImage titleImage = new DefaultOther().getTitleImage(2);
-	List<BufferedImage> coreImage = new DefaultUnit().getCoreImage(1);
+	List<BufferedImage> coreImage = IntStream.range(0, DefaultUnit.CORE_DATA_MAP.size()).mapToObj(i -> DefaultUnit.CORE_DATA_MAP.get(i).getImage(1)).toList();
 	List<Integer> randamList = IntStream.range(0, NUMBER).mapToObj(i -> new Random().nextInt(coreImage.size())).toList();
 	int count;
 	

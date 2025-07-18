@@ -28,7 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import defaultdata.DefaultStage;
-import defaultdata.EditImage;
 import defaultdata.stage.StageData;
 import defendthecastle.MainFrame;
 import savedata.SaveComposition;
@@ -82,7 +81,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 	}
 	
 	private void install(StageData StageData) {
-		stageImage = new EditImage().input(StageData.getImageName(), 2);
+		stageImage = StageData.getImage(2);
 		placementList = StageData.getPlacementPoint();
 		SaveComposition SaveComposition = new SaveComposition();
 		SaveComposition.load();
@@ -240,7 +239,7 @@ public class Battle extends JPanel implements MouseListener, MouseMotionListener
 			rangeDraw(g, new Color(255, 0, 0, 20), x, y, unitMainData[select].getRange());
 			rangeDraw(g, new Color(0, 0, 255, 20), x, y, unitLeftData[select].getRange());
 			g.drawImage(unitMainData[select].getDefaultImage(), x, y, this);
-			g.drawImage(unitMainData[select].getCoreImage(), x, y, this);
+			g.drawImage(unitMainData[select].getDefaultCoreImage(), x, y, this);
 			g.drawImage(unitLeftData[select].getDefaultImage(), x, y, this);
 		}
 	}

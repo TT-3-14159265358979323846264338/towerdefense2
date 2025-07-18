@@ -114,7 +114,7 @@ public class EditImage{
 	}
 	
 	public BufferedImage stageImage(StageData StageData, double ratio) {
-		BufferedImage image = input(StageData.getImageName(), 2);
+		BufferedImage image = StageData.getImage(2);
 		Graphics g = image.getGraphics();
 		BiConsumer<BufferedImage, Point> drawImage = (displayImage, point) -> {
 			g.drawImage(displayImage, point.x, point.y, null);
@@ -123,9 +123,9 @@ public class EditImage{
 		List<BufferedImage> placementImage = new DefaultStage().getPlacementImage(4);
 		IntStream.range(0, placementImage.size()).forEach(i -> StageData.getPlacementPoint().get(i).stream().forEach(j -> g.drawImage(placementImage.get(i), j.get(0).intValue(), j.get(1).intValue(), null)));
 		//設備の表示
-		FacilityData[] FacilityData = IntStream.range(0, DefaultStage.FACILITY_SPECIES).mapToObj(i -> new DefaultStage().getFacilityData(i)).toArray(FacilityData[]::new);
-		List<BufferedImage> frontFacilityImage = Stream.of(FacilityData).map(i -> input(i.getActionFrontImageName().get(0), 4)).toList();
-		List<BufferedImage> sideFacilityImage = Stream.of(FacilityData).map(i -> input(i.getActionSideImageName().get(0), 4)).toList();
+		FacilityData[] FacilityData = IntStream.range(0, DefaultStage.FACILITY_DATA_MAP.size()).mapToObj(i -> DefaultStage.FACILITY_DATA_MAP.get(i)).toArray(FacilityData[]::new);
+		List<BufferedImage> frontFacilityImage = Stream.of(FacilityData).map(i -> i.getActionFrontImage(4).get(0)).toList();
+		List<BufferedImage> sideFacilityImage = Stream.of(FacilityData).map(i -> i.getActionSideImage(4).get(0)).toList();
 		IntStream.range(0, StageData.getFacility().size()).forEach(i -> {
 			drawImage.accept(StageData.getFacilityDirection().get(i)? frontFacilityImage.get(StageData.getFacility().get(i)): sideFacilityImage.get(StageData.getFacility().get(i)), StageData.getFacilityPoint().get(i));
 		});

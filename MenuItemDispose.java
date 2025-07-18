@@ -44,8 +44,8 @@ public class MenuItemDispose extends JPanel{
 	ItemImagePanel WeaponImagePanel = new ItemImagePanel();
 	OperateData OperateData = new OperateData();
 	CreateDisplayList DisplayListCreation = new CreateDisplayList(OperateData);
-	List<BufferedImage> coreImageList = new DefaultUnit().getCoreImage(2);
-	List<BufferedImage> weaponImageList = new DefaultUnit().getWeaponImage(2);
+	List<BufferedImage> coreImageList = IntStream.range(0, DefaultUnit.CORE_DATA_MAP.size()).mapToObj(i -> DefaultUnit.CORE_DATA_MAP.get(i).getImage(2)).toList();
+	List<BufferedImage> weaponImageList = IntStream.range(0, DefaultUnit.WEAPON_DATA_MAP.size()).mapToObj(i -> DefaultUnit.WEAPON_DATA_MAP.get(i).getImage(2)).toList();
 	
 	protected MenuItemDispose(MainFrame MainFrame) {
 		setBackground(new Color(240, 170, 80));
@@ -89,11 +89,10 @@ public class MenuItemDispose extends JPanel{
 	private void addDisposeButton() {
 		add(disposeButton);
 		disposeButton.addActionListener(e->{
-			DefaultUnit DefaultUnit = new DefaultUnit();
 			if(itemScroll.getViewport().getView() == CoreImagePanel) {
-				OperateData.recycle(CoreImagePanel, OperateData.getCoreNumberList(), OperateData.getUsedCoreNumber(), coreImageList, IntStream.range(0, defaultdata.DefaultUnit.CORE_SPECIES).mapToObj(i -> DefaultUnit.getCoreData(i).getRarity()).toList());
+				OperateData.recycle(CoreImagePanel, OperateData.getCoreNumberList(), OperateData.getUsedCoreNumber(), coreImageList, IntStream.range(0, defaultdata.DefaultUnit.CORE_DATA_MAP.size()).mapToObj(i -> DefaultUnit.CORE_DATA_MAP.get(i).getRarity()).toList());
 			}else {
-				OperateData.recycle(WeaponImagePanel, OperateData.getWeaponNumberList(), OperateData.getUsedWeaponNumber(), weaponImageList, IntStream.range(0, defaultdata.DefaultUnit.WEAPON_SPECIES).mapToObj(i -> DefaultUnit.getWeaponData(i).getRarity()).toList());
+				OperateData.recycle(WeaponImagePanel, OperateData.getWeaponNumberList(), OperateData.getUsedWeaponNumber(), weaponImageList, IntStream.range(0, defaultdata.DefaultUnit.WEAPON_DATA_MAP.size()).mapToObj(i -> DefaultUnit.WEAPON_DATA_MAP.get(i).getRarity()).toList());
 			}
 		});
 	}

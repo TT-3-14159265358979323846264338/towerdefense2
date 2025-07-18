@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 
 import defaultdata.DefaultAtackPattern;
 import defaultdata.DefaultStage;
-import defaultdata.EditImage;
 import defaultdata.facility.FacilityData;
 import defaultdata.stage.StageData;
 
@@ -17,10 +16,10 @@ public class BattleFacility extends BattleData{
 	
 	protected BattleFacility(Battle Battle, StageData StageData, int number) {
 		this.Battle = Battle;
-		FacilityData FacilityData = new DefaultStage().getFacilityData(StageData.getFacility().get(number));
+		FacilityData FacilityData = DefaultStage.FACILITY_DATA_MAP.get(StageData.getFacility().get(number));
 		name = FacilityData.getName();
-		rightActionImage = new EditImage().input(StageData.getFacilityDirection().get(number)? FacilityData.getActionFrontImageName(): FacilityData.getActionSideImageName(), 4);
-		breakImage = new EditImage().input(FacilityData.getBreakImageName(), 4);
+		rightActionImage = StageData.getFacilityDirection().get(number)? FacilityData.getActionFrontImage(4): FacilityData.getActionSideImage(4);
+		breakImage = FacilityData.getBreakImage(4);
 		positionX = StageData.getFacilityPoint().get(number).x;
 		positionY = StageData.getFacilityPoint().get(number).y;
 		element = FacilityData.getElement().stream().toList();

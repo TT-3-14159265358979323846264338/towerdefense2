@@ -28,9 +28,8 @@ public class StatusCalculation{
 	List<Integer> coreCutList;
 	
 	public StatusCalculation(List<Integer> unitData) {
-		DefaultUnit DefaultUnit = new DefaultUnit();
 		try {
-			WeaponData WeaponData = DefaultUnit.getWeaponData(unitData.get(0));
+			WeaponData WeaponData = DefaultUnit.WEAPON_DATA_MAP.get(unitData.get(0));
 			rightType = WeaponData.getDistance();
 			rightElement = WeaponData.getElement();
 			rightAtackPattern = WeaponData.getAtackPattern();
@@ -46,7 +45,7 @@ public class StatusCalculation{
 			rightWeaponCutList = defaultCutList();
 		}
 		try {
-			WeaponData WeaponData = DefaultUnit.getWeaponData(unitData.get(2));
+			WeaponData WeaponData = DefaultUnit.WEAPON_DATA_MAP.get(unitData.get(2));
 			leftType = WeaponData.getDistance();
 			leftElement = WeaponData.getElement();
 			leftAtackPattern = WeaponData.getAtackPattern();
@@ -61,7 +60,7 @@ public class StatusCalculation{
 			leftUnitStatus = defaultUnitStatus();
 			leftWeaponCutList = defaultCutList();
 		}
-		CoreData CoreData = DefaultUnit.getCoreData(unitData.get(1));
+		CoreData CoreData = DefaultUnit.CORE_DATA_MAP.get(unitData.get(1));
 		coreWeaponStatus = CoreData.getWeaponStatus();
 		coreUnitStatus = CoreData.getUnitStatus();
 		coreCutList = CoreData.getCutStatus();

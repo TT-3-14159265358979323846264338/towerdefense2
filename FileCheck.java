@@ -42,12 +42,12 @@ public class FileCheck{
 		};
 		SaveHoldItem.load();
 		List<Integer> coreNumberList = SaveHoldItem.getCoreNumberList();
-		if(checkSize(DefaultUnit.CORE_SPECIES, coreNumberList.size())) {
-			addList.accept(DefaultUnit.CORE_SPECIES - coreNumberList.size(), coreNumberList);
+		if(checkSize(DefaultUnit.CORE_DATA_MAP.size(), coreNumberList.size())) {
+			addList.accept(DefaultUnit.CORE_DATA_MAP.size() - coreNumberList.size(), coreNumberList);
 		}
 		List<Integer> weaponNumberList = SaveHoldItem.getWeaponNumberList();
-		if(checkSize(DefaultUnit.WEAPON_SPECIES, weaponNumberList.size())) {
-			addList.accept(DefaultUnit.WEAPON_SPECIES - weaponNumberList.size(), weaponNumberList);
+		if(checkSize(DefaultUnit.WEAPON_DATA_MAP.size(), weaponNumberList.size())) {
+			addList.accept(DefaultUnit.WEAPON_DATA_MAP.size() - weaponNumberList.size(), weaponNumberList);
 		}
 		SaveHoldItem.save(coreNumberList, weaponNumberList);
 	}
@@ -56,12 +56,12 @@ public class FileCheck{
 	private void progressDataCheck() {
 		SaveGameProgress.load();
 		List<Boolean> clearStatus = SaveGameProgress.getClearStatus();
-		if(checkSize(DefaultStage.STAGE_SPECIES, clearStatus.size())) {
-			IntStream.range(0, DefaultStage.STAGE_SPECIES - clearStatus.size()).forEach(i -> clearStatus.add(false));
+		if(checkSize(DefaultStage.STAGE_DATA_MAP.size(), clearStatus.size())) {
+			IntStream.range(0, DefaultStage.STAGE_DATA_MAP.size() - clearStatus.size()).forEach(i -> clearStatus.add(false));
 		}
 		List<List<Boolean>> meritStatus = SaveGameProgress.getMeritStatus();
-		IntStream.range(0, DefaultStage.STAGE_SPECIES).forEach(i -> {
-			StageData StageData = new DefaultStage().getStageData(i);
+		IntStream.range(0, DefaultStage.STAGE_DATA_MAP.size()).forEach(i -> {
+			StageData StageData = DefaultStage.STAGE_DATA_MAP.get(i);
 			try {
 				//meritStatusの内側のListのデータ数を確認し、足りなければ追加
 				if(checkSize(StageData.getMerit().size(), meritStatus.get(i).size())) {

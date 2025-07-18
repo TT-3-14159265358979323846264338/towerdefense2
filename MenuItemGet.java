@@ -499,8 +499,8 @@ class DrawResult extends JPanel implements MouseListener{
 	List<Point> weaponPosition = new ArrayList<>();
 	double total;
 	int position;
-	List<BufferedImage> coreImageList = new DefaultUnit().getCoreImage(2);
-	List<BufferedImage> weaponImageList = new DefaultUnit().getWeaponImage(2);
+	List<BufferedImage> coreImageList = IntStream.range(0, DefaultUnit.CORE_DATA_MAP.size()).mapToObj(i -> DefaultUnit.CORE_DATA_MAP.get(i).getImage(2)).toList();
+	List<BufferedImage> weaponImageList = IntStream.range(0, DefaultUnit.WEAPON_DATA_MAP.size()).mapToObj(i -> DefaultUnit.WEAPON_DATA_MAP.get(i).getImage(2)).toList();
 	int unitSize = 80;
 	
 	protected DrawResult(DefaultLineup DefaultLineup){
@@ -632,7 +632,6 @@ class GachaLineup extends JDialog{
 	}
 	
 	private JScrollPane getLineupScrollPane(DefaultLineup DefaultLineup) {
-		DefaultUnit DefaultUnit = new DefaultUnit();
 		DefaultLineup.setLineup();
 		DefaultLineup.aptitudeTest();
 		Function<Integer, String> getRarity = (rarity) -> {
@@ -652,7 +651,7 @@ class GachaLineup extends JDialog{
 		lineup.addElement("【コア確率】 " + getRatio.apply(getTotal(coreRatio)));
 		lineup.addElement(" ");
 		IntStream.range(0, coreLineup.size()).forEach(i -> {
-			CoreData CoreData = DefaultUnit.getCoreData(coreLineup.get(i));
+			CoreData CoreData = DefaultUnit.CORE_DATA_MAP.get(coreLineup.get(i));
 			String coreName = getRarity.apply(CoreData.getRarity()) + CoreData.getName();
 			lineup.addElement(getName.apply(coreName) + getRatio.apply(coreRatio.get(i)));
 		});
@@ -662,7 +661,7 @@ class GachaLineup extends JDialog{
 		lineup.addElement("【武器確率】 " + getRatio.apply(getTotal(weaponRatio)));
 		lineup.addElement(" ");
 		IntStream.range(0, weaponLineup.size()).forEach(i -> {
-			WeaponData WeaponData = DefaultUnit.getWeaponData(weaponLineup.get(i));
+			WeaponData WeaponData = DefaultUnit.WEAPON_DATA_MAP.get(weaponLineup.get(i));
 			String weaponName = getRarity.apply(WeaponData.getRarity()) + WeaponData.getName();
 			lineup.addElement(getName.apply(weaponName) + getRatio.apply(weaponRatio.get(i)));
 		});

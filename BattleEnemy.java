@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 import defaultdata.DefaultAtackPattern;
 import defaultdata.DefaultEnemy;
-import defaultdata.EditImage;
 import defaultdata.enemy.EnemyData;
 import defaultdata.stage.StageData;
 
@@ -24,9 +23,9 @@ public class BattleEnemy extends BattleData{
 	
 	protected BattleEnemy(Battle Battle, StageData StageData, int number) {
 		this.Battle = Battle;
-		EnemyData EnemyData = new DefaultEnemy().getEnemyData(StageData.getEnemy().get(number).get(0));
+		EnemyData EnemyData = DefaultEnemy.DATA_MAP.get(StageData.getEnemy().get(number).get(0));
 		name = EnemyData.getName();
-		rightActionImage = new EditImage().input(EnemyData.getActionImageName(), 4);
+		rightActionImage = EnemyData.getActionImage(4);
 		move = EnemyData.getMove();
 		type = EnemyData.getType();
 		route = StageData.getRoute().get(StageData.getEnemy().get(number).get(1));

@@ -53,9 +53,9 @@ public class MenuComposition extends JPanel implements MouseListener{
 	ImagePanel WeaponImagePanel = new ImagePanel();
 	SaveData SaveData = new SaveData();
 	DisplayListCreation DisplayListCreation = new DisplayListCreation(SaveData);
-	List<BufferedImage> rightWeaponList = new ArrayList<>(new DefaultUnit().getRightWeaponImage(2));
-	List<BufferedImage> ceterCoreList = new ArrayList<>(new DefaultUnit().getCenterCoreImage(2));
-	List<BufferedImage> leftWeaponList = new ArrayList<>(new DefaultUnit().getLeftWeaponImage(2));
+	List<BufferedImage> rightWeaponList = IntStream.range(0, DefaultUnit.WEAPON_DATA_MAP.size()).mapToObj(i -> DefaultUnit.WEAPON_DATA_MAP.get(i).getRightActionImageName().isEmpty()? null: DefaultUnit.WEAPON_DATA_MAP.get(i).getRightActionImage(2).get(0)).toList();
+	List<BufferedImage> ceterCoreList = IntStream.range(0, DefaultUnit.CORE_DATA_MAP.size()).mapToObj(i -> DefaultUnit.CORE_DATA_MAP.get(i).getActionImage(2)).toList();
+	List<BufferedImage> leftWeaponList = IntStream.range(0, DefaultUnit.WEAPON_DATA_MAP.size()).mapToObj(i -> DefaultUnit.WEAPON_DATA_MAP.get(i).getLeftActionImage(2).get(0)).toList();
 	static int unitSize = 60;
 	
 	protected MenuComposition(MainFrame MainFrame) {
@@ -193,8 +193,8 @@ public class MenuComposition extends JPanel implements MouseListener{
 	}
 	
 	private void addItemScroll() {
-		CoreImagePanel.setImagePanel(new DefaultUnit().getCoreImage(2), DisplayListCreation.getDisplayList(SaveData.getCoreNumberList()), SaveData.getNowCoreNumberList(), true);
-		WeaponImagePanel.setImagePanel(new DefaultUnit().getWeaponImage(2), DisplayListCreation.getDisplayList(SaveData.getWeaponNumberList()), SaveData.getNowWeaponNumberList(), false);
+		CoreImagePanel.setImagePanel(IntStream.range(0, DefaultUnit.CORE_DATA_MAP.size()).mapToObj(i -> DefaultUnit.CORE_DATA_MAP.get(i).getImage(2)).toList(), DisplayListCreation.getDisplayList(SaveData.getCoreNumberList()), SaveData.getNowCoreNumberList(), true);
+		WeaponImagePanel.setImagePanel(IntStream.range(0, DefaultUnit.WEAPON_DATA_MAP.size()).mapToObj(i -> DefaultUnit.WEAPON_DATA_MAP.get(i).getImage(2)).toList(), DisplayListCreation.getDisplayList(SaveData.getWeaponNumberList()), SaveData.getNowWeaponNumberList(), false);
 		itemScroll.getViewport().setView(CoreImagePanel);
     	add(itemScroll);
 	}
@@ -475,14 +475,13 @@ class SaveData{
 	}
 	
 	protected void changeWeapon(int number, int selectWeapon) {
-		DefaultUnit DefaultUnit = new DefaultUnit();
-		if(DefaultUnit.getWeaponData(selectWeapon).getHandle() == 1) {
+		if(DefaultUnit.WEAPON_DATA_MAP.get(selectWeapon).getHandle() == 1) {
 			getActiveUnit(number).set(2, selectWeapon);
 			getActiveUnit(number).set(0, -1);
 		}else if(getActiveUnit(number).get(2) == -1) {
 			change(number, selectWeapon);
 		}else {
-			switch(DefaultUnit.getWeaponData(getActiveUnit(number).get(2)).getHandle()) {
+			switch(DefaultUnit.WEAPON_DATA_MAP.get(getActiveUnit(number).get(2)).getHandle()) {
 			case 0:
 				change(number, selectWeapon);
 				break;
